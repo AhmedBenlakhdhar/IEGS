@@ -1,0 +1,490 @@
+/* static/css/custom.css - "Serene Structure" Minimalist Theme */
+
+/* 1. Variables and Base */
+:root {
+  --bg-main: #f8f9fa;         /* Off-white background */
+  --bg-element: #ffffff;       /* White for cards/elements */
+  --text-primary: #212529;    /* Dark text */
+  --text-secondary: #6c757d;   /* Grey secondary text */
+  --accent-primary: #206a5d;   /* Deep Desaturated Teal */
+  --accent-hover: #184d43;    /* Darker Teal */
+  --border-color: #dee2e6;    /* Standard light border */
+  --border-accent: #81b29a;   /* Muted green-grey accent border */
+
+  /* Rating Colors - Muted but clear */
+  --rating-halal: #60a686;     /* Soft Green */
+  --rating-mashbouh: #ffb74d;  /* Soft Orange */
+  --rating-haram: #e57373;     /* Soft Red */
+  --rating-kufr: #90a4ae;      /* Blue Grey */
+
+  --font-heading: 'Roboto Condensed', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1140px; /* Standard container width */
+}
+
+/* 2. Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem; /* Consistent heading margin */
+}
+
+h1 { font-size: 2.25rem; letter-spacing: 0.5px; margin-bottom: 1.5rem;}
+h4 { font-size: 1.25rem; } /* Card titles */
+h5 { font-size: 1.1rem; } /* Section titles */
+
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* 3. Header & Navigation */
+.site-header {
+  background-color: var(--bg-element);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.site-brand {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--text-primary) !important; /* Override Bootstrap */
+}
+
+.navbar .nav-link {
+  font-family: var(--font-body); /* Use body font for nav links */
+  font-weight: 600; /* Slightly bolder */
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem; /* Standard padding */
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.navbar .nav-link::after { /* Underline effect for active/hover */
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1rem; /* Match padding */
+    right: 1rem; /* Match padding */
+    height: 2px;
+    background-color: var(--accent-primary);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease-out;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: var(--accent-primary);
+}
+
+.navbar .nav-link:hover::after,
+.navbar .nav-link.active::after {
+  transform: scaleX(1);
+}
+
+.navbar .admin-link:hover,
+.navbar .admin-link:hover::after {
+    color: var(--rating-haram); /* Use a standard alert color */
+    background-color: transparent !important; /* Override potential BS hover bg */
+}
+.navbar .admin-link:hover::after {
+    background-color: var(--rating-haram);
+}
+
+
+.navbar-toggler {
+    border-color: var(--border-color);
+}
+.navbar-toggler-icon {
+    /* Default Bootstrap icon is fine for minimalist */
+}
+
+/* 4. Main Content & Page Headers */
+.main-content {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.page-header { /* Optional class for main h1 titles */
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+.page-header h1 {
+    margin-bottom: 0; /* Remove margin if using page-header div */
+}
+
+
+/* 5. Game Card */
+.game-card { /* Using Bootstrap .card structure is okay here */
+  background-color: var(--bg-element);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: 1.5rem; /* Replaces grid gap */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative; /* For accent */
+  overflow: hidden; /* Ensures accent doesn't overflow weirdly */
+}
+
+/* Subtle Islamic Geometric Accent */
+.game-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px; /* Thickness of accent border */
+    background-color: var(--border-accent); /* Use muted accent */
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s ease;
+    /* Optional: Add a subtle pattern to the border */
+    /* background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.1) 75%, transparent 75%, transparent); */
+    /* background-size: 8px 8px; */
+}
+
+.game-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+}
+.game-card:hover::before {
+    opacity: 1; /* Show accent on hover */
+}
+
+.card-img-top { /* Bootstrap class */
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-bottom: 1px solid var(--border-color);
+}
+/* Placeholder */
+.card-img-top.bg-secondary {
+    background-color: #e9ecef !important; /* Lighter placeholder */
+    display: flex; align-items: center; justify-content: center;
+}
+.card-img-top.bg-secondary span { color: var(--text-secondary); font-size: 0.9rem; }
+
+.card-body { /* Bootstrap class */
+  padding: 1.25rem;
+}
+
+.card-title { /* Bootstrap class, h5 in template */
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.2rem; /* Slightly smaller */
+  margin-bottom: 0.5rem;
+}
+
+.game-meta { /* Custom class for dev/publisher */
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.rating-flags-container {
+    margin-bottom: 1rem;
+}
+
+/* Rating Badges */
+.rating-badge {
+  display: inline-block;
+  font-family: var(--font-body); /* Body font for badges */
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.3em 0.8em;
+  border-radius: 4px;
+  color: var(--text-primary); /* Dark text often better contrast */
+  margin-right: 5px;
+  margin-bottom: 5px;
+  line-height: 1.2;
+  text-align: center;
+  border: 1px solid transparent; /* Base border */
+}
+/* Apply Rating Colors */
+.rating-HAL { background-color: var(--rating-halal); border-color: #4d8f71; color: #fff;} /* White text on green */
+.rating-MSH { background-color: var(--rating-mashbouh); border-color: #d99221;}
+.rating-HRM { background-color: var(--rating-haram); border-color: #c95f5f; color: #fff;} /* White text on red */
+.rating-KSK { background-color: var(--rating-kufr); border-color: #768a96; color: #fff;} /* White text on grey */
+
+/* Flags */
+.flag-symbol {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: #e9ecef; /* Light grey background */
+  padding: 0.2em 0.6em;
+  border-radius: 10px; /* Pill */
+  margin-right: 5px;
+  margin-bottom: 5px;
+  line-height: 1;
+  vertical-align: middle;
+}
+.flag-symbol:hover {
+    cursor: default;
+    background-color: #ced4da; /* Darken slightly on hover */
+}
+
+/* Card Button */
+.btn.btn-outline-primary { /* Styling Bootstrap's outline button */
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    padding: 0.4rem 1rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.btn.btn-outline-primary:hover {
+    background-color: var(--accent-primary);
+    color: #ffffff;
+}
+
+/* 6. Detail Page */
+.detail-image-wrapper {
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-element);
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+}
+.detail-image-wrapper img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 2px; /* Slight inner radius */
+}
+/* Placeholder */
+.detail-image-wrapper .img-fluid.rounded.shadow {
+    min-height: 250px; /* Ensure placeholder has height */
+    display: flex; align-items: center; justify-content: center;
+    background-color: #e9ecef; color: var(--text-secondary);
+}
+
+
+.detail-title { /* h1 */
+    font-size: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.detail-meta { /* Dev/Publisher */
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dotted var(--border-color); /* Dotted divider */
+}
+.detail-section:first-of-type { /* No top border on first section */
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+.detail-section h5 { /* Section Titles */
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent-primary);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-rating-area .rating-badge {
+    font-size: 0.9rem;
+    padding: 0.4em 1em;
+}
+.detail-flags .flag-symbol {
+    font-size: 1rem;
+}
+
+/* Back Link */
+.back-link { /* Replaces back-button class */
+    display: inline-block;
+    margin-top: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+.back-link:hover {
+    color: var(--text-primary);
+    text-decoration: underline;
+}
+
+/* 7. Articles */
+.article-item { /* List item */
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.article-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.article-item h4 { /* Title in list */
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    margin-bottom: 0.25rem;
+}
+.article-item h4 a {
+    color: var(--text-primary);
+}
+.article-item h4 a:hover {
+    color: var(--accent-primary);
+    text-decoration: none;
+}
+
+.article-meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.article-excerpt {
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.read-more-link {
+    font-weight: 600;
+}
+
+/* Article Detail */
+.article-detail-meta {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+.article-content p {
+    margin-bottom: 1.25rem;
+}
+.article-content strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* 8. Footer */
+.site-footer {
+  background-color: var(--bg-element);
+  border-top: 1px solid var(--border-color);
+  padding: 1.5rem 0;
+  margin-top: 3rem; /* Ensure space above footer */
+}
+
+.footer-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+}
+
+/* Responsive Adjustments (Bootstrap handles grid mostly) */
+@media (max-width: 768px) {
+    h1 { font-size: 1.8rem; }
+    .detail-title { font-size: 1.6rem; }
+    .main-content { padding-top: 2rem; padding-bottom: 2rem; }
+}
+
+/* 9. Card Link Wrapper Style */
+a.card-link-wrapper {
+    display: block; /* Make the link behave like a block */
+    text-decoration: none; /* Remove underline */
+    color: inherit; /* Inherit text color from parent (body) */
+    transition: none; /* Prevent default link color transition */
+}
+
+a.card-link-wrapper:hover {
+    text-decoration: none; /* Ensure no underline on hover */
+    color: inherit; /* Keep text color inherited */
+}
+
+/* Ensure text inside the card maintains correct color */
+a.card-link-wrapper .card-body h4,
+a.card-link-wrapper .card-body .game-meta,
+a.card-link-wrapper .card-body .rating-badge, /* May need !important if conflicting */
+a.card-link-wrapper .card-body .flag-symbol {
+   /* Re-apply specific colors if needed, or rely on inheritance */
+   /* Example: */
+   color: var(--text-primary); /* For card title */
+}
+a.card-link-wrapper .card-body .game-meta {
+    color: var(--text-secondary);
+}
+/* Ensure badge/flag colors set in their specific rules are maintained */
+a.card-link-wrapper .rating-badge {
+    /* Colors are set by .rating-HAL etc. */
+}
+a.card-link-wrapper .flag-symbol {
+    /* Color is set by .flag-symbol rule */
+}
+
+
+/* 10. Homepage Specific Styles (Optional) */
+.homepage-hero {
+    background-color: var(--bg-element);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.section-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--accent-primary);
+}
+
+.article-summary h5 a:hover {
+    color: var(--accent-hover);
+    text-decoration: none;
+}
+.article-summary-meta {
+    font-size: 0.85rem;
+}
+.article-summary-excerpt {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+hr { /* Use Bootstrap hr class if preferred */
+    border-top: 1px solid var(--border-color);
+    opacity: 0.5;
+}
+
+/* 11. Search Form Styles */
+.search-form input[type="search"] {
+    min-width: 200px; /* Or adjust as needed */
+}
+.search-form .btn { /* Style search button */
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+ .search-form .btn:hover {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #fff;
+}

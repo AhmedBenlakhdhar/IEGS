@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}IEGS Game Ratings{% endblock %}
+
+{% block content %}
+  <div class="page-header d-flex justify-content-between align-items-center">
+    <h1>Game Ratings</h1>
+    {# --- START: Search Form --- #}
+    <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form">
+        <input class="form-control me-2" type="search" placeholder="Search Games..." aria-label="Search" name="q" value="{{ search_query|default:'' }}">
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+    </form>
+    {# --- END: Search Form --- #}
+  </div>
+
+  {% if search_query %}
+      <p class="mb-3 text-secondary">Showing results for: <strong>"{{ search_query }}"</strong></p>
+  {% endif %}
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for game in games %}
+    <div class="col">
+         {# Use the snippet here #}
+         {% include 'ratings/includes/game_card_snippet.html' with game=game %}
+    </div>
+    {% empty %}
+      <p class="col-12 text-center text-secondary">
+        {% if search_query %}
+          No games found matching your search criteria.
+        {% else %}
+          No games rated yet.
+        {% endif %}
+      </p>
+    {% endfor %}
+  </div>
+{% endblock %}

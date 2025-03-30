@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ game.title }} - IEGS Rating{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4 col-md-5 mb-4"> {# Bootstrap grid column for image #}
+        <div class="detail-image-wrapper"> {# Custom wrapper class #}
+          {% if game.cover_image_url %}
+            <img src="{{ game.cover_image_url }}" class="img-fluid" alt="{{ game.title }} Cover"> {# Bootstrap img-fluid #}
+          {% else %}
+            <div class="img-fluid rounded shadow"> {# Placeholder styling class #}
+                <span>No Image Available</span>
+            </div>
+          {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-8 col-md-7"> {# Bootstrap grid column for content #}
+        <h1 class="detail-title">{{ game.title }}</h1> {# Custom class #}
+        <p class="detail-meta"> {# Custom class #}
+            {% if game.developer %}{{ game.developer }}{% endif %}
+            {% if game.developer and game.publisher %} / {% endif %}
+            {% if game.publisher %}{{ game.publisher }}{% endif %}
+            {% if game.release_date %} (Released: {{ game.release_date|date:"F Y" }}){% endif %}
+        </p>
+
+        <div class="detail-section detail-rating-area"> {# Custom class #}
+            <h5>IEGS Rating</h5> {# Custom class applies style #}
+            <span class="rating-badge rating-{{ game.rating_tier.tier_code }}">
+               {{ game.rating_tier.display_name|cut:"✅"|cut:"⚠️"|cut:"❌"|cut:"🛑"|slice:"1:" }}
+           </span>
+        </div>
+
+        <div class="detail-section detail-rationale"> {# Custom class #}
+            <h5>Rationale</h5> {# Custom class applies style #}
+            <p>{{ game.rationale|linebreaks }}</p>
+        </div>
+
+        {% if game.flags.exists %}
+        <div class="detail-section detail-flags"> {# Custom class #}
+            <h5>Content Flags</h5> {# Custom class applies style #}
+            <p>
+                {% for flag in game.flags.all %}
+                    <span class="flag-symbol" title="{{ flag.description }}">{{ flag.symbol }}</span>
+                {% endfor %}
+            </p>
+        </div>
+        {% endif %}
+
+        {% if game.summary %}
+        <div class="detail-section detail-summary"> {# Custom class #}
+            <h5>Summary</h5> {# Custom class applies style #}
+            <p>{{ game.summary|linebreaks }}</p>
+        </div>
+        {% endif %}
+
+         <p class="mt-4" style="font-size: 0.85rem; color: var(--text-secondary);">
+            Rating added: {{ game.date_added|date:"N j, Y" }} | Last updated: {{ game.date_updated|date:"N j, Y" }}
+        </p>
+
+        <a href="{% url 'ratings:game_list' %}" class="back-link">← Back to Game Ratings</a> {# Custom class #}
+
+    </div>
+</div>
+{% endblock %}

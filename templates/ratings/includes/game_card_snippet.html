@@ -1,0 +1,38 @@
+{# templates/ratings/includes/game_card_snippet.html #}
+{% load static %}
+
+{# --- Make the entire card a link --- #}
+<a href="{{ game.get_absolute_url }}" class="card-link-wrapper">
+  <div class="card game-card h-100">
+    {% if game.cover_image_url %}
+      <img src="{{ game.cover_image_url }}" class="card-img-top" alt="{{ game.title }} Cover">
+    {% else %}
+      <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 180px;">
+        <span>No Image</span>
+      </div>
+    {% endif %}
+
+    <div class="card-body d-flex flex-column">
+      <h4 class="card-title">{{ game.title }}</h4>
+
+      <p class="game-meta">
+         {% if game.developer %}{{ game.developer }}{% endif %}
+         {% if game.developer and game.publisher %} / {% endif %}
+         {% if game.publisher %}{{ game.publisher }}{% endif %}
+         {% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}
+      </p>
+
+      <div class="rating-flags-container mt-auto pt-2"> {# mt-auto pushes this down #}
+         <span class="rating-badge rating-{{ game.rating_tier.tier_code }}">
+             {{ game.rating_tier.display_name|cut:"✅"|cut:"⚠️"|cut:"❌"|cut:"🛑"|slice:"1:" }}
+         </span>
+         <br>
+         {% for flag in game.flags.all %}
+           <span class="flag-symbol" title="{{ flag.description }}">{{ flag.symbol }}</span>
+         {% endfor %}
+      </div>
+
+      {# REMOVED DETAILS BUTTON #}
+    </div>
+  </div>
+</a>

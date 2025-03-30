@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }} - IEGS Article{% endblock %}
+
+{% block content %}
+  <article class="article-detail-wrapper mb-4"> {# Optional wrapper #}
+      <h1>{{ article.title }}</h1> {# Standard H1 #}
+      <p class="article-detail-meta"> {# Custom class #}
+          Published: {{ article.published_date|date:"F j, Y" }}
+          {% if article.author_name %} | By: {{ article.author_name }}{% endif %}
+      </p>
+
+      <div class="article-content"> {# Custom class #}
+          {{ article.content|linebreaks }}
+      </div>
+
+      <a href="{% url 'articles:article_list' %}" class="back-link mt-4">← Back to Articles</a> {# Custom class #}
+  </article>
+{% endblock %}
