@@ -1,7 +1,6 @@
 {# templates/ratings/includes/game_card_snippet.html #}
 {% load static %}
 
-{# --- Make the entire card a link --- #}
 <a href="{{ game.get_absolute_url }}" class="card-link-wrapper">
   <div class="card game-card h-100">
     {% if game.cover_image_url %}
@@ -22,17 +21,22 @@
          {% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}
       </p>
 
-      <div class="rating-flags-container mt-auto pt-2"> {# mt-auto pushes this down #}
-         <span class="rating-badge rating-{{ game.rating_tier.tier_code }}">
-             {{ game.rating_tier.display_name|cut:"✅"|cut:"⚠️"|cut:"❌"|cut:"🛑"|slice:"1:" }}
+      {# Push ratings/flags to bottom #}
+      <div class="rating-flags-container mt-auto pt-2">
+         <span class="rating-badge rating-{{ game.rating_tier.tier_code }}"
+               style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};">
+             <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>
+             <span class="rating-label">{{ game.rating_tier.display_name }}</span>
          </span>
-         <br>
+         {% if game.requires_adjustment %} {# Added adjustment badge here too #}
+              <span class="badge adjustment-badge ms-1">Adjustable</span>
+         {% endif %}
+         <br class="mt-1"> {# Slightly more space before flags #}
          {% for flag in game.flags.all %}
-           <span class="flag-symbol" title="{{ flag.description }}">{{ flag.symbol }}</span>
+           <span class="flag-symbol material-symbols-outlined" title="{{ flag.description }}">{{ flag.symbol }}</span>
          {% endfor %}
       </div>
 
-      {# REMOVED DETAILS BUTTON #}
     </div>
   </div>
 </a>

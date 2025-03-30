@@ -1,0 +1,74 @@
+{# templates/registration/signup.html #}
+{% extends "base.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card bg-element">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">Sign Up</h2>
+
+                 {# Display non-field errors (if any) #}
+                 {% if form.non_field_errors %}
+                     <div class="alert alert-danger" role="alert">
+                         {% for error in form.non_field_errors %}
+                           <p class="mb-0">{{ error }}</p>
+                         {% endfor %}
+                     </div>
+                 {% endif %}
+
+                 {# Display messages from views.py (success/error) #}
+                 {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                 {% endif %}
+
+
+                <form method="post" action="{% url 'signup' %}"> {# Point action to the signup URL name #}
+                    {% csrf_token %}
+
+                    {# Render each field with its label and errors #}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {# Add form-control class to the input widget #}
+                            {{ field.as_widget|attr:"class:form-control" }}
+                            {# Display help text if exists #}
+                            {% if field.help_text %}
+                                <div class="form-text text-secondary">{{ field.help_text|safe }}</div>
+                            {% endif %}
+                            {# Display field-specific errors #}
+                            {% if field.errors %}
+                                <div class="invalid-feedback d-block"> {# Force display #}
+                                    {% for error in field.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary filter-apply-btn">Sign Up</button>
+                    </div>
+                </form>
+
+                 <p class="text-center mt-3 small">
+                    Already have an account? <a href="{% url 'login' %}" class="text-secondary">Login</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{# Simple template filter to add attributes (like class) to form widgets #}
+{% include "includes/attr_filter.html" %}
+{% endblock %}

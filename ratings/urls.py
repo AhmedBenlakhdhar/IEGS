@@ -1,14 +1,14 @@
-# ratings/urls.py
+# ratings/urls.py - FULL FILE
 from django.urls import path
 from . import views
 
-app_name = 'ratings'  # Define the namespace for this app
+app_name = 'ratings'
 
 urlpatterns = [
-    # e.g., /games/ (Handled by the root path in iegs_project/urls.py if using 'home')
-    # If you want a separate /games/ path distinct from home, keep this:
+    # Changed game_list to accept optional slugs
     path('', views.game_list, name='game_list'),
-
-    # e.g., /games/minecraft-survival/
-    path('<slug:game_slug>/', views.game_detail, name='game_detail'),
+    path('developer/<slug:developer_slug>/', views.game_list, name='games_by_developer'),
+    path('publisher/<slug:publisher_slug>/', views.game_list, name='games_by_publisher'),
+    path('glossary/', views.glossary_view, name='glossary'), # NEW: Glossary page
+    path('<slug:game_slug>/', views.game_detail, name='game_detail'), # Keep game detail last
 ]

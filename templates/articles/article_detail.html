@@ -4,17 +4,26 @@
 {% block title %}{{ article.title }} - IEGS Article{% endblock %}
 
 {% block content %}
-  <article class="article-detail-wrapper mb-4"> {# Optional wrapper #}
-      <h1>{{ article.title }}</h1> {# Standard H1 #}
-      <p class="article-detail-meta"> {# Custom class #}
+  <article class="article-detail-wrapper mb-4">
+
+      {# --- NEW: Display Header Image --- #}
+      {% if article.header_image_url %}
+      <div class="article-header-image mb-4 text-center">
+          <img src="{{ article.header_image_url }}" class="img-fluid rounded shadow-sm" alt="{{ article.title }} Header Image" style="max-height: 400px;"> {# Limit height potentially #}
+      </div>
+      {% endif %}
+      {# --- End Header Image --- #}
+
+      <h1 class="article-detail-title">{{ article.title }}</h1>
+      <p class="article-detail-meta">
           Published: {{ article.published_date|date:"F j, Y" }}
           {% if article.author_name %} | By: {{ article.author_name }}{% endif %}
       </p>
 
-      <div class="article-content"> {# Custom class #}
+      <div class="article-content">
           {{ article.content|linebreaks }}
       </div>
 
-      <a href="{% url 'articles:article_list' %}" class="back-link mt-4">← Back to Articles</a> {# Custom class #}
+      <a href="{% url 'articles:article_list' %}" class="back-link mt-4">← Back to Articles</a>
   </article>
 {% endblock %}

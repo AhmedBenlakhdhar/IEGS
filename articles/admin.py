@@ -9,3 +9,5 @@ class ArticleAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'published_date'
     ordering = ('-published_date',)
+    # Add fields to admin form
+    fields = ('title', 'slug', 'header_image_url', 'author_name', 'published_date', 'content') # Added header_image_url

@@ -1,67 +1,264 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ game.title }} - IEGS Rating{% endblock %}
+{% block title %}{{ game.title }} - IEGS Rating Details{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-4 col-md-5 mb-4"> {# Bootstrap grid column for image #}
-        <div class="detail-image-wrapper"> {# Custom wrapper class #}
-          {% if game.cover_image_url %}
-            <img src="{{ game.cover_image_url }}" class="img-fluid" alt="{{ game.title }} Cover"> {# Bootstrap img-fluid #}
-          {% else %}
-            <div class="img-fluid rounded shadow"> {# Placeholder styling class #}
-                <span>No Image Available</span>
-            </div>
-          {% endif %}
+{# --- Game Header Info --- #}
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-4">
+        <div class="detail-image-wrapper mb-3 mb-md-0">
+            {% if game.cover_image_url %}
+                <img src="{{ game.cover_image_url }}" class="img-fluid" alt="{{ game.title }} Cover">
+            {% else %}
+                <div class="img-fluid rounded shadow"><span>No Image</span></div>
+            {% endif %}
         </div>
+         {# --- Store Links --- #}
+         {% if game.rating_tier.tier_code == 'HAL' or game.rating_tier.tier_code == 'MSH' %}
+             {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}
+                <div class="store-links-section mt-3">
+                    <h6 class="store-links-title">Available On:</h6>
+                    {% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">Steam</a>{% endif %}
+                    {% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">Epic Games</a>{% endif %}
+                    {% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">GOG</a>{% endif %}
+                     {% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">Other</a>{% endif %}
+                </div>
+            {% endif %}
+         {% endif %}
     </div>
-
-    <div class="col-lg-8 col-md-7"> {# Bootstrap grid column for content #}
-        <h1 class="detail-title">{{ game.title }}</h1> {# Custom class #}
-        <p class="detail-meta"> {# Custom class #}
-            {% if game.developer %}{{ game.developer }}{% endif %}
-            {% if game.developer and game.publisher %} / {% endif %}
-            {% if game.publisher %}{{ game.publisher }}{% endif %}
-            {% if game.release_date %} (Released: {{ game.release_date|date:"F Y" }}){% endif %}
+    <div class="col-lg-9 col-md-8">
+        <h1 class="detail-title mb-1">{{ game.title }}</h1>
+        <p class="detail-meta mb-2">
+             {# --- Make Dev/Pub links --- #}
+             {% if game.developer and game.developer_slug %}
+                 <a href="{% url 'ratings:games_by_developer' developer_slug=game.developer_slug %}">{{ game.developer }}</a>
+             {% elif game.developer %}
+                 {{ game.developer }}
+             {% endif %}
+             {% if game.developer and game.publisher %} / {% endif %}
+              {% if game.publisher and game.publisher_slug %}
+                 <a href="{% url 'ratings:games_by_publisher' publisher_slug=game.publisher_slug %}">{{ game.publisher }}</a>
+             {% elif game.publisher %}
+                 {{ game.publisher }}
+             {% endif %}
+            {% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}
         </p>
-
-        <div class="detail-section detail-rating-area"> {# Custom class #}
-            <h5>IEGS Rating</h5> {# Custom class applies style #}
-            <span class="rating-badge rating-{{ game.rating_tier.tier_code }}">
-               {{ game.rating_tier.display_name|cut:"✅"|cut:"⚠️"|cut:"❌"|cut:"🛑"|slice:"1:" }}
-           </span>
+        {# --- Overall Rating Display --- #}
+        <div class="mb-3 detail-overall-rating">
+            <span class="fw-bold me-2">Overall IEGS Rating:</span>
+				 <span class="rating-badge rating-{{ game.rating_tier.tier_code }}"
+					   style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};">
+					 <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>
+					 <span class="rating-label">{{ game.rating_tier.display_name }}</span>
+				 </span>
+            {% if game.requires_adjustment %}
+                <span class="badge adjustment-badge ms-2">Requires Adjustment</span>
+            {% endif %}
         </div>
 
-        <div class="detail-section detail-rationale"> {# Custom class #}
-            <h5>Rationale</h5> {# Custom class applies style #}
-            <p>{{ game.rationale|linebreaks }}</p>
-        </div>
-
+         {# --- Quick Flags --- #}
         {% if game.flags.exists %}
-        <div class="detail-section detail-flags"> {# Custom class #}
-            <h5>Content Flags</h5> {# Custom class applies style #}
-            <p>
-                {% for flag in game.flags.all %}
-                    <span class="flag-symbol" title="{{ flag.description }}">{{ flag.symbol }}</span>
-                {% endfor %}
-            </p>
+        <div class="mb-3">
+             <span class="fw-bold me-2">Content Flags:</span>
+            {% for flag in game.flags.all %}
+                <span class="flag-symbol material-symbols-outlined" title="{{ flag.description }}">{{ flag.symbol }}</span>
+            {% endfor %}
         </div>
         {% endif %}
-
+         {# --- Optional Summary --- #}
         {% if game.summary %}
-        <div class="detail-section detail-summary"> {# Custom class #}
-            <h5>Summary</h5> {# Custom class applies style #}
-            <p>{{ game.summary|linebreaks }}</p>
-        </div>
+            <p class="game-summary text-secondary">{{ game.summary }}</p>
         {% endif %}
 
-         <p class="mt-4" style="font-size: 0.85rem; color: var(--text-secondary);">
-            Rating added: {{ game.date_added|date:"N j, Y" }} | Last updated: {{ game.date_updated|date:"N j, Y" }}
-        </p>
-
-        <a href="{% url 'ratings:game_list' %}" class="back-link">← Back to Game Ratings</a> {# Custom class #}
+        {# --- NEW: Adjustment Guide --- #}
+        {% if game.requires_adjustment and game.adjustment_guide %}
+        <div class="adjustment-guide-section mt-4">
+             <h5>Adjustment Guide</h5>
+             <div class="adjustment-guide-content">
+                {{ game.adjustment_guide|linebreaks }}
+             </div>
+        </div>
+        {% endif %}
 
     </div>
 </div>
+
+{# --- START: Critic Reviews Section --- #}
+{% if game.critic_reviews.exists %}
+<div class="critic-reviews-section">
+    <h2 class="critic-reviews-title">Critic Reviews</h2>
+    <div class="row row-cols-1 row-cols-md-2 g-3"> {# Grid for reviews #}
+        {% for review in game.critic_reviews.all %}
+        <div class="col">
+            <div class="critic-review-card">
+                <div class="critic-review-header">
+                    <span class="critic-name">{{ review.reviewer_name }}</span>
+                    {% if review.score %}
+                    <span class="critic-score">{{ review.score }}</span>
+                    {% endif %}
+                </div>
+                {% if review.summary %}
+                <blockquote class="critic-summary">
+                    "{{ review.summary|truncatewords:25 }}" {# Show a truncated quote #}
+                </blockquote>
+                {% endif %}
+                <a href="{{ review.review_url }}" class="critic-link" target="_blank" rel="noopener noreferrer">
+                    Read Full Review <span class="material-symbols-outlined external-link-icon">open_in_new</span>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{# --- END: Critic Reviews Section --- #}
+
+{# --- START: Islamic Parental Guide Section --- #}
+<div class="iegs-guide-section">
+    <h2 class="guide-section-title">Islamic Guidance Breakdown</h2>
+
+    {# --- Spoiler Warning (Conditional) --- #}
+    {% if game.has_spoilers_in_details %}
+    <div class="alert alert-warning spoiler-alert" role="alert">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
+          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+      </svg>
+      <strong>Spoiler Warning:</strong> Details below may contain plot spoilers. Click 'Show/Hide Details' where available to reveal.
+    </div>
+    {% endif %}
+
+    {# --- Category Blocks --- #}
+    {# Aqidah & Ideology #}
+    {% if game.aqidah_severity != 'N' or game.aqidah_details %}
+    <div class="guide-category-block">
+        <div class="guide-category-header">
+            <span class="category-title-text">Aqidah & Ideology</span>
+            <span class="severity-circle {{ game.aqidah_severity_css_class|lower }}" title="Severity: {{ game.aqidah_severity_display }}"></span>
+        </div>
+        <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsAqidah" {% else %} class="" {% endif %}>
+            <div class="guide-category-details">
+                {% if game.aqidah_details %}{{ game.aqidah_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">No specific details provided.</p>{% endif %}
+                {% if game.aqidah_reason %}<div class="category-reason"><hr><p><strong>Reasoning/Reference:</strong><br>{{ game.aqidah_reason|linebreaksbr }}</p></div>{% endif %}
+            </div>
+        </div>
+        {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsAqidah" aria-expanded="false" aria-controls="detailsAqidah">Show/Hide Details</button></div>{% endif %}
+    </div>
+    {% endif %}
+
+    {# Violence & Aggression #}
+    {% if game.violence_severity != 'N' or game.violence_details %}
+    <div class="guide-category-block">
+        <div class="guide-category-header">
+            <span class="category-title-text">Violence & Aggression</span>
+            <span class="severity-circle {{ game.violence_severity_css_class|lower }}" title="Severity: {{ game.violence_severity_display }}"></span>
+        </div>
+        <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsViolence" {% else %} class="" {% endif %}>
+            <div class="guide-category-details">
+                {% if game.violence_details %}{{ game.violence_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">No specific details provided.</p>{% endif %}
+                {% if game.violence_reason %}<div class="category-reason"><hr><p><strong>Reasoning/Reference:</strong><br>{{ game.violence_reason|linebreaksbr }}</p></div>{% endif %}
+            </div>
+        </div>
+        {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsViolence" aria-expanded="false" aria-controls="detailsViolence">Show/Hide Details</button></div>{% endif %}
+    </div>
+    {% endif %}
+
+    {# Immorality & Indecency #}
+    {% if game.immorality_severity != 'N' or game.immorality_details %}
+     <div class="guide-category-block">
+        <div class="guide-category-header">
+            <span class="category-title-text">Immorality & Indecency</span>
+            <span class="severity-circle {{ game.immorality_severity_css_class|lower }}" title="Severity: {{ game.immorality_severity_display }}"></span>
+        </div>
+         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsImmorality" {% else %} class="" {% endif %}>
+            <div class="guide-category-details">
+                 {% if game.immorality_details %}{{ game.immorality_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">No specific details provided.</p>{% endif %}
+                 {% if game.immorality_reason %}<div class="category-reason"><hr><p><strong>Reasoning/Reference:</strong><br>{{ game.immorality_reason|linebreaksbr }}</p></div>{% endif %}
+            </div>
+        </div>
+         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsImmorality" aria-expanded="false" aria-controls="detailsImmorality">Show/Hide Details</button></div>{% endif %}
+    </div>
+    {% endif %}
+
+    {# Haram Substances & Gambling #}
+    {% if game.substances_gambling_severity != 'N' or game.substances_gambling_details %}
+     <div class="guide-category-block">
+        <div class="guide-category-header">
+            <span class="category-title-text">Haram Substances & Gambling</span>
+            <span class="severity-circle {{ game.substances_gambling_severity_css_class|lower }}" title="Severity: {{ game.substances_gambling_severity_display }}"></span>
+        </div>
+         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsSubstances" {% else %} class="" {% endif %}>
+            <div class="guide-category-details">
+                 {% if game.substances_gambling_details %}{{ game.substances_gambling_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">No specific details provided.</p>{% endif %}
+                 {% if game.substances_gambling_reason %}<div class="category-reason"><hr><p><strong>Reasoning/Reference:</strong><br>{{ game.substances_gambling_reason|linebreaksbr }}</p></div>{% endif %}
+            </div>
+        </div>
+         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsSubstances" aria-expanded="false" aria-controls="detailsSubstances">Show/Hide Details</button></div>{% endif %}
+    </div>
+    {% endif %}
+
+    {# Audio & Music #}
+    {% if game.audio_music_severity != 'N' or game.audio_music_details %}
+     <div class="guide-category-block">
+        <div class="guide-category-header">
+            <span class="category-title-text">Audio & Music</span>
+            <span class="severity-circle {{ game.audio_music_severity_css_class|lower }}" title="Severity: {{ game.audio_music_severity_display }}"></span>
+        </div>
+         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsAudio" {% else %} class="" {% endif %}>
+            <div class="guide-category-details">
+                 {% if game.audio_music_details %}{{ game.audio_music_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">No specific details provided.</p>{% endif %}
+                 {% if game.audio_music_reason %}<div class="category-reason"><hr><p><strong>Reasoning/Reference:</strong><br>{{ game.audio_music_reason|linebreaksbr }}</p></div>{% endif %}
+            </div>
+        </div>
+         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsAudio" aria-expanded="false" aria-controls="detailsAudio">Show/Hide Details</button></div>{% endif %}
+    </div>
+    {% endif %}
+
+    {# Time Commitment & Addiction Potential #}
+    {% if game.time_addiction_severity != 'N' or game.time_addiction_details %}
+     <div class="guide-category-block">
+        <div class="guide-category-header">
+            <span class="category-title-text">Time Commitment & Addiction Potential</span>
+            <span class="severity-circle {{ game.time_addiction_severity_css_class|lower }}" title="Severity: {{ game.time_addiction_severity_display }}"></span>
+        </div>
+         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsTime" {% else %} class="" {% endif %}>
+            <div class="guide-category-details">
+                 {% if game.time_addiction_details %}{{ game.time_addiction_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">No specific details provided.</p>{% endif %}
+                 {% if game.time_addiction_reason %}<div class="category-reason"><hr><p><strong>Reasoning/Reference:</strong><br>{{ game.time_addiction_reason|linebreaksbr }}</p></div>{% endif %}
+            </div>
+        </div>
+         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsTime" aria-expanded="false" aria-controls="detailsTime">Show/Hide Details</button></div>{% endif %}
+    </div>
+    {% endif %}
+
+    {# Online Conduct & Interaction #}
+    {% if game.online_conduct_severity != 'N' or game.online_conduct_details %}
+     <div class="guide-category-block">
+        <div class="guide-category-header">
+            <span class="category-title-text">Online Conduct & Interaction</span>
+            <span class="severity-circle {{ game.online_conduct_severity_css_class|lower }}" title="Severity: {{ game.online_conduct_severity_display }}"></span>
+        </div>
+         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsOnline" {% else %} class="" {% endif %}>
+            <div class="guide-category-details">
+                 {% if game.online_conduct_details %}{{ game.online_conduct_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">No specific details provided.</p>{% endif %}
+                 {% if game.online_conduct_reason %}<div class="category-reason"><hr><p><strong>Reasoning/Reference:</strong><br>{{ game.online_conduct_reason|linebreaksbr }}</p></div>{% endif %}
+            </div>
+        </div>
+         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsOnline" aria-expanded="false" aria-controls="detailsOnline">Show/Hide Details</button></div>{% endif %}
+    </div>
+    {% endif %}
+
+    {# --- No Concerns Message --- #}
+    {# Logic remains the same #}
+    {% with has_aqidah=game.aqidah_details has_violence=game.violence_details has_immorality=game.immorality_details has_substances=game.substances_gambling_details has_audio=game.audio_music_details has_time=game.time_addiction_details has_online=game.online_conduct_details %}
+        {% if game.aqidah_severity == 'N' and not has_aqidah and game.violence_severity == 'N' and not has_violence and game.immorality_severity == 'N' and not has_immorality and game.substances_gambling_severity == 'N' and not has_substances and game.audio_music_severity == 'N' and not has_audio and game.time_addiction_severity == 'N' and not has_time and game.online_conduct_severity == 'N' and not has_online %}
+            <p class="text-center text-secondary my-4">No significant Islamic concerns noted in the assessed categories.</p>
+        {% endif %}
+    {% endwith %}
+
+</div>
+{# --- END: Islamic Parental Guide Section --- #}
+
+<a href="{% url 'ratings:game_list' %}" class="back-link mt-4">← Back to Game Ratings</a>
+
 {% endblock %}

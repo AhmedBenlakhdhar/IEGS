@@ -1,37 +1,141 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}IEGS Game Ratings{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="page-header d-flex justify-content-between align-items-center">
-    <h1>Game Ratings</h1>
-    {# --- START: Search Form --- #}
-    <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form">
-        <input class="form-control me-2" type="search" placeholder="Search Games..." aria-label="Search" name="q" value="{{ search_query|default:'' }}">
+  <div class="page-header d-block d-md-flex justify-content-between align-items-center">
+    <h1>{{ page_title }}</h1>
+     {# --- START: Search Form --- #}
+     <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form mt-3 mt-md-0 ms-md-auto">
+        <input class="form-control me-2" type="search" placeholder="Search Title/Dev..." aria-label="Search" name="q" value="{{ search_query|default:'' }}">
         <button class="btn btn-outline-secondary" type="submit">Search</button>
-    </form>
+     </form>
     {# --- END: Search Form --- #}
   </div>
 
-  {% if search_query %}
-      <p class="mb-3 text-secondary">Showing results for: <strong>"{{ search_query }}"</strong></p>
-  {% endif %}
+   {% if filter_description %}
+        <div class="alert alert-info small" role="alert">
+            {{ filter_description|safe }} <a href="{% url 'ratings:game_list' %}" class="alert-link">Clear Filter</a>
+        </div>
+   {% endif %}
+
+  {# --- START: Filter/Sort Controls --- #}
+  <form method="GET" action="{% if developer_slug %}{% url 'ratings:games_by_developer' developer_slug=developer_slug %}{% elif publisher_slug %}{% url 'ratings:games_by_publisher' publisher_slug=publisher_slug %}{% else %}{% url 'ratings:game_list' %}{% endif %}" class="filter-sort-form card bg-element mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        {# --- Hidden Search Field (to keep search active when filtering/sorting) --- #}
+        {% if search_query %}
+            <input type="hidden" name="q" value="{{ search_query }}">
+        {% endif %}
+
+        {# --- Tier Filter --- #}
+        <div class="col-md-3 col-sm-6">
+          <label for="tierFilter" class="form-label form-label-sm">Rating Tier</label>
+          <select class="form-select form-select-sm" id="tierFilter" name="tier">
+            <option value="all" {% if not selected_tier or selected_tier == 'all' %}selected{% endif %}>All Tiers</option>
+            {% for tier in all_tiers %}
+              <option value="{{ tier.tier_code }}" {% if selected_tier == tier.tier_code %}selected{% endif %}>
+                {{ tier.icon_name }} {{ tier.display_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        {# --- Adjustment Filter --- #}
+        <div class="col-md-3 col-sm-6">
+           <label for="adjFilter" class="form-label form-label-sm">Adjustment</label>
+           <select class="form-select form-select-sm" id="adjFilter" name="adj">
+               <option value="" {% if not requires_adjustment_filter %}selected{% endif %}>Any</option>
+               <option value="yes" {% if requires_adjustment_filter == 'yes' %}selected{% endif %}>Required</option>
+               <option value="no" {% if requires_adjustment_filter == 'no' %}selected{% endif %}>Not Required</option>
+           </select>
+        </div>
+
+        {# --- Sort By --- #}
+        <div class="col-md-3 col-sm-6">
+          <label for="sortFilter" class="form-label form-label-sm">Sort By</label>
+          <select class="form-select form-select-sm" id="sortFilter" name="sort">
+            <option value="-date_added" {% if sort_by == '-date_added' %}selected{% endif %}>Date Added (Newest)</option>
+            <option value="date_added" {% if sort_by == 'date_added' %}selected{% endif %}>Date Added (Oldest)</option>
+            <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title (A-Z)</option>
+            <option value="-title" {% if sort_by == '-title' %}selected{% endif %}>Title (Z-A)</option>
+            <option value="-release_date" {% if sort_by == '-release_date' %}selected{% endif %}>Release Date (Newest)</option>
+            <option value="release_date" {% if sort_by == 'release_date' %}selected{% endif %}>Release Date (Oldest)</option>
+          </select>
+        </div>
+
+        {# --- Submit Button --- #}
+        <div class="col-md-3 col-sm-6 text-end">
+          <button type="submit" class="btn btn-sm btn-primary filter-apply-btn">Apply Filters</button>
+        </div>
+
+      </div>
+        {# --- Simple Flag Filter Links (Optional) --- #}
+        {% comment %}
+        <div class="mt-3 flag-filter-links">
+            <small>Filter by Flag:</small>
+            <a href="?{% query_transform request flag='' %}" class="badge bg-secondary text-decoration-none me-1 {% if not selected_flag %}active{% endif %}">All</a>
+            {% for flag in all_flags %}
+                 <a href="?{% query_transform request flag=flag.symbol %}" class="badge bg-secondary text-decoration-none me-1 {% if selected_flag == flag.symbol %}active{% endif %}">{{ flag.symbol }}</a>
+            {% endfor %}
+        </div>
+        {% endcomment %}
+    </div>
+  </form>
+  {# --- END: Filter/Sort Controls --- #}
+
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    {% for game in games %}
+    {% for game in games_page %} {# Use games_page from paginator #}
     <div class="col">
-         {# Use the snippet here #}
          {% include 'ratings/includes/game_card_snippet.html' with game=game %}
     </div>
     {% empty %}
       <p class="col-12 text-center text-secondary">
-        {% if search_query %}
-          No games found matching your search criteria.
+        {% if search_query or selected_tier != 'all' or requires_adjustment_filter or selected_flag %}
+          No games found matching your criteria. <a href="{% url 'ratings:game_list' %}">View all games?</a>
         {% else %}
           No games rated yet.
         {% endif %}
       </p>
     {% endfor %}
   </div>
+
+  {# --- START: Pagination --- #}
+    <nav aria-label="Game list navigation" class="mt-5">
+      <ul class="pagination justify-content-center">
+        {% if games_page.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">« First</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ games_page.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">« First</span></li>
+          <li class="page-item disabled"><span class="page-link">Previous</span></li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <span class="page-link">Page {{ games_page.number }} of {{ games_page.paginator.num_pages }}</span>
+        </li>
+
+
+        {% if games_page.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ games_page.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+          </li>
+           <li class="page-item">
+            <a class="page-link" href="?page={{ games_page.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Last »</a>
+          </li>
+        {% else %}
+           <li class="page-item disabled"><span class="page-link">Next</span></li>
+           <li class="page-item disabled"><span class="page-link">Last »</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {# --- END: Pagination --- #}
+
+
 {% endblock %}

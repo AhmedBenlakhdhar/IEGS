@@ -1,17 +1,18 @@
 # articles/models.py
 from django.db import models
-from django.contrib.auth.models import User # Optional: Link to users later
 from django.utils.text import slugify
-from django.urls import reverse # Ensure reverse is imported
+from django.urls import reverse
 from django.utils import timezone
 
 class Article(models.Model):
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=270, unique=True, blank=True, help_text="Unique URL-friendly name. Leave blank to auto-generate from title.")
+    # --- NEW: Header Image ---
+    header_image_url = models.URLField(max_length=300, blank=True, null=True, help_text="URL for an image to display at the top of the article.")
+    # --- End New Field ---
     content = models.TextField()
-    # author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) # Optional
     author_name = models.CharField(max_length=100, blank=True, help_text="Display author name (if not linked to user)")
-    published_date = models.DateTimeField(default=timezone.now, help_text="Set a future date to schedule publication.")
+    published_date = models.DateTimeField(default=timezone.now)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
