@@ -736,3 +736,62 @@ html[dir="rtl"] .article-list-simple .list-group-item small:first-of-type {
     /* Example: */
     /* order: -1; margin-right: auto; */
 }
+
+/* --- Styles for Severity Text and Reason Tooltip Icon --- */
+.severity-display {
+  /* Uses d-flex align-items-center from HTML */
+  gap: 0.25rem; /* Adds small space between circle/text/icon */
+}
+
+.severity-text {
+  font-size: 0.75rem; /* Smaller text */
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1; /* Align better with circle */
+}
+
+.info-icon {
+  font-size: 1rem; /* Icon size */
+  color: var(--text-secondary);
+  cursor: help; /* Indicate it provides help */
+  vertical-align: middle;
+  transition: color 0.2s ease;
+  line-height: 1; /* Align better */
+}
+
+.info-icon:hover {
+  color: var(--accent-primary);
+}
+
+/* RTL Adjustments for new elements */
+html[dir="rtl"] .severity-text.ms-2 {
+  margin-left: 0 !important;
+  margin-right: 0.5rem !important; /* Flipped ms-2 */
+}
+html[dir="rtl"] .info-icon.ms-2 {
+  margin-left: 0 !important;
+  margin-right: 0.5rem !important; /* Flipped ms-2 */
+}
+/* --- End Severity/Tooltip Icon Styles --- */
+
+/* Optional: Adjust tooltip appearance (Bootstrap default is usually fine) */
+.tooltip-inner {
+max-width: 300px; /* Allow slightly wider tooltips */
+text-align: left; /* Ensure LTR text inside tooltip */
+background-color: var(--bg-element-lighter); /* Match theme */
+color: var(--text-primary);
+border: 1px solid var(--border-color);
+}
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+border-top-color: var(--border-color); /* Match theme */
+}
+.tooltip.bs-tooltip-end .tooltip-arrow::before {
+ border-right-color: var(--border-color);
+}
+/* etc. for bottom/start if needed */
+
+html[dir="rtl"] .tooltip-inner {
+  text-align: right; /* RTL text inside tooltip */
+}
