@@ -77,17 +77,18 @@ def github_webhook(request):
         )
         print(f"INFO: Git pull successful. Output:\n{result.stdout}")
 
-        # Optional: Touch the WSGI file to force reload (adjust path if needed)
-        # username = os.environ.get('PA_USER', 'your_pythonanywhere_username') # Best get username reliably
-        # wsgi_file_path = f'/var/www/{username}_pythonanywhere_com_wsgi.py'
-        # try:
-        #     if os.path.exists(wsgi_file_path):
-        #         subprocess.run(['touch', wsgi_file_path], check=True)
-        #         print(f"INFO: Touched WSGI file: {wsgi_file_path}")
-        #     else:
-        #          print(f"WARN: WSGI file not found at expected path: {wsgi_file_path}")
-        # except Exception as e:
-        #     print(f"ERROR: Failed to touch WSGI file: {e}")
+        try:
+            # Construct the WSGI file path dynamically
+            username = os.environ.get('PA_USER', 'pixeladder') # Uses env var, falls back to username
+            wsgi_file_path = f'/var/www/{username}_pythonanywhere_com_wsgi.py'
+            if os.path.exists(wsgi_file_path):
+                subprocess.run(['touch', wsgi_file_path], check=True)
+                print(f"INFO: Touched WSGI file to trigger reload: {wsgi_file_path}")
+            else:
+                 print(f"WARN: WSGI file not found at expected path, reload may not occur: {wsgi_file_path}")
+        except Exception as e:
+            print(f"ERROR: Failed to touch WSGI file: {e}")
+        # --- End of added/uncommented lines ---
 
         return HttpResponse('Update successful')
 
