@@ -1,11 +1,11 @@
-# iegs_project/urls.py
+# mgc_project/urls.py
 
 from django.contrib import admin
 from django.urls import path, include
 from ratings import views as rating_views
 
 # --- Import the new webhook view ---
-from . import views as project_views # Assuming views.py is in the same dir (iegs_project)
+from . import views as project_views # Assuming views.py is in the same dir (mgc_project)
 
 # --- Imports needed for Internationalization ---
 from django.conf.urls.i18n import i18n_patterns

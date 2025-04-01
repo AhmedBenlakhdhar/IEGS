@@ -1,1 +1,37 @@
-# --- Python ---# Virtual Environmentvenv//venv/env//env/*.pyc__pycache__/.env/.env# Django stuff*.logdb.sqlite3db.sqlite3-journalstaticfiles_collected/media/ # If you add a media root for user uploads# Secret settings file (if you use Option 2)secret_settings.py/secret_settings.pyiegs_project/secret_settings.py # If inside the project config folder# OS generated files.DS_StoreThumbs.db# IDE files (add your specific IDE if needed).idea/.vscode/*.swp*.swo# Build artifactsdist/build/*.egg-info/
+# --- Python ---mgc_project
+# Virtual Environment
+venv/
+/venv/
+env/
+/env/
+*.pyc
+__pycache__/
+.env
+/.env
+
+# Django stuff
+*.log
+db.sqlite3
+db.sqlite3-journal
+staticfiles_collected/
+media/ # If you add a media root for user uploads
+
+# Secret settings file (if you use Option 2)
+secret_settings.py
+/secret_settings.py
+iegs_project/secret_settings.py # If inside the project config folder
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files (add your specific IDE if needed)
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
+*.egg-info/

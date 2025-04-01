@@ -97,7 +97,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='game',
             name='rating_tier',
-            field=models.ForeignKey(help_text='Overall IEGS Rating based on detailed assessment.', on_delete=django.db.models.deletion.PROTECT, related_name='games', to='ratings.ratingtier'),
+            field=models.ForeignKey(help_text='Overall MGC Rating based on detailed assessment.', on_delete=django.db.models.deletion.PROTECT, related_name='games', to='ratings.ratingtier'),
         ),
         migrations.AlterField(
             model_name='game',

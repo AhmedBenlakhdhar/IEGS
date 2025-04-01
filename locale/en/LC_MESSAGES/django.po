@@ -66,11 +66,11 @@ msgstr ""
 msgid "Articles"
 msgstr ""
 
-#: .\iegs_project\settings.py:101
+#: .\mgc_project\settings.py:101
 msgid "English"
 msgstr ""
 
-#: .\iegs_project\settings.py:102
+#: .\mgc_project\settings.py:102
 msgid "Arabic"
 msgstr ""
 
@@ -87,7 +87,7 @@ msgid "Additional Info"
 msgstr ""
 
 #: .\ratings\admin.py:54
-msgid "Detailed IEGS Breakdown"
+msgid "Detailed MGC Breakdown"
 msgstr ""
 
 #: .\ratings\forms.py:12
@@ -259,7 +259,7 @@ msgid "Auto-generated slug for publisher filtering."
 msgstr ""
 
 #: .\ratings\models.py:88
-msgid "Overall IEGS Rating based on detailed assessment."
+msgid "Overall MGC Rating based on detailed assessment."
 msgstr ""
 
 #: .\ratings\models.py:91
@@ -543,7 +543,7 @@ msgid "Please correct the errors below."
 msgstr ""
 
 #: .\templates\articles\article_detail.html:5
-msgid "IEGS Article"
+msgid "MGC Article"
 msgstr ""
 
 #: .\templates\articles\article_detail.html:13
@@ -564,7 +564,7 @@ msgid "← Back to Articles"
 msgstr ""
 
 #: .\templates\articles\article_list.html:5
-msgid "IEGS Blog"
+msgid "MGC Blog"
 msgstr ""
 
 #: .\templates\articles\article_list.html:9 .\templates\base.html:57
@@ -612,12 +612,12 @@ msgid "No articles published yet."
 msgstr ""
 
 #: .\templates\base.html:9
-msgid "IEGS Ratings"
+msgid "MGC Ratings"
 msgstr ""
 
 #: .\templates\base.html:9 .\templates\base.html:46
 #: .\templates\registration\login.html:5 .\templates\registration\signup.html:5
-msgid "IEGS"
+msgid "MGC"
 msgstr ""
 
 #: .\templates\base.html:60
@@ -666,7 +666,7 @@ msgstr ""
 #: .\templates\base.html:136
 #, python-format
 msgid ""
-"Islamic Ethical Gaming Standard © %(current_year)s. Based on Quran & Sunnah "
+"Muslim Game Classification © %(current_year)s. Based on Quran & Sunnah "
 "(Understanding of As-Salaf)."
 msgstr ""
 
@@ -679,11 +679,11 @@ msgid "Switch to Arabic"
 msgstr ""
 
 #: .\templates\homepage.html:5
-msgid "IEGS - Islamic Ethical Gaming Standard"
+msgid "MGC - Muslim Game Classification"
 msgstr ""
 
 #: .\templates\homepage.html:11
-msgid "Islamic Ethical Gaming Standard"
+msgid "Muslim Game Classification"
 msgstr ""
 
 #: .\templates\homepage.html:13
@@ -701,12 +701,12 @@ msgid "Read Articles"
 msgstr ""
 
 #: .\templates\homepage.html:24
-msgid "What is IEGS?"
+msgid "What is MGC?"
 msgstr ""
 
 #: .\templates\homepage.html:26
 msgid ""
-"The Islamic Ethical Gaming Standard (IEGS) provides ratings and detailed "
+"The Muslim Game Classification (MGC) provides ratings and detailed "
 "guidance for video games based on the principles of the Quran and the "
 "Sunnah, following the understanding of the Salaf-us-Salih (Pious "
 "Predecessors). Our goal is to help Muslims make informed decisions about the "
@@ -751,7 +751,7 @@ msgid "Visit FAQ"
 msgstr ""
 
 #: .\templates\ratings\game_detail.html:5
-msgid "IEGS Rating Details"
+msgid "MGC Rating Details"
 msgstr ""
 
 #: .\templates\ratings\game_detail.html:14
@@ -786,7 +786,7 @@ msgid "Other"
 msgstr ""
 
 #: .\templates\ratings\game_detail.html:54
-msgid "Overall IEGS Rating:"
+msgid "Overall MGC Rating:"
 msgstr ""
 
 #: .\templates\ratings\game_detail.html:90
@@ -1013,7 +1013,7 @@ msgid "Last »"
 msgstr ""
 
 #: .\templates\ratings\glossary.html:5
-msgid "IEGS Glossary"
+msgid "MGC Glossary"
 msgstr ""
 
 #: .\templates\ratings\glossary.html:9
@@ -1022,7 +1022,7 @@ msgstr ""
 
 #: .\templates\ratings\glossary.html:13
 msgid ""
-"Understanding the terms used in the Islamic Ethical Gaming Standard (IEGS)."
+"Understanding the terms used in the Muslim Game Classification (MGC)."
 msgstr ""
 
 #: .\templates\ratings\glossary.html:22

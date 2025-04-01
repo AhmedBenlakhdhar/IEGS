@@ -51,7 +51,7 @@ class GameAdmin(admin.ModelAdmin):
              'fields': ('adjustment_guide', 'steam_link', 'epic_link', 'gog_link', 'other_store_link',
                         'critic_reviews')
         }),
-        (_('Detailed IEGS Breakdown'), { # <--- Use _()
+        (_('Detailed MGC Breakdown'), { # <--- Use _()
             'classes': ('collapse',),
             # Ensure this is a tuple (or list) of tuples (or strings)
             'fields': (

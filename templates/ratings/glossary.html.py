@@ -2,7 +2,7 @@ BBBBBBB BBBBBBBBBBB
 BBBB BBBBBB
 BBBB BBBB 
 
-BBBBB BBBBB gettext(u'IEGS Glossary') BBBBBBBB
+BBBBB BBBBB gettext(u'MGC Glossary') BBBBBBBB
 
 BBBBB BBBBBBB
 XXXX XXXXXXXXXXXXXXXXXXXX
@@ -10,7 +10,7 @@ XXXX XXXXXXXXXXXXXXXXXXXX
 XXXXXX
 
 XXXX XXXXXXXXXXXXXXXXXXXXXXXXX
-    XX XXXXXXXXXXX XXXXXXXXXXXXXXXX gettext(u'Understanding the terms used in the Islamic Ethical Gaming Standard (IEGS).') XXXX
+    XX XXXXXXXXXXX XXXXXXXXXXXXXXXX gettext(u'Understanding the terms used in the Muslim Game Classification (MGC).') XXXX
 
     XXX XXXXXXXXXXXXX gettext(u'Rating Tiers') XXXXX
     XXX XXXXXXXXXXXX

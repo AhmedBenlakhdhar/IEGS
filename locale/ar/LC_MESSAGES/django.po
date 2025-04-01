@@ -66,11 +66,11 @@ msgstr "مقالة"
 msgid "Articles"
 msgstr "مقالات"
 
-#: .\iegs_project\settings.py:101
+#: .\mgc_project\settings.py:101
 msgid "English"
 msgstr "الإنجليزية"
 
-#: .\iegs_project\settings.py:102
+#: .\mgc_project\settings.py:102
 msgid "Arabic"
 msgstr "العربية"
 

@@ -1,4 +1,4 @@
-# iegs_project/settings.py
+# mgc_project/settings.py
 
 import os
 from pathlib import Path
@@ -20,7 +20,7 @@ GITHUB_WEBHOOK_SECRET = 'M@a=pUN-8W}J6*E?Y;D{()' # Must match GitHub
 # Path to the root of your git repository on PythonAnywhere
 # BASE_DIR usually points to the directory containing manage.py, which is often the repo root. Adjust if needed.
 
-REPO_PATH = '/home/pixeladder/IEGS'
+REPO_PATH = '/home/pixeladder/MGC'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True # Keep True for development
@@ -60,7 +60,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'iegs_project.urls'
+ROOT_URLCONF = 'mgc_project.urls'
 
 TEMPLATES = [
     {
@@ -78,7 +78,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'iegs_project.wsgi.application'
+WSGI_APPLICATION = 'mgc_project.wsgi.application'
 
 
 # Database
