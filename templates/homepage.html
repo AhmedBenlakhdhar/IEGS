@@ -1,66 +1,99 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}IEGS - Islamic Ethical Gaming Standard{% endblock %}
+{% block title %}{% translate "MGC - Muslim Game Classification" %}{% endblock %}
 
 {% block content %}
+
+
+  {# --- END: Filter/Sort Controls --- #}
+
+  {# --- START: Pre-translate known rating strings (Workaround) --- #}
+  {% get_current_language as LANGUAGE_CODE_CURRENT %}
+
+  {% translate "Haram" as translated_haram %}
+  {% translate "Mashbouh" as translated_mashbouh %}
+  {% translate "Halal" as translated_halal %}
+  {% translate "Kufr" as translated_kufr %}
+  {# --- END: Pre-translate --- #}
+
+
+  {# --- 1. Hero Section --- #}
   <div class="homepage-hero text-center py-5 mb-5">
-      <h1 class="display-4 fw-bold">Islamic Ethical Gaming Standard</h1>
+      <h1 class="display-4 fw-bold">{% translate "Muslim Game Classification" %}</h1>
       <p class="lead col-lg-8 mx-auto text-secondary">
-          Navigating video games according to the Quran & Sunnah as understood by As-Salaf. Find ratings and guidance.
+          {% translate "Navigating video games according to the Quran & Sunnah as understood by As-Salaf. Find ratings and guidance." %}
       </p>
       <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-          <a href="{% url 'ratings:game_list' %}" class="btn btn-primary btn-lg px-4 gap-3">Browse Game Ratings</a>
-          <a href="{% url 'articles:article_list' %}" class="btn btn-outline-secondary btn-lg px-4">Read Articles</a>
+          <a href="{% url 'ratings:game_list' %}" class="btn btn-primary btn-lg px-4 gap-3">{% translate "Browse Game Ratings" %}</a>
+          <a href="{% url 'articles:article_list' %}" class="btn btn-outline-secondary btn-lg px-4">{% translate "Read Articles" %}</a>
       </div>
   </div>
 
-  <div class="row g-5">
-      {# Section for Latest Games #}
-      <div class="col-md-7">
-          <h2 class="pb-2 border-bottom mb-3 section-title">Latest Game Ratings</h2>
-           <div class="row row-cols-1 row-cols-md-2 g-4"> {# Nested grid for cards #}
-              {% if latest_games %}
-                  {% for game in latest_games %}
-                     <div class="col">
-                         {% include 'ratings/includes/game_card_snippet.html' with game=game %}
-                     </div>
-                  {% endfor %}
-              {% else %}
-                 <p class="col-12 text-secondary">No games rated yet.</p>
-              {% endif %}
-           </div>
-           {% if latest_games %}
-           <div class="text-center mt-4">
-                <a href="{% url 'ratings:game_list' %}" class="btn btn-sm btn-outline-secondary">View All Games</a>
-            </div>
+  {# --- 2. What is MGC Section --- #}
+  <section id="what-is-iegs" class="py-5 text-center bg-element rounded mb-5">
+    <div class="container">
+        <h2 class="section-title mb-4">{% translate "What is MGC?" %}</h2>
+        <p class="lead text-secondary col-lg-8 mx-auto">
+            {% blocktranslate %}The Muslim Game Classification (MGC) provides ratings and detailed guidance for video games based on the principles of the Quran and the Sunnah, following the understanding of the As-Salaf-us-Salih (Pious Predecessors). Our goal is to help Muslims make informed decisions about the games they play according to the Islamic rulings.{% endblocktranslate %}
+        </p>
+        {# Optional: Link to a future 'About' page #}
+        {# <a href="#" class="btn btn-sm btn-outline-info mt-3">{% translate "Learn More About Our Methodology" %}</a> #}
+    </div>
+  </section>
+
+  {# --- 3. Featured Halal Games Section --- #}
+  <section id="featured-halal" class="py-5">
+    <div class="container">
+        <h2 class="section-title text-center mb-4">{% translate "Featured Halal Games" %}</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
+            {% if top_halal_games %}
+                {% for game in top_halal_games %}
+                   <div class="col">
+                       {# Include the existing card snippet #}
+                       {% include 'ratings/includes/game_card_snippet.html' with game=game %}
+                   </div>
+                {% endfor %}
+            {% else %}
+               <p class="col-12 text-center text-secondary">{% translate "No Halal games featured yet." %}</p>
             {% endif %}
-      </div>
+       </div>
+       {% if top_halal_games %}
+       <div class="text-center mt-4">
+            {# Link to the game list filtered by Halal tier #}
+            <a href="{% url 'ratings:game_list' %}?tier=HAL" class="btn btn-sm btn-outline-secondary">{% translate "View All Halal Rated Games" %}</a>
+        </div>
+        {% endif %}
+    </div>
+  </section>
 
-      {# Section for Latest Articles #}
-      <div class="col-md-5">
-          <h2 class="pb-2 border-bottom mb-3 section-title">Recent Articles</h2>
-          {% if latest_articles %}
+  {# --- 4. Recent Articles / Insights Section --- #}
+  <section id="recent-articles" class="py-5 bg-element rounded mt-5 mb-5">
+    <div class="container">
+        <h2 class="section-title text-center mb-4">{% translate "Recent Articles & Insights" %}</h2>
+        {% if latest_articles %}
+            <div class="list-group list-group-flush article-list-simple">
               {% for article in latest_articles %}
-                  <div class="article-summary mb-3">
-                      <h5 class="mb-1">
-                          <a href="{{ article.get_absolute_url }}" class="link-light text-decoration-none article-summary-title">{{ article.title }}</a>
-                      </h5>
-                      <p class="text-secondary article-summary-meta">
-                          {{ article.published_date|date:"F j, Y" }}
-                          {% if article.author_name %} - {{ article.author_name }}{% endif %}
-                      </p>
-                       <p class="article-summary-excerpt">{{ article.content|striptags|truncatewords:25 }}</p>
-                  </div>
-                 {% if not forloop.last %}<hr class="my-3">{% endif %} {# Divider between articles #}
-              {% endfor %}
-               <div class="text-center mt-4">
-                    <a href="{% url 'articles:article_list' %}" class="btn btn-sm btn-outline-secondary">View All Articles</a>
-                </div>
-          {% else %}
-              <p class="text-secondary">No articles published yet.</p>
-          {% endif %}
-      </div>
-  </div>
+                  <a href="{{ article.get_absolute_url }}" class="list-group-item list-group-item-action bg-transparent article-summary-simple">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 article-summary-title">{{ article.title }}</h5>
+                        <small class="text-secondary">{{ article.published_date|date:"M d" }}</small> {# Shorter date #}
+                      </div>
+                      <p class="mb-1 text-secondary article-summary-excerpt">{{ article.content|striptags|truncatewords:20 }}</p>
+                      {% if article.author_name %}
+                        <small class="text-tertiary">{% blocktranslate %}By {{ article.author_name }}{% endblocktranslate %}</small>
+                      {% endif %}
+                  </a>
+               {% endfor %}
+            </div>
+             <div class="text-center mt-4">
+                  <a href="{% url 'articles:article_list' %}" class="btn btn-sm btn-outline-secondary">{% translate "View All Articles" %}</a>
+              </div>
+        {% else %}
+            <p class="text-center text-secondary">{% translate "No articles published yet." %}</p>
+        {% endif %}
+    </div>
+  </section>
 
 {% endblock %}

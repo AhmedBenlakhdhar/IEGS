@@ -1,12 +1,15 @@
-# ratings/admin.py - FULL FILE
+# ratings/admin.py - FULL FILE (REVISED)
 from django.contrib import admin
 from .models import RatingTier, Flag, Game, CriticReview
+from django.utils.translation import gettext_lazy as _ # <--- Ensure this import is present
 
 @admin.register(RatingTier)
 class RatingTierAdmin(admin.ModelAdmin):
     list_display = ('tier_code', 'icon_name', 'display_name', 'color_hex', 'order')
     ordering = ('order',)
-    fields = ('tier_code', 'icon_name', 'display_name', 'color_hex', 'description', 'order')
+    # Use _() for fieldset titles/fields if you define them, otherwise defaults work
+    # For simplicity, default field order is often fine here.
+    # fields = ('tier_code', 'icon_name', 'display_name', 'color_hex', 'description', 'order')
     readonly_fields = ('tier_code',)
 
 @admin.register(Flag)
@@ -23,33 +26,36 @@ class CriticReviewAdmin(admin.ModelAdmin):
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     list_display = ('title', 'rating_tier', 'requires_adjustment', 'developer', 'publisher', 'date_updated')
-    list_filter = ('rating_tier', 'requires_adjustment', 'developer', 'publisher') # Added adjustment filter
+    list_filter = ('rating_tier', 'requires_adjustment', 'developer', 'publisher')
     search_fields = ('title', 'developer', 'publisher', 'summary')
     prepopulated_fields = {'slug': ('title',)}
     filter_horizontal = ('flags', 'critic_reviews')
     date_hierarchy = 'date_added'
     ordering = ('-date_updated',)
-    # Make slugs read-only as they are auto-generated
     readonly_fields = ('developer_slug', 'publisher_slug', 'date_added', 'date_updated')
 
+    # --- Apply _() to fieldset titles ---
     fieldsets = (
-        ('Core Information', {
+        (_('Core Information'), { # <--- Use _()
             'fields': ('title', 'slug', 'cover_image_url',
-                       ('developer', 'developer_slug'),
-                       ('publisher', 'publisher_slug'),
+                       ('developer', 'developer_slug'), # Ensure this is a tuple
+                       ('publisher', 'publisher_slug'), # Ensure this is a tuple
                        'release_date', 'summary')
         }),
-        ('Overall Rating & Flags', {
+        (_('Overall Rating & Flags'), { # <--- Use _()
             'fields': ('rating_tier', 'requires_adjustment', 'flags', 'rationale', 'has_spoilers_in_details')
         }),
-        ('Additional Info', {
+        (_('Additional Info'), { # <--- Use _()
              'classes': ('collapse',),
+             # Ensure all items here are strings
              'fields': ('adjustment_guide', 'steam_link', 'epic_link', 'gog_link', 'other_store_link',
-                        'critic_reviews') # <-- ADD critic_reviews field here
+                        'critic_reviews')
         }),
-        ('Detailed IEGS Breakdown', {
+        (_('Detailed IEGS Breakdown'), { # <--- Use _()
             'classes': ('collapse',),
+            # Ensure this is a tuple (or list) of tuples (or strings)
             'fields': (
+                # Ensure each of these is a tuple of strings
                 ('aqidah_severity', 'aqidah_details', 'aqidah_reason'),
                 ('violence_severity', 'violence_details', 'violence_reason'),
                 ('immorality_severity', 'immorality_details', 'immorality_reason'),
@@ -57,6 +63,8 @@ class GameAdmin(admin.ModelAdmin):
                 ('audio_music_severity', 'audio_music_details', 'audio_music_reason'),
                 ('time_addiction_severity', 'time_addiction_details', 'time_addiction_reason'),
                 ('online_conduct_severity', 'online_conduct_details', 'online_conduct_reason'),
+                # --- CRITICAL: Check your actual file for typos here ---
+                # --- Make sure there are no {} or [] used inside 'fields' ---
             )
         }),
     )

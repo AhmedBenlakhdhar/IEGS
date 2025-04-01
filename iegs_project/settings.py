@@ -17,7 +17,11 @@ SECRET_KEY = 'django-insecure-droa#jdqf!u^t9t0$ux!_cconx3=bpx=n3a1!dwr*_=50-=51n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True # Keep True for development
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'pixeladder.pythonanywhere.com', # For PythonAnywhere
+    '127.0.0.1',                    # For local development (standard IP)
+    'localhost',                    # For local development (standard hostname)
+]
 
 
 # Application definition
@@ -120,9 +124,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static', # Use Path object division
-]
+STATICFILES_DIRS = [ BASE_DIR / 'static', ]
+STATIC_ROOT = '/home/pixeladder/MGC/venv/Lib/site-packages/django/contrib/staticfiles'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -1,101 +1,106 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %} {# <--- ADD THIS LINE #}
 
-{% block title %}IEGS Glossary{% endblock %}
+{% block title %}{% translate "IEGS Glossary" %}{% endblock %}
 
 {% block content %}
 <div class="page-header">
-  <h1>Glossary of Terms</h1>
+  <h1>{% translate "Glossary of Terms" %}</h1>
 </div>
 
 <div class="glossary-content">
-    <p class="lead text-secondary">Understanding the terms used in the Islamic Ethical Gaming Standard (IEGS).</p>
+    <p class="lead text-secondary">{% translate "Understanding the terms used in the Muslim Game Classification (MGC)." %}</p>
 
-    <h3 class="mt-4">Rating Tiers</h3>
+    <h3 class="mt-4">{% translate "Rating Tiers" %}</h3>
     <dl class="row">
+        {# --- Halal --- #}
         <dt class="col-sm-3">
 			<span class="rating-badge" style="background-color: var(--rating-halal); color: #000;">
 				<span class="material-symbols-outlined rating-icon"> check_circle </span>
-				<span class="rating-label"> Halal </span>
+				{# Get tier name from DB if possible, or translate static text #}
+                <span class="rating-label">{% translate "Halal" %}</span>
 			</span>
 		</dt>
-        <dd class="col-sm-9">Permissible. Games generally free from prohibited elements, or where such elements are minor, incidental, completely avoidable, and easily disabled/modified without compromising the core experience. Primarily focuses on skill, strategy, problem-solving, or permissible themes.</dd>
+        <dd class="col-sm-9">{% translate "Permissible. Games generally free from prohibited elements, or where such elements are minor, incidental, completely avoidable, and easily disabled/modified without compromising the core experience. Primarily focuses on skill, strategy, problem-solving, or permissible themes." %}</dd>
 
+        {# --- Mashbouh --- #}
         <dt class="col-sm-3">
 			<span class="rating-badge" style="background-color: var(--rating-mashbouh); color: #000">
 				<span class="material-symbols-outlined rating-icon"> warning </span>
-				<span class="rating-label"> Mashbouh </span>
+				<span class="rating-label">{% translate "Mashbouh" %}</span>
 			</span>
 		</dt>
-        <dd class="col-sm-9">Doubtful / Caution Advised. Games containing elements whose permissibility is unclear, disputed among scholars, or contain problematic elements that may be avoidable but require significant player vigilance or effort. Engagement requires careful consideration and Taqwa (God-consciousness). Avoid if in doubt.</dd>
+        <dd class="col-sm-9">{% translate "Doubtful / Caution Advised. Games containing elements whose permissibility is unclear, disputed among scholars, or contain problematic elements that may be avoidable but require significant player vigilance or effort. Engagement requires careful consideration and Taqwa (God-consciousness). Avoid if in doubt." %}</dd>
 
+        {# --- Haram --- #}
         <dt class="col-sm-3">
 			<span class="rating-badge" style="background-color: var(--rating-haram); color: #000">
 				<span class="material-symbols-outlined rating-icon"> cancel </span>
-				<span class="rating-label"> Haram </span>
+				<span class="rating-label">{% translate "Haram" %}</span>
 			</span>
 		</dt>
-        <dd class="col-sm-9">Impermissible. Games featuring clear and unavoidable prohibited content or core mechanics integral to the gameplay that involve committing or simulating major sins, promoting vice, or containing themes fundamentally opposed to Islamic morality.</dd>
+        <dd class="col-sm-9">{% translate "Impermissible. Games featuring clear and unavoidable prohibited content or core mechanics integral to the gameplay that involve committing or simulating major sins, promoting vice, or containing themes fundamentally opposed to Islamic morality." %}</dd>
 
+        {# --- Kufr / Shirk --- #}
         <dt class="col-sm-3">
-			
 			<span class="rating-badge" style="background-color: var(--rating-kufr); color: #fff">
 				<span class="material-symbols-outlined rating-icon"> gpp_bad </span>
-				<span class="rating-label"> Kufr </span>
+				<span class="rating-label">{% translate "Kufr" %}</span>
 			</span>
 		</dt>
-        <dd class="col-sm-9">Disbelief / Polytheism. Games containing explicit promotion, normalization, or requirement of participation in acts of Shirk (associating partners with Allah) or Kufr (disbelief), blasphemy, veneration of false deities, practice of magic (Sihr), or direct attacks on core Islamic tenets.</dd>
+        <dd class="col-sm-9">{% translate "Disbelief / Polytheism. Games containing explicit promotion, normalization, or requirement of participation in acts of Shirk (associating partners with Allah) or Kufr (disbelief), blasphemy, veneration of false deities, practice of magic (Sihr), or direct attacks on core Islamic tenets." %}</dd>
     </dl>
 
-     <h3 class="mt-4">Severity Levels (for Breakdown Categories)</h3>
+     <h3 class="mt-4">{% translate "Severity Levels (for Breakdown Categories)" %}</h3>
     <dl class="row">
-        <dt class="col-sm-3"><span class="severity-circle severity-n"></span> None</dt>
-        <dd class="col-sm-9">No significant concerns identified in this specific category based on review.</dd>
+        <dt class="col-sm-3"><span class="severity-circle severity-n"></span> {% translate "None" %}</dt>
+        <dd class="col-sm-9">{% translate "No significant concerns identified in this specific category based on review." %}</dd>
 
-        <dt class="col-sm-3"><span class="severity-circle severity-l"></span> Low</dt>
-        <dd class="col-sm-9">Minor issues present, potentially avoidable, or requiring caution. May correspond to Mashbouh elements if pervasive.</dd>
+        <dt class="col-sm-3"><span class="severity-circle severity-l"></span> {% translate "Low" %}</dt>
+        <dd class="col-sm-9">{% translate "Minor issues present, potentially avoidable, or requiring caution. May correspond to Mashbouh elements if pervasive." %}</dd>
 
-        <dt class="col-sm-3"><span class="severity-circle severity-m"></span> Medium</dt>
-        <dd class="col-sm-9">Moderate concerns. Problematic elements are present and may be difficult to avoid or are normalized to some extent. Often found in Mashbouh or lower-end Haram ratings.</dd>
+        <dt class="col-sm-3"><span class="severity-circle severity-m"></span> {% translate "Medium" %}</dt>
+        <dd class="col-sm-9">{% translate "Moderate concerns. Problematic elements are present and may be difficult to avoid or are normalized to some extent. Often found in Mashbouh or lower-end Haram ratings." %}</dd>
 
-         <dt class="col-sm-3"><span class="severity-circle severity-h"></span> High</dt>
-        <dd class="col-sm-9">Severe concerns. Elements directly contradict Islamic principles and are likely integral or unavoidable. Usually indicates a Haram rating.</dd>
+         <dt class="col-sm-3"><span class="severity-circle severity-h"></span> {% translate "High" %}</dt>
+        <dd class="col-sm-9">{% translate "Severe concerns. Elements directly contradict Islamic principles and are likely integral or unavoidable. Usually indicates a Haram rating." %}</dd>
 
-        <dt class="col-sm-3"><span class="severity-circle severity-p"></span> Prohibited</dt>
-        <dd class="col-sm-9">Explicitly prohibited content, often related to Kufr/Shirk or major unavoidable Haram actions. Indicates Haram or Kufr/Shirk rating.</dd>
+        <dt class="col-sm-3"><span class="severity-circle severity-p"></span> {% translate "Prohibited" %}</dt>
+        <dd class="col-sm-9">{% translate "Explicitly prohibited content, often related to Kufr/Shirk or major unavoidable Haram actions. Indicates Haram or Kufr rating." %}</dd>
     </dl>
 
-    <h3 class="mt-4">Key Islamic Terms</h3>
+    <h3 class="mt-4">{% translate "Key Islamic Terms" %}</h3>
     <dl class="row">
-        <dt class="col-sm-3">Tawhid</dt>
-        <dd class="col-sm-9">The core Islamic concept of the absolute Oneness of Allah (God), central to faith.</dd>
+        <dt class="col-sm-3">{% translate "Tawhid" %}</dt>
+        <dd class="col-sm-9">{% translate "The core Islamic concept of the absolute Oneness of Allah (God), central to faith." %}</dd>
 
-        <dt class="col-sm-3">Shirk</dt>
-        <dd class="col-sm-9">Associating partners with Allah; polytheism. The gravest sin in Islam.</dd>
+        <dt class="col-sm-3">{% translate "Shirk" %}</dt>
+        <dd class="col-sm-9">{% translate "Associating partners with Allah; polytheism. The gravest sin in Islam." %}</dd>
 
-        <dt class="col-sm-3">Kufr</dt>
-        <dd class="col-sm-9">Disbelief or rejection of the fundamental tenets of Islam.</dd>
+        <dt class="col-sm-3">{% translate "Kufr" %}</dt>
+        <dd class="col-sm-9">{% translate "Disbelief or rejection of the fundamental tenets of Islam." %}</dd>
 
-        <dt class="col-sm-3">'Awrah</dt>
-        <dd class="col-sm-9">Parts of the body that must be covered according to Islamic guidelines. Exposure of 'Awrah without necessity is impermissible.</dd>
+        <dt class="col-sm-3">{% translate "'Awrah" %}</dt>
+        <dd class="col-sm-9">{% translate "Parts of the body that must be covered according to Islamic guidelines. Exposure of 'Awrah without necessity is impermissible." %}</dd>
 
-         <dt class="col-sm-3">Zina</dt>
-        <dd class="col-sm-9">Unlawful sexual intercourse (fornication or adultery).</dd>
+         <dt class="col-sm-3">{% translate "Zina" %}</dt>
+        <dd class="col-sm-9">{% translate "Unlawful sexual intercourse (fornication or adultery)." %}</dd>
 
-         <dt class="col-sm-3">Qimar / Maysir</dt>
-        <dd class="col-sm-9">Gambling; games of chance involving stakes.</dd>
+         <dt class="col-sm-3">{% translate "Qimar / Maysir" %}</dt>
+        <dd class="col-sm-9">{% translate "Gambling; games of chance involving stakes." %}</dd>
 
-         <dt class="col-sm-3">Laghw</dt>
-        <dd class="col-sm-9">Idle talk, vain pursuits, or activities that distract from religious duties or beneficial actions.</dd>
+         <dt class="col-sm-3">{% translate "Laghw" %}</dt>
+        <dd class="col-sm-9">{% translate "Idle talk, vain pursuits, or activities that distract from religious duties or beneficial actions." %}</dd>
 
-         <dt class="col-sm-3">Akhlaq</dt>
-        <dd class="col-sm-9">Islamic ethics, morals, and manners.</dd>
+         <dt class="col-sm-3">{% translate "Akhlaq" %}</dt>
+        <dd class="col-sm-9">{% translate "Islamic ethics, morals, and manners." %}</dd>
 
-        <dt class="col-sm-3">As-Salaf As-Salih</dt>
-        <dd class="col-sm-9">The Pious Predecessors; refers to the first three generations of Muslims (Companions, Successors, Successors of the Successors), whose understanding of Islam is considered the most authentic.</dd>
+        <dt class="col-sm-3">{% translate "As-Salaf As-Salih" %}</dt>
+        <dd class="col-sm-9">{% translate "The Pious Predecessors; refers to the first three generations of Muslims (Companions, Successors, Successors of the Successors), whose understanding of Islam is considered the most authentic." %}</dd>
 
     </dl>
-    <p><a href="{% url 'home' %}" class="back-link mt-3">← Back to Home</a></p>
+    <p><a href="{% url 'home' %}" class="back-link mt-3">{% translate "← Back to Home" %}</a></p>
 </div>
 
 {% endblock %}

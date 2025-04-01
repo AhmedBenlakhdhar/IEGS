@@ -2,6 +2,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Article
 from django.db.models import Q # Import Q
+from django.utils.translation import gettext_lazy as _ # Import for potential future use
 
 def article_list(request):
     """Displays a list of all published articles, handles search."""
@@ -18,6 +19,8 @@ def article_list(request):
     context = {
         'articles': articles,
         'search_query': search_query, # Pass query back
+        # Example if you wanted a dynamic title:
+        # 'page_title': _('Blog Articles'),
     }
     return render(request, 'articles/article_list.html', context)
 
@@ -27,5 +30,7 @@ def article_detail(request, article_slug):
     article = get_object_or_404(Article, slug=article_slug, published_date__isnull=False)
     context = {
         'article': article,
+        # Example:
+        # 'page_title': article.title, # Title comes from model, already marked there
     }
     return render(request, 'articles/article_detail.html', context)

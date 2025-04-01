@@ -1,0 +1,117 @@
+/* static/css/custom-rtl.css */
+
+body.rtl {
+  /* Example: Ensure body text aligns right */
+  text-align: right;
+  /* Add an Arabic font family */
+  font-family: 'Cairo', var(--font-primary), sans-serif;
+}
+
+/* Adjust margins/paddings that use left/right specifically */
+/* Bootstrap RTL handles ms-* and me-* automatically */
+
+/* Fix icon margins */
+body.rtl .site-brand svg {
+    margin-left: 8px; /* Was margin-right */
+    margin-right: 0;
+}
+body.rtl .rating-badge .rating-icon {
+    margin-left: 4px; /* Was margin-right */
+    margin-right: 0;
+}
+body.rtl .flag-symbol {
+    margin-left: 6px; /* Was margin-right */
+    margin-right: 0;
+}
+body.rtl .external-link-icon {
+    margin-right: 2px; /* Was margin-left */
+    margin-left: 0;
+}
+body.rtl .theme-toggle-button {
+    margin-right: 1rem; /* Was margin-left */
+    margin-left: 0;
+}
+
+
+/* Adjust text alignment if needed */
+body.rtl .text-end { text-align: left !important; } /* Flip text-end */
+body.rtl .text-start { text-align: right !important; } /* Flip text-start */
+body.rtl .guide-category-footer.text-end { text-align: left !important; } /* Fix footer button */
+body.rtl .filter-sort-form .text-end { text-align: left !important; } /* Fix filter button */
+
+
+/* Adjust specific borders */
+body.rtl .page-header::after {
+    left: auto; /* Remove left positioning */
+    right: 0; /* Position on the right */
+     clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%); /* Flip clip-path */
+}
+body.rtl .detail-meta::after {
+    left: auto;
+    right: 0;
+}
+body.rtl .article-item::before {
+    left: auto;
+    right: 0;
+    border-width: 20px 0 0 20px; /* Adjust border for top-right */
+    border-color: var(--accent-primary) transparent transparent transparent; /* Match colors */
+}
+body.rtl .adjustment-guide-section {
+    border-left: none;
+    border-right: 4px solid var(--highlight-gold); /* Move border to right */
+}
+body.rtl .store-link {
+    border-left: none;
+    /* Example: border-right: 3px solid #66c0f4; */ /* Re-apply if needed */
+}
+body.rtl .store-link.steam { border-right: 3px solid #66c0f4; }
+body.rtl .store-link.epic { border-right: 3px solid #ffffff; }
+body.rtl .store-link.gog { border-right: 3px solid #8a43ce; }
+body.rtl .store-link.other { border-right: 3px solid var(--text-secondary); }
+
+
+/* Adjust list bullets */
+body.rtl .registration-form-container ul li {
+    padding-left: 0; /* Remove left padding */
+    padding-right: 1.4em; /* Add right padding */
+}
+body.rtl .registration-form-container ul li::before {
+    left: auto; /* Remove left positioning */
+    right: 0.25em; /* Position on the right */
+}
+
+/* Adjust blockquote border */
+body.rtl .critic-summary {
+    border-left: none;
+    border-right: 3px solid var(--border-color);
+    padding-left: 0;
+    padding-right: 0.75rem;
+}
+
+/* Specific font adjustments for Arabic if needed */
+body.rtl h1, body.rtl h2, body.rtl h3, body.rtl h4, body.rtl h5, body.rtl h6 {
+    font-family: 'Cairo', var(--font-heading), sans-serif; /* Prioritize Arabic font */
+}
+body.rtl .site-brand,
+body.rtl .navbar .nav-link,
+body.rtl .rating-badge,
+body.rtl .category-title-text,
+body.rtl .guide-section-title,
+body.rtl .form-title,
+body.rtl .btn-submit,
+body.rtl .back-link {
+     font-family: 'Cairo', var(--font-heading), sans-serif; /* Ensure heading/UI font where needed */
+}
+
+/* Fix severity circle margin */
+body.rtl .severity-circle {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+/* Fix filter select icon position (Bootstrap might handle this, but just in case) */
+body.rtl .form-select {
+    background-position: left 0.75rem center;
+    padding-left: 0.75rem;
+    padding-right: 2.25rem;
+}

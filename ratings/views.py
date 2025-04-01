@@ -1,4 +1,4 @@
-# ratings/views.py - FULL FILE
+# ratings/views.py - FULL FILE (with i18n)
 from django.shortcuts import render, get_object_or_404, redirect, Http404
 from .models import Game, RatingTier, Flag
 from articles.models import Article # Assuming articles app exists
@@ -8,13 +8,22 @@ from .forms import SignUpForm # Import the signup form
 from django.contrib.auth import login
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _ # Import for translation
+from django.utils.translation import gettext # Can use for immediate translation
 
 # --- Homepage View ---
 def homepage(request):
-    latest_games = Game.objects.select_related('rating_tier').order_by('-date_added')[:4]
+    # Fetch latest few articles (published)
     latest_articles = Article.objects.filter(published_date__isnull=False).order_by('-published_date')[:3]
+
+    # Fetch top 3-4 'Halal' rated games (adjust count as needed)
+    # Assumes your Halal tier code is 'HAL'
+    top_halal_games = Game.objects.select_related('rating_tier').filter(
+        rating_tier__tier_code='HAL'
+    ).order_by('-release_date', '-date_added')[:3] # Order by release date first, then added date
+
     context = {
-        'latest_games': latest_games,
+        # 'latest_games': latest_games, # Removing this, replaced by top_halal_games
+        'top_halal_games': top_halal_games,
         'latest_articles': latest_articles,
     }
     return render(request, 'homepage.html', context)
@@ -30,19 +39,19 @@ def game_list(request, developer_slug=None, publisher_slug=None):
         games_queryset = games_queryset.filter(developer_slug=developer_slug)
         first_game = games_queryset.first()
         if first_game and first_game.developer:
-            # Use f-string with translation marker if needed, or keep simple
-            page_title = _("Games by %(developer_name)s") % {'developer_name': first_game.developer}
-            filter_description = _("Showing games developed by <strong>%(developer_name)s</strong>.") % {'developer_name': first_game.developer}
+            # Use gettext for immediate translation with context
+            page_title = gettext("Games by %(developer_name)s") % {'developer_name': first_game.developer}
+            filter_description = gettext("Showing games developed by <strong>%(developer_name)s</strong>.") % {'developer_name': first_game.developer}
         else:
-             page_title = _("Games by Developer")
+             page_title = _("Games by Developer") # Fallback title
     elif publisher_slug:
         games_queryset = games_queryset.filter(publisher_slug=publisher_slug)
         first_game = games_queryset.first()
         if first_game and first_game.publisher:
-            page_title = _("Games by %(publisher_name)s") % {'publisher_name': first_game.publisher}
-            filter_description = _("Showing games published by <strong>%(publisher_name)s</strong>.") % {'publisher_name': first_game.publisher}
+            page_title = gettext("Games by %(publisher_name)s") % {'publisher_name': first_game.publisher}
+            filter_description = gettext("Showing games published by <strong>%(publisher_name)s</strong>.") % {'publisher_name': first_game.publisher}
         else:
-            page_title = _("Games by Publisher")
+            page_title = _("Games by Publisher") # Fallback title
 
     # Get Filter/Sort Parameters
     search_query = request.GET.get('q', '')
@@ -98,8 +107,8 @@ def game_list(request, developer_slug=None, publisher_slug=None):
 
     context = {
         'games_page': games_page,
-        'page_title': page_title,
-        'filter_description': filter_description,
+        'page_title': page_title, # Already translated above
+        'filter_description': filter_description, # Already translated above
         'all_tiers': all_tiers,
         'all_flags': all_flags,
         'search_query': search_query,
@@ -134,10 +143,11 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, _("Registration successful! You are now logged in.")) # Translate message
+            # Use _() for messages
+            messages.success(request, _("Registration successful! You are now logged in."))
             return redirect('home')
         else:
-            messages.error(request, _("Please correct the errors below.")) # Translate message
+            messages.error(request, _("Please correct the errors below.")) # Generic error
     else: # GET request
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})

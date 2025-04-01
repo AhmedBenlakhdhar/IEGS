@@ -1,4 +1,4 @@
-# ratings/models.py - FULL FILE
+# ratings/models.py - FULL FILE (with i18n)
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
@@ -8,13 +8,15 @@ from django.utils.translation import gettext_lazy as _ # Import for translation
 
 # Represents the overall rating category (Halal, Mashbouh, etc.)
 class RatingTier(models.Model):
+    # --- MODIFY TIER_CHOICES display names ---
     TIER_CHOICES = [
-        ('HAL', _('Halal / Mubah')),
-        ('MSH', _('Mashbouh')),
-        ('HRM', _('Haram')),
-        ('KSK', _('Kufr / Shirk')),
+        ('HAL', _('Halal')),      # Use simple name
+        ('MSH', _('Mashbouh')),   # Use simple name
+        ('HRM', _('Haram')),      # Use simple name
+        ('KFR', _('Kufr')),       # Use simple name (Assuming KFR code for Kufr)
     ]
     tier_code = models.CharField(max_length=3, choices=TIER_CHOICES, unique=True, primary_key=True)
+    # Use _() for verbose_name and help_text
     display_name = models.CharField(max_length=50, unique=True, verbose_name=_('Display Name'))
     icon_name = models.CharField(
         max_length=50,
@@ -32,7 +34,9 @@ class RatingTier(models.Model):
         verbose_name_plural = _('Rating Tiers')
 
     def __str__(self):
-        return self.display_name
+        # Return the display_name which is already marked for translation potentially
+        # Or directly translate if needed, but display_name is usually sufficient
+        return self.display_name # Keep as is, relies on display_name field
 
 # Represents quick visual flags for content types
 class Flag(models.Model):
@@ -44,14 +48,16 @@ class Flag(models.Model):
         verbose_name_plural = _('Content Flags')
 
     def __str__(self):
+        # F-strings can be tricky with lazy translation. Construct carefully if needed.
+        # This is mostly for admin, so direct translation might not be critical here.
         return f"{self.symbol} - {self.description}"
 
 # --- Critic Review Model ---
 class CriticReview(models.Model):
-    reviewer_name = models.CharField(max_length=100, help_text="e.g., IGN, GameSpot, Metacritic", verbose_name=_('Reviewer Name'))
-    score = models.CharField(max_length=20, blank=True, help_text="e.g., 9/10, 85/100, Recommended", verbose_name=_('Score'))
-    review_url = models.URLField(max_length=300, unique=True, help_text="Direct link to the review", verbose_name=_('Review URL'))
-    summary = models.TextField(blank=True, help_text="Optional short quote or summary from the review", verbose_name=_('Summary Quote'))
+    reviewer_name = models.CharField(max_length=100, help_text=_("e.g., IGN, GameSpot, Metacritic"), verbose_name=_('Reviewer Name'))
+    score = models.CharField(max_length=20, blank=True, help_text=_("e.g., 9/10, 85/100, Recommended"), verbose_name=_('Score'))
+    review_url = models.URLField(max_length=300, unique=True, help_text=_("Direct link to the review"), verbose_name=_('Review URL'))
+    summary = models.TextField(blank=True, help_text=_("Optional short quote or summary from the review"), verbose_name=_('Summary Quote'))
     date_added = models.DateTimeField(auto_now_add=True, verbose_name=_('Date Added'))
 
     class Meta:
@@ -60,7 +66,8 @@ class CriticReview(models.Model):
         verbose_name_plural = _('Critic Reviews')
 
     def __str__(self):
-        return f"{self.reviewer_name} ({self.score or 'No Score'})" # Show placeholder if score is blank
+        # Use translated placeholder if score is blank
+        return f"{self.reviewer_name} ({self.score or _('No Score')})"
 
 # Represents a specific video game and its detailed rating
 class Game(models.Model):
@@ -75,10 +82,10 @@ class Game(models.Model):
     developer_slug = models.SlugField(max_length=110, blank=True, help_text=_("Auto-generated slug for developer filtering."))
     publisher_slug = models.SlugField(max_length=110, blank=True, help_text=_("Auto-generated slug for publisher filtering."))
 
-    # --- IEGS Rating & Flags ---
+    # --- MGC Rating & Flags ---
     rating_tier = models.ForeignKey(
         RatingTier, on_delete=models.PROTECT, related_name='games',
-        help_text=_("Overall IEGS Rating based on detailed assessment."), verbose_name=_('Rating Tier')
+        help_text=_("Overall MGC Rating based on detailed assessment."), verbose_name=_('Rating Tier')
     )
     requires_adjustment = models.BooleanField(
         default=False, help_text=_("Check if this game needs user adjustments (settings, mods) to meet its assigned Halal/Mubah rating."),
@@ -96,10 +103,12 @@ class Game(models.Model):
         verbose_name=_('Adjustment Guide')
     )
 
-    # --- Detailed IEGS Breakdown Fields ---
+    # --- Detailed MGC Breakdown Fields ---
     SEVERITY_CHOICES = [
+        # Use _() for display names
         ('N', _('None')), ('L', _('Low')), ('M', _('Medium')), ('H', _('High')), ('P', _('Prohibited')),
     ]
+    # Wrap verbose_name, choices, help_text
     aqidah_severity = models.CharField(_('Aqidah Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     aqidah_details = models.TextField(_('Aqidah Details'), blank=True, help_text=_("Specific examples related to Aqidah concerns (magic, deities, ideologies etc)."))
     aqidah_reason = models.TextField(_('Aqidah Reason'), blank=True, help_text=_("Reasoning or reference for the Aqidah severity rating."))
@@ -144,8 +153,8 @@ class Game(models.Model):
     )
 
     # --- Timestamps ---
-    date_added = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+    date_added = models.DateTimeField(auto_now_add=True, verbose_name=_('Date Added')) # Added verbose_name
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date Updated')) # Added verbose_name
 
     class Meta:
         ordering = ['-date_added']
@@ -153,12 +162,13 @@ class Game(models.Model):
         verbose_name_plural = _('Games')
 
     def save(self, *args, **kwargs):
+        # Logic doesn't involve user-facing strings, no changes needed
         if not self.slug: self.slug = slugify(self.title)
         if self.developer and not self.developer_slug: self.developer_slug = slugify(self.developer)
         if self.publisher and not self.publisher_slug: self.publisher_slug = slugify(self.publisher)
-        original_slug = self.slug; counter = 1
+        orMGCnal_slug = self.slug; counter = 1
         while Game.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
-            self.slug = f'{original_slug}-{counter}'; counter += 1
+            self.slug = f'{orMGCnal_slug}-{counter}'; counter += 1
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -168,6 +178,7 @@ class Game(models.Model):
         return self.title
 
     # --- Properties for template use ---
+    # These rely on SEVERITY_CHOICES which are marked for translation
     @cached_property
     def aqidah_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.aqidah_severity, '?')
     @cached_property

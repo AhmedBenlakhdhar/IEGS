@@ -1,29 +1,31 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %} {# <--- ADD THIS LINE #}
 
-{% block title %}{{ article.title }} - IEGS Article{% endblock %}
+{% block title %}{{ article.title }} - {% translate "IEGS Article" %}{% endblock %}
 
 {% block content %}
   <article class="article-detail-wrapper mb-4">
 
-      {# --- NEW: Display Header Image --- #}
       {% if article.header_image_url %}
       <div class="article-header-image mb-4 text-center">
-          <img src="{{ article.header_image_url }}" class="img-fluid rounded shadow-sm" alt="{{ article.title }} Header Image" style="max-height: 400px;"> {# Limit height potentially #}
+          {# Translate alt text #}
+          <img src="{{ article.header_image_url }}" class="img-fluid rounded shadow-sm" alt="{% blocktranslate %}{{ article.title }} Header Image{% endblocktranslate %}" style="max-height: 400px;">
       </div>
       {% endif %}
-      {# --- End Header Image --- #}
 
-      <h1 class="article-detail-title">{{ article.title }}</h1>
+      <h1 class="article-detail-title">{{ article.title }}</h1> {# Title from model #}
       <p class="article-detail-meta">
-          Published: {{ article.published_date|date:"F j, Y" }}
-          {% if article.author_name %} | By: {{ article.author_name }}{% endif %}
+          {# Translate labels #}
+          {% translate "Published:" %} {{ article.published_date|date:"F j, Y" }}
+          {% if article.author_name %} | {% translate "By:" %} {{ article.author_name }}{% endif %}
       </p>
 
       <div class="article-content">
-          {{ article.content|linebreaks }}
+          {{ article.content|linebreaks }} {# Content from model #}
       </div>
 
-      <a href="{% url 'articles:article_list' %}" class="back-link mt-4">← Back to Articles</a>
+      {# Translate back link #}
+      <a href="{% url 'articles:article_list' %}" class="back-link mt-4">{% translate "← Back to Articles" %}</a>
   </article>
 {% endblock %}

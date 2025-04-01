@@ -156,7 +156,7 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .flag-symbol { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 1.1rem; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; color: var(--text-secondary); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 4px 6px; border-radius: 4px; margin-right: 6px; margin-bottom: 6px; vertical-align: -2px; transition: color 0.2s, background-color 0.2s, border-color 0.2s; }
 .flag-symbol:hover { color: var(--accent-primary); border-color: var(--accent-primary); background-color: var(--bg-secondary); cursor: default; }
 .rating-icon { font-size: 1em; vertical-align: -2px; margin-right: 4px; }
-.badge.adjustment-badge { background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); font-family: var(--font-primary); font-weight: 600; font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; }
+.badge.adjustment-badge { background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); font-family: var(--font-primary); font-weight: 600; font-size: 0.75rem; padding: 7px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; }
 
 /* 6. Game Detail Page */
 .detail-image-wrapper { background-color: var(--bg-element-lighter); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 6px; margin-bottom: 1.5rem; }
@@ -183,8 +183,8 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .store-link.gog { border-left: 3px solid #8a43ce; }
 .store-link.other { border-left: 3px solid var(--text-secondary); }
 
-/* 7. IEGS Guidance Breakdown */
-.iegs-guide-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+/* 7. MGC Guidance Breakdown */
+.MGC-guide-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
 .guide-section-title { font-weight: var(--font-heading-weight); color: var(--text-primary); margin-bottom: 1.5rem !important; text-align: center; text-transform: uppercase; letter-spacing: 1px; font-size: 1.5rem; }
 .guide-category-block { background-color: transparent; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 1rem; overflow: hidden; }
 .guide-category-header { background-color: var(--bg-element); padding: 0.75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
@@ -272,7 +272,7 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 
 /* 15. Glossary Page Styles */
 .glossary-content dt { font-family: var(--font-heading); font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
-.glossary-content dt:first-of-type { padding-top: 0; border-top: none; }
+.glossary-content dt:first-of-type { border-top: none; }
 .glossary-content dd { color: var(--text-secondary); margin-bottom: 1rem; padding-left: 1rem; }
 .glossary-content dt .material-symbols-outlined, .glossary-content dt .severity-circle { margin-right: 8px; vertical-align: -3px; font-size: 1.2em; }
 .glossary-content dt .severity-circle { width: 14px; height: 14px; border: none; display: inline-block; border-radius: 50%;}
@@ -281,6 +281,49 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .theme-toggle-button { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 5px 8px; border-radius: 50%; cursor: pointer; transition: color 0.2s, border-color 0.2s, transform 0.2s; margin-left: 1rem; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; }
 .theme-toggle-button:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
 .theme-toggle-button .material-symbols-outlined { font-size: 1.2rem; }
+/* Language Toggle Button */
+/* Language Toggle Button */
+.language-toggle-button {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-heading); /* Use heading font */
+  font-weight: 600;
+  font-size: 0.9rem; /* Adjust as needed */
+  /* padding: 5px 8px; */ /* OrMGCnal padding - might make it wide */
+  padding: 0; /* Remove padding if using fixed width/height */
+  width: 32px; /* Match theme button width */
+  height: 32px; /* Match theme button height */
+  border-radius: 50%; /* Make it circular */
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+  margin-left: 1rem; /* LTR spacing */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1; /* Ensure text fits vertically */
+}
+
+.language-toggle-button:hover {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  background-color: var(--bg-element-lighter); /* Subtle background on hover */
+}
+
+/* RTL override for the button margin */
+html[dir="rtl"] .language-toggle-button {
+  margin-left: 0;
+  margin-right: 1rem; /* Flipped from margin-left */
+}
+#language-toggle-text
+{
+	margin-top: -4px;
+}
+html[dir="rtl"] #language-toggle-text
+{
+	margin-top: 0px;
+}
+
 
 /* 17. Authentication Forms (Login/Signup) - ADJUSTED DARK THEME */
 .registration-form-container { padding-top: 2rem; padding-bottom: 3rem; }
@@ -314,4 +357,382 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
     .navbar-nav { margin-top: 0.5rem; } /* Space when collapsed */
     .registration-form-container .card-body { padding: 1.5rem; }
     .theme-toggle-button { margin-left: 0.5rem;}
+}
+
+/* ==========================================================================
+   RTL (Right-to-Left) Language Overrides - v3
+   ========================================================================== */
+
+html[dir="rtl"] {
+  /* Prioritize an Arabic-friendly font if not already done */
+  --font-primary: 'Cairo', 'Inter', sans-serif;
+  --font-heading: 'Cairo', 'Exo 2', sans-serif;
+}
+
+/* --- General Text Alignment (Ensure this is present) --- */
+html[dir="rtl"] body {
+  text-align: right;
+}
+
+/* --- Header & Navigation --- */
+
+/* Flip the main nav links block to the right side near the brand */
+html[dir="rtl"] .navbar-nav {
+    margin-right: auto !important; /* Override ms-auto */
+    margin-left: 0 !important;
+    padding-right: 0; /* Reset potential LTR padding */
+}
+
+/* Ensure dropdown menu aligns correctly */
+html[dir="rtl"] .dropdown-menu-end {
+    right: auto !important; /* Override Bootstrap LTR positioning */
+    left: 0 !important; /* Align to the left edge of parent */
+}
+html[dir="rtl"] .dropdown-menu[data-bs-popper] {
+    left: 0 !important;
+    right: auto !important;
+}
+
+/* Flip margin for the theme toggle button */
+html[dir="rtl"] .navbar .nav-item .theme-toggle-button {
+  margin-left: 0;
+  margin-right: 1rem; /* Was margin-left in LTR */
+}
+
+/* --- Page Header Area --- */
+
+/* Ensure header text aligns right */
+html[dir="rtl"] .page-header h1 {
+  text-align: right;
+}
+
+/* Flip the decorative underline */
+html[dir="rtl"] .page-header::after {
+  left: auto; /* Remove LTR positioning */
+  right: 0; /* Position accent line on the right */
+}
+
+/* Move the search form to the left side */
+html[dir="rtl"] .page-header .search-form {
+   margin-right: auto !important; /* Override ms-md-auto */
+   margin-left: 0 !important;
+}
+
+/* Flip the margin utility for the search input field */
+html[dir="rtl"] .search-form .me-2 {
+    margin-left: 0.5rem !important;
+    margin-right: 0 !important;
+}
+
+/* --- Filter/Sort Controls --- */
+
+/* Align the "Apply Filters" button container to the left */
+html[dir="rtl"] .filter-sort-form .text-end {
+    text-align: left !important;
+}
+
+/* --- Game Card & Detail --- */
+
+html[dir="rtl"] .game-meta,
+html[dir="rtl"] .detail-meta {
+  text-align: right;
+}
+
+/* Flip the game detail meta underline */
+html[dir="rtl"] .detail-meta::after {
+  left: auto;
+  right: 0;
+}
+
+/* --- Rating Badges (Cards, Detail, Glossary) --- */
+
+/* Apply display: flex to the badge itself to enable ordering */
+html[dir="rtl"] .rating-badge {
+    display: inline-flex; /* Use flex to allow ordering */
+    flex-direction: row-reverse; /* Reverse the visual order: label then icon */
+    align-items: center; /* Keep items vertically centered */
+    margin-left: 6px; /* Flipped spacing between badges/flags */
+    margin-right: 0;
+	direction: ltr;
+}
+
+/* Adjust spacing for the icon (now on the left) */
+html[dir="rtl"] .rating-badge .rating-icon {
+  margin-left: 4px; /* Add space between label (now first) and icon */
+  margin-right: 0;
+}
+
+
+/* --- Flag Symbols --- */
+/* Flip margin for flag symbols */
+html[dir="rtl"] .flag-symbol {
+  margin-right: 0;
+  margin-left: 6px; /* Flipped from margin-right */
+}
+
+/* --- Adjustment Badges --- */
+/* Flip margin for "Adjustable" badge */
+html[dir="rtl"] .badge.adjustment-badge.ms-1 {
+    margin-right: 0.25rem !important; /* Flipped ms-1 */
+    margin-left: 0 !important;
+}
+html[dir="rtl"] .badge.adjustment-badge.ms-2 { /* For detail page */
+    margin-right: 0.5rem !important; /* Flipped ms-2 */
+    margin-left: 0 !important;
+}
+
+/* --- Game Detail Specific Overrides --- */
+html[dir="rtl"] .detail-overall-rating {
+  text-align: right;
+}
+html[dir="rtl"] .detail-overall-rating .me-2 { /* Bootstrap class used here */
+    margin-left: 0.5rem !important;
+    margin-right: 0 !important;
+}
+html[dir="rtl"] .adjustment-guide-section {
+  border-left: none;
+  border-right: 4px solid var(--highlight-gold); /* Move border to the right */
+}
+html[dir="rtl"] .store-link {
+  margin-right: 0;
+  margin-left: 5px; /* Flipped from margin-right */
+  border-left: none;
+  /* Apply border to the right for specific stores */
+}
+html[dir="rtl"] .store-link.steam { border-right: 3px solid #66c0f4; }
+html[dir="rtl"] .store-link.epic { border-right: 3px solid #ffffff; }
+html[dir="rtl"] .store-link.gog { border-right: 3px solid #8a43ce; }
+html[dir="rtl"] .store-link.other { border-right: 3px solid var(--text-secondary); }
+
+html[dir="rtl"] .critic-summary {
+    border-right: 0.25rem solid var(--border-color); /* Move quote border */
+    border-left: none;
+    padding-right: 1rem;
+    padding-left: 0;
+}
+html[dir="rtl"] .critic-link .external-link-icon {
+    vertical-align: middle;
+    margin-right: 0.25rem; /* Add space before icon */
+    margin-left: 0;
+}
+
+/* --- MGC Guide Breakdown --- */
+html[dir="rtl"] .guide-category-header {
+  /* Flexbox justify-content: space-between usually works fine */
+}
+html[dir="rtl"] .severity-circle {
+  margin-left: 0;
+  margin-right: 10px; /* Flipped from margin-left */
+}
+html[dir="rtl"] .guide-category-details {
+  text-align: right;
+}
+html[dir="rtl"] .category-reason strong {
+    display: block; /* Ensure heading is on its own line if needed */
+}
+html[dir="rtl"] .guide-category-footer.spoiler-toggle-footer {
+  text-align: left; /* Buttons often align opposite to text */
+}
+html[dir="rtl"] .spoiler-alert svg {
+    margin-left: 0.5rem; /* Add space after icon */
+    margin-right: 0;
+}
+
+/* --- Articles --- */
+html[dir="rtl"] .article-item h4,
+html[dir="rtl"] .article-meta,
+html[dir="rtl"] .article-excerpt,
+html[dir="rtl"] .read-more-link, /* Assume default right alignment is ok */
+html[dir="rtl"] .article-detail-meta,
+html[dir="rtl"] .article-content {
+  text-align: right;
+}
+
+
+/* --- Back Link --- */
+/* Alignment should follow body text */
+
+
+/* --- Filter/Sort Form --- */
+html[dir="rtl"] .filter-sort-form .form-label-sm {
+  text-align: right;
+}
+
+
+/* --- Pagination --- */
+/* Bootstrap 5 should handle pagination alignment well with bootstrap.rtl.css */
+
+
+/* --- Glossary --- */
+html[dir="rtl"] .glossary-content dt {
+  text-align: right;
+}
+/* Flip margin for icons/circles in glossary dt */
+html[dir="rtl"] .glossary-content dt .material-symbols-outlined,
+html[dir="rtl"] .glossary-content dt .severity-circle {
+  margin-right: 0;
+  margin-left: 8px; /* Flipped from margin-right */
+}
+/* Ensure glossary descriptions align right */
+html[dir="rtl"] .glossary-content dd {
+  padding-top: 1rem;
+  padding-left: 0;
+  padding-right: 1rem; /* Use padding-right for indentation */
+  margin-left: 0;
+  margin-right: 0; /* Reset margin-right often needed with dl */
+  text-align: right;
+}
+/* Flip Bootstrap column classes used in glossary dl */
+html[dir="rtl"] .dl-horizontal dt, /* If using older BS classes */
+html[dir="rtl"] .row > dt[class*="col-"] { /* For Bootstrap 5 row/col */
+    text-align: right;
+    /* Might need float: right; clear: right; depending on exact structure */
+}
+
+
+/* --- Auth Forms --- */
+html[dir="rtl"] .registration-form-container .form-field-group label.form-label,
+html[dir="rtl"] .registration-form-container .form-error-text,
+html[dir="rtl"] .registration-form-container .form-help-text {
+    text-align: right;
+}
+html[dir="rtl"] .registration-form-container input[type="text"],
+html[dir="rtl"] .registration-form-container input[type="email"],
+html[dir="rtl"] .registration-form-container input[type="password"] {
+    text-align: right;
+}
+html[dir="rtl"] .registration-form-container ul li {
+    text-align: right;
+    padding-left: 0;
+    padding-right: 1.4em; /* Adjust padding for list bullet */
+}
+html[dir="rtl"] .registration-form-container ul li::before {
+    left: auto;
+    right: 0.25em; /* Position bullet on the right */
+}
+/* --- END RTL Overrides --- */
+
+/* Language Switcher Icon */
+.lang-icon {
+  font-size: 1.1em; /* Adjust size as needed */
+  vertical-align: -2px; /* Align vertically with text */
+  margin-right: 4px; /* Space before text (LTR) */
+}
+
+html[dir="rtl"] .lang-icon {
+  margin-right: 0;
+  margin-left: 4px; /* Space after text (RTL) */
+}
+
+/* ==========================================================================
+   Language Switcher Link Styles
+   ========================================================================== */
+
+.language-switcher .lang-switch-link {
+  font-family: var(--font-heading); /* Use heading font like other nav links */
+  font-weight: 600;
+  font-size: 0.8rem; /* Make it smaller than main nav links */
+  text-transform: uppercase;
+  color: var(--text-secondary); /* Make it less prominent than active links */
+  padding: 0.4rem 0.6rem; /* Smaller padding */
+  border: 1px solid var(--border-color); /* Add a subtle border */
+  border-radius: 4px;
+  line-height: 1; /* Ensure consistent height */
+  display: inline-flex; /* Align icon and text */
+  align-items: center;
+  margin-left: 1rem; /* Space before Account dropdown (LTR) */
+}
+
+.language-switcher .lang-switch-link:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+  background-color: var(--bg-element-lighter);
+}
+
+.language-switcher .lang-icon {
+  font-size: 1rem; /* Smaller icon */
+  vertical-align: -1px;
+  margin-right: 3px; /* Space before text (LTR) */
+}
+
+/* RTL Overrides for Language Switcher */
+html[dir="rtl"] .language-switcher .lang-switch-link {
+  margin-left: 0;
+  margin-right: 1rem; /* Space before Account dropdown (RTL) */
+}
+
+html[dir="rtl"] .language-switcher .lang-icon {
+  margin-right: 0;
+  margin-left: 3px; /* Space after text (RTL) */
+}
+
+/* Adjust vertical alignment with other nav items if needed */
+.navbar-nav .nav-item.language-switcher {
+    /* Add padding-top or adjust alignment if it looks off */
+}
+
+/* Homepage Specific Styles */
+
+/* Section Title Styling */
+.section-title {
+  font-weight: 800; /* Extra bold */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-primary); /* Use accent color */
+  position: relative;
+  padding-bottom: 0.75rem;
+  display: inline-block; /* Allow centering */
+}
+
+/* Optional: Add underline to section titles */
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%; /* Center the line */
+  transform: translateX(-50%); /* Center the line */
+  width: 50px;
+  height: 3px;
+  background-color: var(--border-lighter); /* Subtle underline */
+}
+html[dir="rtl"] .section-title::after {
+    /* Centered line doesn't need flipping */
+}
+
+
+/* "What is MGC?" Section */
+#what-is-MGC {
+    border: 1px solid var(--border-color);
+}
+
+/* Recent Articles Simple List */
+.article-list-simple .list-group-item {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    transition: background-color 0.2s ease;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+.article-list-simple .list-group-item:hover {
+    background-color: var(--bg-element-lighter) !important; /* Override bootstrap hover */
+    color: var(--accent-primary);
+}
+.article-list-simple .list-group-item-action:hover .article-summary-title {
+    color: var(--accent-primary); /* Make title accent on hover */
+}
+.article-list-simple .article-summary-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: color 0.2s ease;
+}
+.article-list-simple .article-summary-excerpt {
+    font-size: 0.9rem;
+}
+
+/* RTL Adjustments for new elements */
+html[dir="rtl"] .article-list-simple .list-group-item small:first-of-type {
+    /* Flip date position if needed using flex order or margins on parent */
+    /* Example: */
+    /* order: -1; margin-right: auto; */
 }
