@@ -14,6 +14,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Use your actual secret key here
 SECRET_KEY = 'django-insecure-droa#jdqf!u^t9t0$ux!_cconx3=bpx=n3a1!dwr*_=50-=51n'
 
+# GITHUB WEBHOOK CONFIGURATION
+# !!! CHANGE THIS TO A STRONG, RANDOM SECRET !!!
+GITHUB_WEBHOOK_SECRET = 'M@a=pUN-8W}J6*E?Y;D{()' # Must match GitHub
+# Path to the root of your git repository on PythonAnywhere
+# BASE_DIR usually points to the directory containing manage.py, which is often the repo root. Adjust if needed.
+
+REPO_PATH = '/home/pixeladder/IEGS'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True # Keep True for development
 
