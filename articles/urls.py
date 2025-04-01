@@ -8,6 +8,6 @@ urlpatterns = [
     # e.g., /articles/
     path('', views.article_list, name='article_list'),
 
-    # e.g., /articles/why-iegs-is-important/
+    # e.g., /articles/why-mgc-is-important/
     path('<slug:article_slug>/', views.article_detail, name='article_detail'),
 ]

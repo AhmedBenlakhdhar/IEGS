@@ -98,7 +98,7 @@ urlpatterns = [
     # e.g., /articles/
     path('', views.article_list, name='article_list'),
 
-    # e.g., /articles/why-iegs-is-important/
+    # e.g., /articles/why-mgc-is-important/
     path('<slug:article_slug>/', views.article_detail, name='article_detail'),
 ]
 
@@ -7724,7 +7724,7 @@ document.addEventListener('DOMContentLoaded', function() {
 {# --- END: Critic Reviews Section --- #}
 
 {# --- START: Islamic Guidance Section --- #}
-<div class="iegs-guide-section">
+<div class="mgc-guide-section">
     <h2 class="guide-section-title">{% translate "Islamic Guidance Breakdown" %}</h2>
 
     {# --- Spoiler Warning (Conditional) --- #}
@@ -8561,7 +8561,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 
   {# --- 2. What is MGC Section --- #}
-  <section id="what-is-iegs" class="py-5 text-center bg-element rounded mb-5">
+  <section id="what-is-mgc" class="py-5 text-center bg-element rounded mb-5">
     <div class="container">
         <h2 class="section-title mb-4">{% translate "What is MGC?" %}</h2>
         <p class="lead text-secondary col-lg-8 mx-auto">
@@ -8727,7 +8727,7 @@ media/ # If you add a media root for user uploads
 # Secret settings file (if you use Option 2)
 secret_settings.py
 /secret_settings.py
-iegs_project/secret_settings.py # If inside the project config folder
+mgc_project/secret_settings.py # If inside the project config folder
 
 # OS generated files
 .DS_Store
@@ -8754,7 +8754,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iegs_project.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mgc_project.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
