@@ -2,10 +2,11 @@
 
 import os
 from pathlib import Path
-from django.utils.translation import gettext_lazy as _ # Import for LANGUAGES
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -43,9 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ratings.apps.RatingsConfig',
     'articles.apps.ArticlesConfig',
-    # Optional: Add django-widget-tweaks if you prefer it for forms
-    # 'widget_tweaks',
+    'django_recaptcha',
+    'widget_tweaks',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -66,11 +68,11 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')], # Or BASE_DIR / 'templates'
-        'APP_DIRS': True,
+        'APP_DIRS': True, # This should normally find the tags
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request', # Needed for LocaleMiddleware
+                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -146,3 +148,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 # LOGIN_URL = '/accounts/login/' # Default is usually fine
 # --------------------------
+
+# Add these lines anywhere in settings.py
+RECAPTCHA_PUBLIC_KEY = '6LeZpAcrAAAAAChxgWEoMz9JOHkkcE3plMzh6eD_'  # Paste your Site Key
+RECAPTCHA_PRIVATE_KEY = '6LeZpAcrAAAAAC9lLdEKjOmUW2jSKc0JnoR2pSfs' # Paste your Secret Key

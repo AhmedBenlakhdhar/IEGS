@@ -1,11 +1,13 @@
-# ratings/models.py - FULL FILE (with i18n)
+# ratings/models.py - FULL FILE (with comments auto-approved, flagging)
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
 from django.utils import timezone # Needed if you add date/time fields later
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _ # Import for translation
+from django.contrib.auth.models import User # Import User for comments
 
+# ... (RatingTier, Flag, CriticReview, Game models remain the same as previous version) ...
 # Represents the overall rating category (Halal, Mashbouh, etc.)
 class RatingTier(models.Model):
     # --- MODIFY TIER_CHOICES display names ---
@@ -34,13 +36,11 @@ class RatingTier(models.Model):
         verbose_name_plural = _('Rating Tiers')
 
     def __str__(self):
-        # Return the display_name which is already marked for translation potentially
-        # Or directly translate if needed, but display_name is usually sufficient
-        return self.display_name # Keep as is, relies on display_name field
+        return self.display_name
 
 # Represents quick visual flags for content types
 class Flag(models.Model):
-    symbol = models.CharField(max_length=50, unique=True, verbose_name=_('Symbol (Icon Name)')) # Stores Material Symbol name
+    symbol = models.CharField(max_length=50, unique=True, verbose_name=_('Symbol (Icon Name)'))
     description = models.CharField(max_length=100, verbose_name=_('Description'))
 
     class Meta:
@@ -48,8 +48,6 @@ class Flag(models.Model):
         verbose_name_plural = _('Content Flags')
 
     def __str__(self):
-        # F-strings can be tricky with lazy translation. Construct carefully if needed.
-        # This is mostly for admin, so direct translation might not be critical here.
         return f"{self.symbol} - {self.description}"
 
 # --- Critic Review Model ---
@@ -66,7 +64,6 @@ class CriticReview(models.Model):
         verbose_name_plural = _('Critic Reviews')
 
     def __str__(self):
-        # Use translated placeholder if score is blank
         return f"{self.reviewer_name} ({self.score or _('No Score')})"
 
 # Represents a specific video game and its detailed rating
@@ -87,7 +84,7 @@ class Game(models.Model):
     gog_link = models.URLField(_("GOG Store URL"), max_length=300, blank=True, null=True)
     other_store_link = models.URLField(_("Other Store URL"), max_length=300, blank=True, null=True)
 
-    # --- START: Platform Availability Fields ---
+    # --- Platform Availability Fields ---
     available_pc = models.BooleanField(_("Available on PC"), default=False)
     available_ps5 = models.BooleanField(_("Available on PS5"), default=False)
     available_ps4 = models.BooleanField(_("Available on PS4"), default=False)
@@ -121,10 +118,8 @@ class Game(models.Model):
 
     # --- Detailed MGC Breakdown Fields ---
     SEVERITY_CHOICES = [
-        # Use _() for display names
         ('N', _('None')), ('L', _('Low')), ('M', _('Medium')), ('H', _('High')), ('P', _('Prohibited')),
     ]
-    # Wrap verbose_name, choices, help_text
     aqidah_severity = models.CharField(_('Aqidah Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     aqidah_details = models.TextField(_('Aqidah Details'), blank=True, help_text=_("Specific examples related to Aqidah concerns (magic, deities, ideologies etc)."))
     aqidah_reason = models.TextField(_('Aqidah Reason'), blank=True, help_text=_("Reasoning or reference for the Aqidah severity rating."))
@@ -169,8 +164,8 @@ class Game(models.Model):
     )
 
     # --- Timestamps ---
-    date_added = models.DateTimeField(auto_now_add=True, verbose_name=_('Date Added')) # Added verbose_name
-    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date Updated')) # Added verbose_name
+    date_added = models.DateTimeField(auto_now_add=True, verbose_name=_('Date Added'))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date Updated'))
 
     class Meta:
         ordering = ['-date_added']
@@ -178,13 +173,15 @@ class Game(models.Model):
         verbose_name_plural = _('Games')
 
     def save(self, *args, **kwargs):
-        # Logic doesn't involve user-facing strings, no changes needed
         if not self.slug: self.slug = slugify(self.title)
         if self.developer and not self.developer_slug: self.developer_slug = slugify(self.developer)
         if self.publisher and not self.publisher_slug: self.publisher_slug = slugify(self.publisher)
-        orMGCnal_slug = self.slug; counter = 1
-        while Game.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
-            self.slug = f'{orMGCnal_slug}-{counter}'; counter += 1
+        original_slug = self.slug; counter = 1
+        queryset = Game.objects.filter(slug=self.slug)
+        if self.pk:
+            queryset = queryset.exclude(pk=self.pk)
+        while queryset.exists():
+            self.slug = f'{original_slug}-{counter}'; counter += 1
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -193,10 +190,10 @@ class Game(models.Model):
     def __str__(self):
         return self.title
 
-    # --- Properties for template use ---
-    # These rely on SEVERITY_CHOICES which are marked for translation
+    # --- Cached Properties for Severity ---
     @cached_property
     def aqidah_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.aqidah_severity, '?')
+    # ... (other severity_display properties remain the same) ...
     @cached_property
     def aqidah_severity_css_class(self): return f"severity-{self.aqidah_severity}"
     @cached_property
@@ -223,3 +220,33 @@ class Game(models.Model):
     def online_conduct_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.online_conduct_severity, '?')
     @cached_property
     def online_conduct_severity_css_class(self): return f"severity-{self.online_conduct_severity}"
+
+
+# --- Game Comment Model (Updated) ---
+class GameComment(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='game_comments')
+    content = models.TextField(_('Comment'))
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Date Posted'))
+    approved = models.BooleanField(default=True, verbose_name=_('Approved')) # Default changed to True
+    flagged_by = models.ManyToManyField(User, related_name='flagged_comments', blank=True, verbose_name=_('Flagged By'))
+    moderator_attention_needed = models.BooleanField(default=False, verbose_name=_('Needs Attention'))
+
+    class Meta:
+        ordering = ['created_date'] # Order oldest first for display
+        verbose_name = _('Game Comment')
+        verbose_name_plural = _('Game Comments')
+
+    def __str__(self):
+        status = _('Approved') if self.approved else _('Unapproved')
+        if self.moderator_attention_needed:
+            status += f" ({_('Flagged')})"
+        return _("Comment by %(username)s on %(game_title)s (%(status)s)") % {
+            'username': self.user.username,
+            'game_title': self.game.title,
+            'status': status
+        }
+
+    @property
+    def flag_count(self):
+        return self.flagged_by.count()

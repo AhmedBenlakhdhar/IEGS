@@ -2654,3 +2654,98 @@ msgstr "تواصل أو احصل على المساعدة أو ساهم"
 
 #~ msgid "Mubah"
 #~ msgstr "مباح"
+
+#: .\ratings\admin.py:86
+msgid "Comment Preview"
+msgstr "معاينة التعليق"
+
+#: .\ratings\admin.py:89
+msgid "Approve selected comments"
+msgstr "الموافقة على التعليقات المحددة"
+
+#: .\ratings\admin.py:91
+#, python-format
+msgid "%(updated)d comments were successfully approved."
+msgid_plural "%(updated)d comments were successfully approved."
+msgstr[0] "تمت الموافقة بنجاح على %(updated)d تعليقات."
+msgstr[1] "تمت الموافقة بنجاح على تعليق واحد (%(updated)d)."
+msgstr[2] "تمت الموافقة بنجاح على تعليقين (%(updated)d)."
+msgstr[3] "تمت الموافقة بنجاح على %(updated)d تعليقات."
+msgstr[4] "تمت الموافقة بنجاح على %(updated)d تعليقاً."
+msgstr[5] "تمت الموافقة بنجاح على %(updated)d تعليق."
+
+#: .\ratings\forms.py:38
+msgid "Add your comment..."
+msgstr "أضف تعليقك..."
+
+#: .\ratings\forms.py:41
+msgid "Your Comment"
+msgstr "تعليقك"
+
+#: .\ratings\models.py:217
+msgid "Comment"
+msgstr "تعليق"
+
+#: .\ratings\models.py:218
+msgid "Date Posted"
+msgstr "تاريخ النشر"
+
+#: .\ratings\models.py:219
+msgid "Approved"
+msgstr "تمت الموافقة عليه"
+
+#: .\ratings\models.py:223
+msgid "Game Comment"
+msgstr "تعليق لعبة"
+
+#: .\ratings\models.py:224
+msgid "Game Comments"
+msgstr "تعليقات الألعاب"
+
+#: .\ratings\views.py:171
+msgid "You must be logged in to post a comment."
+msgstr "يجب عليك تسجيل الدخول لنشر تعليق."
+
+#: .\ratings\views.py:182
+msgid "Your comment has been submitted and is awaiting approval."
+msgstr "تم إرسال تعليقك وهو في انتظار الموافقة."
+
+#: .\ratings\views.py:185
+msgid "There was an error submitting your comment. Please check the form."
+msgstr "حدث خطأ أثناء إرسال تعليقك. يرجى مراجعة النموذج."
+
+#: .\templates\ratings\game_detail.html:335
+#, python-format
+msgid "%(comment_count)s Comment"
+msgid_plural "%(comment_count)s Comments"
+msgstr[0] "%(comment_count)s تعليقات"
+msgstr[1] "تعليق واحد (%(comment_count)s)"
+msgstr[2] "تعليقان (%(comment_count)s)"
+msgstr[3] "%(comment_count)s تعليقات"
+msgstr[4] "%(comment_count)s تعليقاً"
+msgstr[5] "%(comment_count)s تعليق"
+
+#: .\templates\ratings\game_detail.html:341
+msgid "ago"
+msgstr "منذ"
+
+#: .\templates\ratings\game_detail.html:348
+msgid "No comments yet. Be the first to comment!"
+msgstr "لا توجد تعليقات بعد. كن أول من يعلق!"
+
+#: .\templates\ratings\game_detail.html:354
+msgid "Add Your Comment"
+msgstr "أضف تعليقك"
+
+#: .\templates\ratings\game_detail.html:375
+msgid "Submit Comment"
+msgstr "إرسال التعليق"
+
+#: .\templates\ratings\game_detail.html:377
+msgid "Your comment will be visible after approval."
+msgstr "سيكون تعليقك مرئياً بعد الموافقة عليه."
+
+#: .\templates\ratings\game_detail.html:382
+#, python-format
+msgid "Please <a href=\"%(login_url)s\" class=\"text-primary\">login</a> to post a comment."
+msgstr "يرجى <a href=\"%(login_url)s\" class=\"text-primary\">تسجيل الدخول</a> لنشر تعليق."

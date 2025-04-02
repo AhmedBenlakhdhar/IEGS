@@ -1,34 +1,42 @@
-# ratings/forms.py (with i18n)
+# ratings/forms.py (with CAPTCHA)
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.utils.translation import gettext_lazy as _ # Import for translation
+from django.utils.translation import gettext_lazy as _
+from .models import GameComment
+from django_recaptcha.fields import ReCaptchaField # <--- Import from the correct app name
 
 class SignUpForm(UserCreationForm):
-    # Override email field to make it required and add help text
     email = forms.EmailField(
         max_length=254,
-        required=True, # Make email required
-        help_text=_('Required. Please enter a valid email address.') # Use _()
+        required=True,
+        help_text=_('Required. Please enter a valid email address.')
     )
-    # Note: Labels for username, password1, password2 come from UserCreationForm
-    # and Django handles their translation if its locale files are present.
-    # We can override them here with _() if needed for customization.
-    # e.g., username = forms.CharField(label=_('Preferred Username'), ...)
+    captcha = ReCaptchaField() # <--- Change to ReCaptchaField
 
     class Meta(UserCreationForm.Meta):
         model = User
-        # Define fields explicitly to control order and inclusion
-        fields = ('username', 'email') # Removed first/last name for simplicity
+        fields = ('username', 'email')
 
-    # Optional: Add clean_email method for extra validation if needed
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
-            # Use _() for validation errors
             raise forms.ValidationError(_("An account with this email already exists."))
         return email
 
-    # If you were overriding clean methods for password validation,
-    # you would use _() for those ValidationError messages too.
-    # e.g., raise forms.ValidationError(_("Passwords do not match."))
+class GameCommentForm(forms.ModelForm):
+    captcha = ReCaptchaField() # <--- Change to ReCaptchaField
+
+    class Meta:
+        model = GameComment
+        fields = ['content'] # Only content and captcha needed from user
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': _('Add your comment...'),
+                'class': 'form-control' # Ensure class is added here
+                }),
+        }
+        labels = {
+            'content': '', # Hide the default label, placeholder is enough
+        }

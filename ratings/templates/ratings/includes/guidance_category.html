@@ -1,0 +1,39 @@
+{# ratings/templates/ratings/includes/guidance_category.html #}
+{% load i18n %}
+
+{% if severity != 'None' or details or reason %}
+<div class="guide-category-block">
+    <div class="guide-category-header"
+         data-bs-toggle="collapse"
+         data-bs-target="#details{{ slug }}" {# Use the slug passed from the parent #}
+         aria-expanded="false"
+         aria-controls="details{{ slug }}"
+         title="{% translate 'Show/Hide Details & Reason' %}">
+        <span class="category-title-text">{% translate category_name %}</span> {# Translate the category name passed from parent #}
+        <div class="severity-display d-flex align-items-center">
+             <span class="d-flex align-items-center">
+                 <span class="severity-text ms-2">{{ severity }}</span> {# Use severity passed from parent #}
+                 <span class="severity-circle {{ severity_class|lower }}" title="{% translate 'Severity Rating' %}"></span> {# Use severity_class passed from parent #}
+             </span>
+             <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
+        </div>
+    </div>
+    <div class="collapse" id="details{{ slug }}">
+        <div class="guide-category-details">
+            {% if details %}
+                {{ details|linebreaksbr }} {# Use details passed from parent #}
+            {% endif %}
+            {% if reason %}
+                <div class="category-reason-inline">
+                    {% if details %}<hr class="reason-separator">{% endif %}
+                    <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
+                    <p class="reason-text">{{ reason|linebreaksbr }}</p> {# Use reason passed from parent #}
+                </div>
+            {% endif %}
+            {% if not details and not reason %}
+                <p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
