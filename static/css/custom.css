@@ -1025,11 +1025,8 @@ html[dir="rtl"] .platform-badge {
   width: 20px;
   position: relative;
   top: -2px;
-  filter: invert(0.6);
+  filter: invert(0.6) sepia(1) saturate(1.2) hue-rotate(175deg);
 }
 .light-mode .platform-icon img {
-    width: 20px;
-    position: relative;
-    top: -2px;
-    filter: invert(0.6) sepia(1) saturate(1.2) hue-rotate(175deg);
+  filter: invert(0.6);
 }
