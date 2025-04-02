@@ -27,9 +27,9 @@ REPO_PATH = '/home/pixeladder/MGC'
 DEBUG = True # Keep True for development
 
 ALLOWED_HOSTS = [
-    'pixeladder.pythonanywhere.com', # For PythonAnywhere
-    '127.0.0.1',                    # For local development (standard IP)
-    'localhost',                    # For local development (standard hostname)
+    'pixeladder.pythonanywhere.com', # Your live domain
+    '127.0.0.1',                   # Keep for local if needed
+    'localhost',                   # Keep for local if needed
 ]
 
 
@@ -150,5 +150,5 @@ LOGOUT_REDIRECT_URL = '/'
 # --------------------------
 
 # Add these lines anywhere in settings.py
-RECAPTCHA_PUBLIC_KEY = '6LeZpAcrAAAAAChxgWEoMz9JOHkkcE3plMzh6eD_'  # Paste your Site Key
-RECAPTCHA_PRIVATE_KEY = '6LeZpAcrAAAAAC9lLdEKjOmUW2jSKc0JnoR2pSfs' # Paste your Secret Key
+RECAPTCHA_PUBLIC_KEY = '6LexugcrAAAAACDHcXQogzALwIC87hxMufE8WAcU'  # Paste your Site Key
+RECAPTCHA_PRIVATE_KEY = '6LexugcrAAAAAJnJge1mqszLJ9B7wATMRyi5KqcJ' # Paste your Secret Key
