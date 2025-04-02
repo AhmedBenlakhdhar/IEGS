@@ -24,7 +24,7 @@ GITHUB_WEBHOOK_SECRET = 'M@a=pUN-8W}J6*E?Y;D{()' # Must match GitHub
 REPO_PATH = '/home/pixeladder/MGC'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True # Keep True for development
+DEBUG = True # Keep True for development, SET TO FALSE FOR PRODUCTION
 
 ALLOWED_HOSTS = [
     'pixeladder.pythonanywhere.com', # Your live domain
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', # Django's staticfiles app must be here
     # --- Your apps AFTER modeltranslation and admin ---
     'ratings.apps.RatingsConfig',
     'articles.apps.ArticlesConfig',
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Add whitenoise if not using PA static files mapping
     'django.contrib.sessions.middleware.SessionMiddleware',
     # --- LocaleMiddleware (After Session, Before Common) ---
     'django.middleware.locale.LocaleMiddleware',
@@ -149,9 +150,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [ BASE_DIR / 'static', ]
-# STATIC_ROOT = '/home/pixeladder/MGC/staticfiles_collected' # Set your production static root
+STATIC_URL = 'static/' # URL prefix for static files
+STATICFILES_DIRS = [ BASE_DIR / 'static', ] # For YOUR app's static files during development
+
+# --- CORRECTED STATIC_ROOT ---
+# This is where `collectstatic` will copy ALL static files (yours + admin + others)
+STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
+# -----------------------------
+
+# Optional: If using WhiteNoise (simpler setup sometimes)
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
