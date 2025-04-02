@@ -1021,13 +1021,13 @@ html[dir="rtl"] .platform-badge {
 } */
 /* --- End Platform/Detail Meta Styles --- */
 
-img.platform-icon {
+.platform-icon img {
   width: 20px;
   position: relative;
   top: -2px;
   filter: invert(0.6);
 }
-.light-mode img.platform-icon {
+.light-mode .platform-icon img {
     width: 20px;
     position: relative;
     top: -2px;
