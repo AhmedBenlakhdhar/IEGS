@@ -813,12 +813,8 @@ msgid "Spoiler Warning:"
 msgstr "تحذير حرق أحداث:"
 
 #: .\templates\ratings\game_detail.html:157
-msgid ""
-"Details below may contain plot spoilers. Click 'Show/Hide Details' where "
-"available to reveal."
-msgstr ""
-"التفاصيل أدناه قد تحتوي على حرق للأحداث. انقر 'إظهار / إخفاء التفاصيل' حيثما "
-"كان ذلك متاحاً للكشف عنها."
+msgid "Details below may contain plot spoilers."
+msgstr "التفاصيل قد تحتوي على حرق للأحداث."
 
 #: .\templates\ratings\game_detail.html:167
 msgid "Aqidah & Ideology"

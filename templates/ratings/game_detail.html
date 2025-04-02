@@ -41,7 +41,7 @@
                  </div>
             </div>
         {% endif %}
-        {# --- END: Platform Icons on Detail Page --- #}    
+        {# --- END: Platform Icons on Detail Page --- #}
 
         {# --- Store Links (Now Always Displayed if links exist) --- #}
         {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}
@@ -158,38 +158,39 @@
 </div>
 {% endif %}
 
-{# --- Islamic Guidance Section --- (No changes needed here for this request) #}
+{# --- Islamic Guidance Section --- #}
 <div class="mgc-guide-section">
     <h2 class="guide-section-title">{% translate "Islamic Guidance Breakdown" %}</h2>
     {% if game.has_spoilers_in_details %}
     <div class="alert alert-warning spoiler-alert" role="alert">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg>
-      <strong>{% translate "Spoiler Warning:" %}</strong> {% translate "Details below may contain plot spoilers. Click 'Show/Hide Details' where available to reveal." %}
+      <strong>{% translate "Spoiler Warning:" %}</strong> {% translate "Details below may contain plot spoilers." %}
     </div>
     {% endif %}
-    {# Category Blocks Go Here (Unchanged from previous step) #}
+
+    {# Category Blocks Go Here #}
     {# Aqidah #}
      {% if game.aqidah_severity != 'N' or game.aqidah_details or game.aqidah_reason %}
-     {% with category_slug="Aqidah" category_has_reason=game.aqidah_reason category_has_details=game.aqidah_details category_has_spoilers=game.has_spoilers_in_details %}
+     {% with category_slug="Aqidah" category_has_reason=game.aqidah_reason category_has_details=game.aqidah_details %}
      <div class="guide-category-block">
-         <div class="guide-category-header">
+         {# --- HEADER: Now acts as the toggle button --- #}
+         <div class="guide-category-header"
+              data-bs-toggle="collapse"
+              data-bs-target="#details{{ category_slug }}"
+              aria-expanded="false"
+              aria-controls="details{{ category_slug }}"
+              title="{% translate 'Show/Hide Details & Reason' %}" >
              <span class="category-title-text">{% translate "Aqidah & Ideology" %}</span>
              <div class="severity-display d-flex align-items-center">
                   <span class="d-flex align-items-center">
-                     <span class="severity-circle {{ game.aqidah_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                     <span class="severity-text ms-2">{{ game.aqidah_severity_display }}</span>
+                      <span class="severity-text ms-2">{{ game.aqidah_severity_display }}</span>
+                      <span class="severity-circle {{ game.aqidah_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
                   </span>
-                  <button class="btn btn-sm reason-toggle-icon ms-2"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}"
-                          title="{% translate 'Show/Hide Details & Reason' %}">
-                     <span class="material-symbols-outlined">expand_more</span>
-                 </button>
+                  {# --- Persistent icon indicator --- #}
+                  <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
              </div>
          </div>
+         {# --- Collapsible Content --- #}
          <div class="collapse" id="details{{ category_slug }}">
              <div class="guide-category-details">
                  {% if category_has_details %}
@@ -207,40 +208,28 @@
                  {% endif %}
              </div>
          </div>
-         {% if category_has_spoilers %}
-             <div class="guide-category-footer text-end spoiler-toggle-footer">
-                 <button class="btn btn-sm spoiler-toggle-btn" type="button"
-                         data-bs-toggle="collapse"
-                         data-bs-target="#details{{ category_slug }}"
-                         aria-expanded="false"
-                         aria-controls="details{{ category_slug }}">
-                     {% translate "Show/Hide Details" %}
-                 </button>
-             </div>
-         {% endif %}
+         {# --- REMOVED Footer Button Block --- #}
      </div>
      {% endwith %}
      {% endif %}
+
     {# Violence #}
      {% if game.violence_severity != 'N' or game.violence_details or game.violence_reason %}
-     {% with category_slug="Violence" category_has_reason=game.violence_reason category_has_details=game.violence_details category_has_spoilers=game.has_spoilers_in_details %}
+     {% with category_slug="Violence" category_has_reason=game.violence_reason category_has_details=game.violence_details %}
      <div class="guide-category-block">
-         <div class="guide-category-header">
+         <div class="guide-category-header"
+              data-bs-toggle="collapse"
+              data-bs-target="#details{{ category_slug }}"
+              aria-expanded="false"
+              aria-controls="details{{ category_slug }}"
+              title="{% translate 'Show/Hide Details & Reason' %}">
              <span class="category-title-text">{% translate "Violence & Aggression" %}</span>
              <div class="severity-display d-flex align-items-center">
                   <span class="d-flex align-items-center">
-                     <span class="severity-circle {{ game.violence_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                     <span class="severity-text ms-2">{{ game.violence_severity_display }}</span>
+                      <span class="severity-text ms-2">{{ game.violence_severity_display }}</span>
+                      <span class="severity-circle {{ game.violence_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
                   </span>
-                  <button class="btn btn-sm reason-toggle-icon ms-2"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}"
-                          title="{% translate 'Show/Hide Details & Reason' %}">
-                     <span class="material-symbols-outlined">expand_more</span>
-                 </button>
+                  <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
              </div>
          </div>
          <div class="collapse" id="details{{ category_slug }}">
@@ -260,40 +249,27 @@
                  {% endif %}
              </div>
          </div>
-         {% if category_has_spoilers %}
-             <div class="guide-category-footer text-end spoiler-toggle-footer">
-                 <button class="btn btn-sm spoiler-toggle-btn" type="button"
-                         data-bs-toggle="collapse"
-                         data-bs-target="#details{{ category_slug }}"
-                         aria-expanded="false"
-                         aria-controls="details{{ category_slug }}">
-                     {% translate "Show/Hide Details" %}
-                 </button>
-             </div>
-         {% endif %}
      </div>
      {% endwith %}
      {% endif %}
+
     {# Immorality #}
       {% if game.immorality_severity != 'N' or game.immorality_details or game.immorality_reason %}
-      {% with category_slug="Immorality" category_has_reason=game.immorality_reason category_has_details=game.immorality_details category_has_spoilers=game.has_spoilers_in_details %}
+      {% with category_slug="Immorality" category_has_reason=game.immorality_reason category_has_details=game.immorality_details %}
       <div class="guide-category-block">
-         <div class="guide-category-header">
+         <div class="guide-category-header"
+              data-bs-toggle="collapse"
+              data-bs-target="#details{{ category_slug }}"
+              aria-expanded="false"
+              aria-controls="details{{ category_slug }}"
+              title="{% translate 'Show/Hide Details & Reason' %}">
              <span class="category-title-text">{% translate "Immorality & Indecency" %}</span>
               <div class="severity-display d-flex align-items-center">
                   <span class="d-flex align-items-center">
-                     <span class="severity-circle {{ game.immorality_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                     <span class="severity-text ms-2">{{ game.immorality_severity_display }}</span>
+                      <span class="severity-text ms-2">{{ game.immorality_severity_display }}</span>
+                      <span class="severity-circle {{ game.immorality_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
                   </span>
-                  <button class="btn btn-sm reason-toggle-icon ms-2"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}"
-                          title="{% translate 'Show/Hide Details & Reason' %}">
-                     <span class="material-symbols-outlined">expand_more</span>
-                 </button>
+                  <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
              </div>
          </div>
           <div class="collapse" id="details{{ category_slug }}">
@@ -313,40 +289,27 @@
                   {% endif %}
              </div>
          </div>
-          {% if category_has_spoilers %}
-              <div class="guide-category-footer text-end spoiler-toggle-footer">
-                  <button class="btn btn-sm spoiler-toggle-btn" type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}">
-                      {% translate "Show/Hide Details" %}
-                  </button>
-              </div>
-          {% endif %}
      </div>
      {% endwith %}
      {% endif %}
+
     {# Substances #}
       {% if game.substances_gambling_severity != 'N' or game.substances_gambling_details or game.substances_gambling_reason %}
-      {% with category_slug="Substances" category_has_reason=game.substances_gambling_reason category_has_details=game.substances_gambling_details category_has_spoilers=game.has_spoilers_in_details %}
+      {% with category_slug="Substances" category_has_reason=game.substances_gambling_reason category_has_details=game.substances_gambling_details %}
       <div class="guide-category-block">
-         <div class="guide-category-header">
+         <div class="guide-category-header"
+              data-bs-toggle="collapse"
+              data-bs-target="#details{{ category_slug }}"
+              aria-expanded="false"
+              aria-controls="details{{ category_slug }}"
+              title="{% translate 'Show/Hide Details & Reason' %}">
              <span class="category-title-text">{% translate "Haram Substances & Gambling" %}</span>
               <div class="severity-display d-flex align-items-center">
                   <span class="d-flex align-items-center">
-                     <span class="severity-circle {{ game.substances_gambling_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                     <span class="severity-text ms-2">{{ game.substances_gambling_severity_display }}</span>
+                      <span class="severity-text ms-2">{{ game.substances_gambling_severity_display }}</span>
+                      <span class="severity-circle {{ game.substances_gambling_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
                   </span>
-                  <button class="btn btn-sm reason-toggle-icon ms-2"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}"
-                          title="{% translate 'Show/Hide Details & Reason' %}">
-                     <span class="material-symbols-outlined">expand_more</span>
-                 </button>
+                  <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
              </div>
          </div>
           <div class="collapse" id="details{{ category_slug }}">
@@ -366,40 +329,27 @@
                   {% endif %}
              </div>
          </div>
-          {% if category_has_spoilers %}
-              <div class="guide-category-footer text-end spoiler-toggle-footer">
-                  <button class="btn btn-sm spoiler-toggle-btn" type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}">
-                      {% translate "Show/Hide Details" %}
-                  </button>
-              </div>
-          {% endif %}
      </div>
      {% endwith %}
      {% endif %}
+
     {# Audio #}
       {% if game.audio_music_severity != 'N' or game.audio_music_details or game.audio_music_reason %}
-      {% with category_slug="Audio" category_has_reason=game.audio_music_reason category_has_details=game.audio_music_details category_has_spoilers=game.has_spoilers_in_details %}
+      {% with category_slug="Audio" category_has_reason=game.audio_music_reason category_has_details=game.audio_music_details %}
       <div class="guide-category-block">
-         <div class="guide-category-header">
+         <div class="guide-category-header"
+              data-bs-toggle="collapse"
+              data-bs-target="#details{{ category_slug }}"
+              aria-expanded="false"
+              aria-controls="details{{ category_slug }}"
+              title="{% translate 'Show/Hide Details & Reason' %}">
              <span class="category-title-text">{% translate "Audio & Music" %}</span>
               <div class="severity-display d-flex align-items-center">
                   <span class="d-flex align-items-center">
-                     <span class="severity-circle {{ game.audio_music_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                     <span class="severity-text ms-2">{{ game.audio_music_severity_display }}</span>
+                      <span class="severity-text ms-2">{{ game.audio_music_severity_display }}</span>
+                      <span class="severity-circle {{ game.audio_music_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
                   </span>
-                  <button class="btn btn-sm reason-toggle-icon ms-2"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}"
-                          title="{% translate 'Show/Hide Details & Reason' %}">
-                     <span class="material-symbols-outlined">expand_more</span>
-                 </button>
+                  <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
              </div>
          </div>
           <div class="collapse" id="details{{ category_slug }}">
@@ -419,40 +369,27 @@
                   {% endif %}
              </div>
          </div>
-          {% if category_has_spoilers %}
-              <div class="guide-category-footer text-end spoiler-toggle-footer">
-                  <button class="btn btn-sm spoiler-toggle-btn" type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}">
-                      {% translate "Show/Hide Details" %}
-                  </button>
-              </div>
-          {% endif %}
      </div>
      {% endwith %}
      {% endif %}
+
     {# Time #}
       {% if game.time_addiction_severity != 'N' or game.time_addiction_details or game.time_addiction_reason %}
-      {% with category_slug="Time" category_has_reason=game.time_addiction_reason category_has_details=game.time_addiction_details category_has_spoilers=game.has_spoilers_in_details %}
+      {% with category_slug="Time" category_has_reason=game.time_addiction_reason category_has_details=game.time_addiction_details %}
       <div class="guide-category-block">
-         <div class="guide-category-header">
+         <div class="guide-category-header"
+              data-bs-toggle="collapse"
+              data-bs-target="#details{{ category_slug }}"
+              aria-expanded="false"
+              aria-controls="details{{ category_slug }}"
+              title="{% translate 'Show/Hide Details & Reason' %}">
              <span class="category-title-text">{% translate "Time Commitment & Addiction Potential" %}</span>
               <div class="severity-display d-flex align-items-center">
                   <span class="d-flex align-items-center">
-                     <span class="severity-circle {{ game.time_addiction_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                     <span class="severity-text ms-2">{{ game.time_addiction_severity_display }}</span>
+                      <span class="severity-text ms-2">{{ game.time_addiction_severity_display }}</span>
+                      <span class="severity-circle {{ game.time_addiction_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
                   </span>
-                  <button class="btn btn-sm reason-toggle-icon ms-2"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}"
-                          title="{% translate 'Show/Hide Details & Reason' %}">
-                     <span class="material-symbols-outlined">expand_more</span>
-                 </button>
+                  <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
              </div>
          </div>
           <div class="collapse" id="details{{ category_slug }}">
@@ -472,40 +409,27 @@
                   {% endif %}
              </div>
          </div>
-          {% if category_has_spoilers %}
-              <div class="guide-category-footer text-end spoiler-toggle-footer">
-                  <button class="btn btn-sm spoiler-toggle-btn" type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}">
-                      {% translate "Show/Hide Details" %}
-                  </button>
-              </div>
-          {% endif %}
      </div>
      {% endwith %}
      {% endif %}
+
     {# Online #}
      {% if game.online_conduct_severity != 'N' or game.online_conduct_details or game.online_conduct_reason %}
-     {% with category_slug="Online" category_has_reason=game.online_conduct_reason category_has_details=game.online_conduct_details category_has_spoilers=game.has_spoilers_in_details %}
+     {% with category_slug="Online" category_has_reason=game.online_conduct_reason category_has_details=game.online_conduct_details %}
      <div class="guide-category-block">
-        <div class="guide-category-header">
+        <div class="guide-category-header"
+              data-bs-toggle="collapse"
+              data-bs-target="#details{{ category_slug }}"
+              aria-expanded="false"
+              aria-controls="details{{ category_slug }}"
+              title="{% translate 'Show/Hide Details & Reason' %}">
             <span class="category-title-text">{% translate "Online Conduct & Interaction" %}</span>
              <div class="severity-display d-flex align-items-center">
                   <span class="d-flex align-items-center">
-                     <span class="severity-circle {{ game.online_conduct_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                     <span class="severity-text ms-2">{{ game.online_conduct_severity_display }}</span>
+                      <span class="severity-text ms-2">{{ game.online_conduct_severity_display }}</span>
+                      <span class="severity-circle {{ game.online_conduct_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
                   </span>
-                  <button class="btn btn-sm reason-toggle-icon ms-2"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#details{{ category_slug }}"
-                          aria-expanded="false"
-                          aria-controls="details{{ category_slug }}"
-                          title="{% translate 'Show/Hide Details & Reason' %}">
-                     <span class="material-symbols-outlined">expand_more</span>
-                 </button>
+                  <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
              </div>
         </div>
          <div class="collapse" id="details{{ category_slug }}">
@@ -525,17 +449,6 @@
                   {% endif %}
             </div>
         </div>
-         {% if category_has_spoilers %}
-             <div class="guide-category-footer text-end spoiler-toggle-footer">
-                 <button class="btn btn-sm spoiler-toggle-btn" type="button"
-                         data-bs-toggle="collapse"
-                         data-bs-target="#details{{ category_slug }}"
-                         aria-expanded="false"
-                         aria-controls="details{{ category_slug }}">
-                     {% translate "Show/Hide Details" %}
-                 </button>
-             </div>
-         {% endif %}
      </div>
      {% endwith %}
      {% endif %}

@@ -187,28 +187,92 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .MGC-guide-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
 .guide-section-title { font-weight: var(--font-heading-weight); color: var(--text-primary); margin-bottom: 1.5rem !important; text-align: center; text-transform: uppercase; letter-spacing: 1px; font-size: 1.5rem; }
 .guide-category-block { background-color: transparent; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 1rem; overflow: hidden; }
-.guide-category-header { background-color: var(--bg-element); padding: 0.75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+
+/* --- MODIFIED: Make Header Clickable --- */
+.guide-category-header[data-bs-toggle="collapse"] {
+    background-color: var(--bg-element);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer; /* <<< ADD THIS: Pointer cursor */
+    position: relative; /* Good practice if using absolute positioning for icon later */
+    transition: background-color 0.2s ease; /* Optional: subtle hover effect */
+}
+/* Optional: Subtle hover effect on the clickable header */
+.guide-category-header[data-bs-toggle="collapse"]:hover {
+    background-color: var(--bg-element-lighter);
+}
+
 .category-title-text { font-size: 0.8rem; font-weight: var(--font-heading-weight); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; }
+
+/* --- Styles for Severity Display Elements (Keep these) --- */
 .severity-circle { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-left: 10px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.2); }
+html[dir="rtl"] .severity-circle { margin-left: 0; margin-right: 10px; } /* Keep RTL flip */
 .severity-circle.severity-n { background-color: var(--severity-n-color); }
 .severity-circle.severity-l { background-color: var(--severity-l-color); }
 .severity-circle.severity-m { background-color: var(--severity-m-color); }
 .severity-circle.severity-h { background-color: var(--severity-h-color); }
 .severity-circle.severity-p { background-color: var(--severity-p-color); }
+
+/* Keep severity text style */
+.severity-text {
+  font-size: 0.75rem; /* Smaller text */
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1; /* Align better with circle */
+}
+html[dir="rtl"] .severity-text.ms-2 { /* Keep RTL flip for margin */
+  margin-left: 0 !important;
+  margin-right: 0.5rem !important;
+}
+
+
+/* --- ADD/MODIFY: Styles for the Persistent Toggle Indicator --- */
+.guide-category-header .material-symbols-outlined.toggle-indicator {
+    color: var(--text-secondary); /* Match other secondary icons */
+    font-size: 1.25rem; /* Consistent size */
+    transition: transform 0.3s ease; /* Smooth rotation */
+    vertical-align: middle; /* Align nicely */
+    line-height: 1; /* Prevent extra spacing */
+}
+/* ADD THIS: Rotate icon when expanded */
+.guide-category-header[aria-expanded="true"] .material-symbols-outlined.toggle-indicator {
+     transform: rotate(180deg);
+}
+/* Keep RTL flip for the icon's margin */
+html[dir="rtl"] .toggle-indicator.ms-2 {
+    margin-left: 0 !important;
+    margin-right: 0.5rem !important;
+}
+
+
+/* --- Styles for Collapsible Details Area (Keep these) --- */
 .guide-category-details { padding: 1rem 1.25rem; font-size: 0.95rem; line-height: 1.7; color: var(--text-primary); background-color: transparent; }
 .guide-category-details p:last-child { margin-bottom: 0; }
-.category-reason { margin-top: 1rem; padding-top: 0.75rem; }
-.category-reason hr { margin-top: 0; margin-bottom: 0.75rem; border-top: 1px dashed var(--border-color); opacity: 0.5; }
-.category-reason p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0; }
-.category-reason strong { color: var(--text-primary); font-weight: 600; }
+.guide-category-block .collapse.show .guide-category-details { border-top: 1px solid var(--border-color); } /* Add separator when shown */
+html[dir="rtl"] .guide-category-details { text-align: right; } /* Keep RTL */
+
+
+/* --- Styles for Inline Reason (Keep these) --- */
+.category-reason-inline { margin-top: 1rem; padding-top: 0.75rem; }
+.reason-separator { margin-top: 0; margin-bottom: 0.75rem; border-top: 1px dashed var(--border-color); opacity: 0.5; }
+.reason-label { font-size: 0.8rem; font-weight: 600; color: var(--text-tertiary); margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.reason-text { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0; }
+html[dir="rtl"] .category-reason-inline { /* Text alignment should be handled by body */ }
+
+
+/* --- Keep Spoiler Alert Styles --- */
 .spoiler-alert { background-color: var(--alert-warning-bg); color: var(--alert-warning-text); border-color: var(--alert-warning-border); border-radius: 4px; margin-bottom: 1.5rem; font-weight: 600; padding: 0.75rem 1rem; }
 .spoiler-alert strong { color: inherit; }
 .spoiler-alert svg { vertical-align: -2px; }
-.guide-category-block .collapse.show .guide-category-details { border-top: 1px solid var(--border-color); }
-.guide-category-footer.spoiler-toggle-footer { background-color: var(--bg-element); padding: 0.5rem 1.25rem; border-top: 1px solid var(--border-color); border-radius: 0 0 5px 5px; }
-.spoiler-toggle-btn { font-family: var(--font-primary); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 0.3rem 0.8rem; border-radius: 3px; transition: all 0.2s ease; letter-spacing: 0.5px; }
-.spoiler-toggle-btn:hover { color: var(--accent-primary); border-color: var(--accent-primary); background-color: var(--bg-secondary); }
-.spoiler-toggle-btn[aria-expanded="true"] { color: var(--accent-primary); border-color: var(--accent-primary); background-color: var(--bg-secondary); }
+html[dir="rtl"] .spoiler-alert svg { /* Keep RTL flip for icon spacing */
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
 
 /* 8. Articles */
 .article-item { padding-bottom: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
