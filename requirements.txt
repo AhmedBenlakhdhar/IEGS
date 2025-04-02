@@ -6,7 +6,7 @@ sqlparse
 tzdata
 django-modeltranslation
 django-recaptcha
-widget_tweaks
+django-widget-tweaks
 
 # pillow # Add if needed by your project or other dependencies
 # python-dotenv # Add if using .env files
