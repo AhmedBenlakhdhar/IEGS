@@ -32,7 +32,7 @@
           {% endif %}
           {% if game.available_switch %}
               {# Font Awesome doesn't have a direct Switch icon, use a generic gamepad or mobile icon #}
-               <span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Nintendo_Switch_Logo.svg" alt="{% translate 'Nintendo Switch' %}"></span>
+               <span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="https://www.svgrepo.com/show/342069/nintendo-switch.svg" alt="{% translate 'Nintendo Switch' %}"></span>
           {% endif %}
           {# Add message if no platforms are checked #}
           {% if not game.available_pc and not game.available_ps5 and not game.available_ps4 and not game.available_xbox_series and not game.available_xbox_one and not game.available_switch %}
