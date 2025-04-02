@@ -1030,3 +1030,6 @@ html[dir="rtl"] .platform-badge {
 .light-mode .platform-icon img {
   filter: invert(0.6);
 }
+.platform-icon img:hover {
+  filter: invert(1) sepia(100) saturate(100) hue-rotate(290deg);
+}
