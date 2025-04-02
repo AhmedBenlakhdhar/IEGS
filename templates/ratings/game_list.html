@@ -68,8 +68,30 @@
           </select>
         </div>
 
+        {# --- Placeholder for Alignment --- #}
+        <div class="col-md-3 col-sm-6 d-none d-md-block">
+            <label class="form-label form-label-sm"> </label> {# Keep space for sort #}
+        </div>
+
+        {# --- Platform Filters (Full Width on next row essentially) --- #}
+        <div class="col-12 mt-3 mt-md-2"> {# Reduced top margin on medium+ screens #}
+          <label class="form-label form-label-sm">{% translate "Platforms" %}</label>
+          <div class="d-flex flex-wrap gap-2">
+            {# Iterate over the list passed from the view context #}
+            {% for platform_item in platform_list_for_template %}
+              <div class="form-check form-check-inline mb-1"> {# Added mb-1 for better wrapping #}
+                <input class="form-check-input" type="checkbox" name="platform" value="{{ platform_item.code }}" id="platform_{{ platform_item.code }}"
+                       {% if platform_item.code in selected_platforms %}checked{% endif %}>
+                <label class="form-check-label small" for="platform_{{ platform_item.code }}">
+                  {{ platform_item.name }}
+                </label>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
         {# --- Submit Button --- #}
-        <div class="col-md-3 col-sm-6 text-end">
+        <div class="col-12 mt-3 text-end"> {# Full width, text-end for button #}
           <button type="submit" class="btn btn-sm btn-primary filter-apply-btn">{% translate "Apply Filters" %}</button>
         </div>
 
@@ -95,7 +117,7 @@
     </div>
     {% empty %}
       <p class="col-12 text-center text-secondary">
-        {% if search_query or selected_tier != 'all' or requires_adjustment_filter or selected_flag %}
+        {% if search_query or selected_tier != 'all' or requires_adjustment_filter or selected_flag or selected_platforms %} {# Added selected_platforms to condition #}
             {# Generate the URL into a variable first #}
             {% url 'ratings:game_list' as all_games_url %}
             {# Now use the variable inside the blocktranslate tag #}

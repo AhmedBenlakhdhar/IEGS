@@ -1,4 +1,4 @@
-# ratings/views.py - FULL FILE (with i18n)
+# ratings/views.py - FULL FILE (with i18n and corrected platform filtering)
 from django.shortcuts import render, get_object_or_404, redirect, Http404
 from .models import Game, RatingTier, Flag
 from articles.models import Article # Assuming articles app exists
@@ -59,6 +59,7 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     selected_flag = request.GET.get('flag', '')
     requires_adjustment_filter = request.GET.get('adj', '')
     sort_by = request.GET.get('sort', '-date_added')
+    selected_platforms = request.GET.getlist('platform') # Get list of selected platforms
 
     # Apply Search Filter
     if search_query:
@@ -83,6 +84,23 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     elif requires_adjustment_filter == 'no':
          games_queryset = games_queryset.filter(requires_adjustment=False)
 
+    # --- Platform Filtering ---
+    platform_filters = Q()
+    if selected_platforms:
+        for plat_code in selected_platforms:
+            if plat_code == 'pc': platform_filters |= Q(available_pc=True)
+            elif plat_code == 'ps5': platform_filters |= Q(available_ps5=True)
+            elif plat_code == 'ps4': platform_filters |= Q(available_ps4=True)
+            elif plat_code == 'xbx': platform_filters |= Q(available_xbox_series=True)
+            elif plat_code == 'xb1': platform_filters |= Q(available_xbox_one=True)
+            elif plat_code == 'nsw': platform_filters |= Q(available_switch=True)
+            elif plat_code == 'and': platform_filters |= Q(available_android=True)
+            elif plat_code == 'ios': platform_filters |= Q(available_ios=True)
+
+        if platform_filters:
+            games_queryset = games_queryset.filter(platform_filters).distinct()
+    # --- End Platform Filtering ---
+
     # Apply Sorting
     valid_sort_options = ['title', '-title', 'release_date', '-release_date', 'date_added', '-date_added']
     if sort_by in valid_sort_options:
@@ -105,6 +123,19 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     all_tiers = RatingTier.objects.all()
     all_flags = Flag.objects.order_by('description') # Order flags alphabetically
 
+    # --- Define Platform List for Template ---
+    platform_list_for_template = [
+        {'code': 'pc', 'name': 'PC'},
+        {'code': 'ps5', 'name': 'PS5'},
+        {'code': 'ps4', 'name': 'PS4'},
+        {'code': 'xbx', 'name': 'Xbox Series'},
+        {'code': 'xb1', 'name': 'Xbox One'},
+        {'code': 'nsw', 'name': 'Switch'},
+        {'code': 'and', 'name': 'Android'},
+        {'code': 'ios', 'name': 'iOS'},
+    ]
+    # --- END Define Platform List ---
+
     context = {
         'games_page': games_page,
         'page_title': page_title, # Already translated above
@@ -116,6 +147,8 @@ def game_list(request, developer_slug=None, publisher_slug=None):
         'selected_flag': selected_flag,
         'requires_adjustment_filter': requires_adjustment_filter,
         'sort_by': sort_by,
+        'selected_platforms': selected_platforms, # Pass selected platforms back
+        'platform_list_for_template': platform_list_for_template, # Pass the defined list
     }
     return render(request, 'ratings/game_list.html', context)
 
