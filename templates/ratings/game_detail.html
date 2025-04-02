@@ -1,40 +1,65 @@
 {% extends "base.html" %}
 {% load static %}
-{% load i18n %} {# <--- ADD THIS LINE #}
+{% load i18n %}
 
 {% block title %}{{ game.title }} - {% translate "MGC Rating Details" %}{% endblock %}
 
 {% block content %}
-{# --- Game Header Info --- (Remains the same) #}
+{# --- Game Header Info --- #}
 <div class="row mb-4">
     <div class="col-lg-3 col-md-4">
+        {# --- Image --- #}
         <div class="detail-image-wrapper mb-3 mb-md-0">
             {% if game.cover_image_url %}
-                {# Translate alt text #}
                 <img src="{{ game.cover_image_url }}" class="img-fluid" alt="{% blocktranslate %}{{ game.title }} Cover{% endblocktranslate %}">
             {% else %}
-                 {# Translate placeholder text #}
                 <div class="img-fluid rounded shadow"><span>{% translate "No Image" %}</span></div>
             {% endif %}
         </div>
-         {# --- Store Links --- #}
-         {% if game.rating_tier.tier_code == 'HAL' or game.rating_tier.tier_code == 'MSH' %}
-             {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}
-                <div class="store-links-section mt-3">
-                    <h6 class="store-links-title">{% translate "Available On:" %}</h6>
-                    {# Translate store names #}
-                    {% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}
-                    {% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}
-                    {% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}
-                     {% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}
-                </div>
-            {% endif %}
-         {% endif %}
+
+        {# --- START: Platform Icons on Detail Page --- #}
+        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch %}
+            <div class="detail-platform-section mt-3">
+                <h6 class="detail-platform-title">{% translate "Available On:" %}</h6>
+                 <div class="platform-icons-container"> {# Reuse container class #}
+                     {% if game.available_pc %}
+                         <span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>
+                     {% endif %}
+                     {% if game.available_ps5 %}
+                          <span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>
+                     {% elif game.available_ps4 %}
+                          <span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>
+                     {% endif %}
+                     {% if game.available_xbox_series %}
+                         <span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>
+                      {% elif game.available_xbox_one %}
+                          <span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>
+                     {% endif %}
+                     {% if game.available_switch %}
+                         <span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><i class="fa-solid fa-gamepad"></i></span>
+                     {% endif %}
+                 </div>
+            </div>
+        {% endif %}
+        {# --- END: Platform Icons on Detail Page --- #}    
+
+        {# --- Store Links (Now Always Displayed if links exist) --- #}
+        {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}
+           <div class="store-links-section mt-3">
+               {% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}
+               {% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}
+               {% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}
+               {% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}
+           </div>
+        {% endif %}
+        {# --- End Store Links --- #}
+
     </div>
     <div class="col-lg-9 col-md-8">
         <h1 class="detail-title mb-1">{{ game.title }}</h1>
-        <p class="detail-meta mb-2">
-             {# Dev/Pub links show data from model, no direct translation needed here #}
+
+        {# --- Developer / Publisher Info (MOVED HERE) --- #}
+        <p class="detail-meta mb-2 mt-3"> {# Added mt-3 for spacing #}
              {% if game.developer and game.developer_slug %}
                  <a href="{% url 'ratings:games_by_developer' developer_slug=game.developer_slug %}">{{ game.developer }}</a>
              {% elif game.developer %}
@@ -48,35 +73,29 @@
              {% endif %}
             {% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}
         </p>
+        {# --- End Moved Dev/Pub Info --- #}
+
 
         {# --- Overall Rating Display --- #}
         <div class="mb-3 detail-overall-rating">
             <span class="fw-bold me-2">{% translate "Overall MGC Rating:" %}</span>
-				 <span class="rating-badge rating-{{ game.rating_tier.tier_code }}"
-					   style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};">
-					 <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>
-
-
-						  {% get_current_language as LANGUAGE_CODE_CURRENT %}
-
-						  {% translate "Haram" as translated_haram %}
-						  {% translate "Mashbouh" as translated_mashbouh %}
-						  {% translate "Halal" as translated_halal %}
-						  {% translate "Kufr" as translated_kufr %}
-						  {# --- END: Pre-translate --- #}
-
-						 <span class="rating-label">
-							{# Check against the exact English string stored in the DB #}
-							{% if game.rating_tier.display_name == "Haram" %}{{ translated_haram }}
-							{% elif game.rating_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}
-							{% elif game.rating_tier.display_name == "Halal" %}{{ translated_halal }}
-							{% elif game.rating_tier.display_name == "Kufr" %}{{ translated_kufr }}
-							{% else %}{{ game.rating_tier.display_name }} {# Fallback to orMGCnal if no match #}
-							{% endif %}
-						 </span>
-
-
-				 </span>
+             <span class="rating-badge rating-{{ game.rating_tier.tier_code }}"
+                   style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};">
+                 <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>
+                  {% get_current_language as LANGUAGE_CODE_CURRENT %}
+                  {% translate "Haram" as translated_haram %}
+                  {% translate "Mashbouh" as translated_mashbouh %}
+                  {% translate "Halal" as translated_halal %}
+                  {% translate "Kufr" as translated_kufr %}
+                 <span class="rating-label">
+                    {% if game.rating_tier.display_name == "Haram" %}{{ translated_haram }}
+                    {% elif game.rating_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}
+                    {% elif game.rating_tier.display_name == "Halal" %}{{ translated_halal }}
+                    {% elif game.rating_tier.display_name == "Kufr" %}{{ translated_kufr }}
+                    {% else %}{{ game.rating_tier.display_name }}
+                    {% endif %}
+                 </span>
+             </span>
             {% if game.requires_adjustment %}
                 <span class="badge adjustment-badge ms-2">{% translate "Requires Adjustment" %}</span>
             {% endif %}
@@ -87,11 +106,11 @@
         <div class="mb-3">
              <span class="fw-bold me-2">{% translate "Content Flags:" %}</span>
             {% for flag in game.flags.all %}
-                {# Flag description (title attribute) is translated via model #}
                 <span class="flag-symbol material-symbols-outlined" title="{{ flag.description }}">{{ flag.symbol }}</span>
             {% endfor %}
         </div>
         {% endif %}
+
          {# --- Optional Summary --- #}
         {% if game.summary %}
             <p class="game-summary text-secondary">{{ game.summary }}</p>
@@ -100,7 +119,6 @@
         {# --- Adjustment Guide --- #}
         {% if game.requires_adjustment and game.adjustment_guide %}
         <div class="adjustment-guide-section mt-4">
-             {# Translate guide title #}
              <h5>{% translate "Adjustment Guide" %}</h5>
              <div class="adjustment-guide-content">
                 {{ game.adjustment_guide|linebreaks }}
@@ -111,7 +129,7 @@
     </div>
 </div>
 
-{# --- START: Critic Reviews Section --- (Remains the same) #}
+{# --- Critic Reviews Section --- #}
 {% if game.critic_reviews.exists %}
 <div class="critic-reviews-section">
     <h2 class="critic-reviews-title">{% translate "Critic Reviews" %}</h2>
@@ -139,225 +157,410 @@
     </div>
 </div>
 {% endif %}
-{# --- END: Critic Reviews Section --- #}
 
-{# --- START: Islamic Guidance Section --- #}
+{# --- Islamic Guidance Section --- (No changes needed here for this request) #}
 <div class="mgc-guide-section">
     <h2 class="guide-section-title">{% translate "Islamic Guidance Breakdown" %}</h2>
-
-    {# --- Spoiler Warning (Conditional) --- #}
     {% if game.has_spoilers_in_details %}
     <div class="alert alert-warning spoiler-alert" role="alert">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
-          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-      </svg>
-      {# Translate warning #}
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg>
       <strong>{% translate "Spoiler Warning:" %}</strong> {% translate "Details below may contain plot spoilers. Click 'Show/Hide Details' where available to reveal." %}
     </div>
     {% endif %}
-
-    {# --- Category Blocks --- #}
-
-    {# Aqidah & Ideology #}
-    {% if game.aqidah_severity != 'N' or game.aqidah_details %}
-    <div class="guide-category-block">
-        <div class="guide-category-header">
-            <span class="category-title-text">{% translate "Aqidah & Ideology" %}</span>
-            <div class="severity-display d-flex align-items-center">
-                <span class="severity-circle {{ game.aqidah_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                <span class="severity-text ms-2">{{ game.aqidah_severity_display }}</span>
-                {% if game.aqidah_reason %}
-                    <span class="material-symbols-outlined info-icon ms-2"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          title="{{ game.aqidah_reason|escape }}">
-                        info
-                    </span>
-                {% endif %}
-            </div>
-        </div>
-        <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsAqidah" {% else %} class="" {% endif %}>
-            <div class="guide-category-details">
-                {% if game.aqidah_details %}{{ game.aqidah_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>{% endif %}
-            </div>
-        </div>
-        {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsAqidah" aria-expanded="false" aria-controls="detailsAqidah">{% translate "Show/Hide Details" %}</button></div>{% endif %}
-    </div>
-    {% endif %}
-
-    {# Violence & Aggression #}
-    {% if game.violence_severity != 'N' or game.violence_details %}
-    <div class="guide-category-block">
-        <div class="guide-category-header">
-            <span class="category-title-text">{% translate "Violence & Aggression" %}</span>
-            <div class="severity-display d-flex align-items-center">
-                <span class="severity-circle {{ game.violence_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                <span class="severity-text ms-2">{{ game.violence_severity_display }}</span>
-                {% if game.violence_reason %}
-                    <span class="material-symbols-outlined info-icon ms-2"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          title="{{ game.violence_reason|escape }}">
-                        info
-                    </span>
-                {% endif %}
-            </div>
-        </div>
-        <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsViolence" {% else %} class="" {% endif %}>
-            <div class="guide-category-details">
-                {% if game.violence_details %}{{ game.violence_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>{% endif %}
-            </div>
-        </div>
-        {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsViolence" aria-expanded="false" aria-controls="detailsViolence">{% translate "Show/Hide Details" %}</button></div>{% endif %}
-    </div>
-    {% endif %}
-
-    {# Immorality & Indecency #}
-    {% if game.immorality_severity != 'N' or game.immorality_details %}
+    {# Category Blocks Go Here (Unchanged from previous step) #}
+    {# Aqidah #}
+     {% if game.aqidah_severity != 'N' or game.aqidah_details or game.aqidah_reason %}
+     {% with category_slug="Aqidah" category_has_reason=game.aqidah_reason category_has_details=game.aqidah_details category_has_spoilers=game.has_spoilers_in_details %}
      <div class="guide-category-block">
-        <div class="guide-category-header">
-            <span class="category-title-text">{% translate "Immorality & Indecency" %}</span>
-            <div class="severity-display d-flex align-items-center">
-                <span class="severity-circle {{ game.immorality_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                <span class="severity-text ms-2">{{ game.immorality_severity_display }}</span>
-                {% if game.immorality_reason %}
-                    <span class="material-symbols-outlined info-icon ms-2"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          title="{{ game.immorality_reason|escape }}">
-                        info
-                    </span>
-                {% endif %}
-            </div>
-        </div>
-         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsImmorality" {% else %} class="" {% endif %}>
-            <div class="guide-category-details">
-                 {% if game.immorality_details %}{{ game.immorality_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>{% endif %}
-            </div>
-        </div>
-         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsImmorality" aria-expanded="false" aria-controls="detailsImmorality">{% translate "Show/Hide Details" %}</button></div>{% endif %}
-    </div>
-    {% endif %}
-
-    {# Haram Substances & Gambling #}
-    {% if game.substances_gambling_severity != 'N' or game.substances_gambling_details %}
+         <div class="guide-category-header">
+             <span class="category-title-text">{% translate "Aqidah & Ideology" %}</span>
+             <div class="severity-display d-flex align-items-center">
+                  <span class="d-flex align-items-center">
+                     <span class="severity-circle {{ game.aqidah_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
+                     <span class="severity-text ms-2">{{ game.aqidah_severity_display }}</span>
+                  </span>
+                  <button class="btn btn-sm reason-toggle-icon ms-2"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}"
+                          title="{% translate 'Show/Hide Details & Reason' %}">
+                     <span class="material-symbols-outlined">expand_more</span>
+                 </button>
+             </div>
+         </div>
+         <div class="collapse" id="details{{ category_slug }}">
+             <div class="guide-category-details">
+                 {% if category_has_details %}
+                     {{ game.aqidah_details|linebreaksbr }}
+                 {% endif %}
+                 {% if category_has_reason %}
+                     <div class="category-reason-inline">
+                         {% if category_has_details %}<hr class="reason-separator">{% endif %}
+                         <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
+                         <p class="reason-text">{{ game.aqidah_reason|linebreaksbr }}</p>
+                     </div>
+                 {% endif %}
+                 {% if not category_has_details and not category_has_reason %}
+                     <p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>
+                 {% endif %}
+             </div>
+         </div>
+         {% if category_has_spoilers %}
+             <div class="guide-category-footer text-end spoiler-toggle-footer">
+                 <button class="btn btn-sm spoiler-toggle-btn" type="button"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#details{{ category_slug }}"
+                         aria-expanded="false"
+                         aria-controls="details{{ category_slug }}">
+                     {% translate "Show/Hide Details" %}
+                 </button>
+             </div>
+         {% endif %}
+     </div>
+     {% endwith %}
+     {% endif %}
+    {# Violence #}
+     {% if game.violence_severity != 'N' or game.violence_details or game.violence_reason %}
+     {% with category_slug="Violence" category_has_reason=game.violence_reason category_has_details=game.violence_details category_has_spoilers=game.has_spoilers_in_details %}
      <div class="guide-category-block">
-        <div class="guide-category-header">
-            <span class="category-title-text">{% translate "Haram Substances & Gambling" %}</span>
-            <div class="severity-display d-flex align-items-center">
-                <span class="severity-circle {{ game.substances_gambling_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                <span class="severity-text ms-2">{{ game.substances_gambling_severity_display }}</span>
-                {% if game.substances_gambling_reason %}
-                    <span class="material-symbols-outlined info-icon ms-2"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          title="{{ game.substances_gambling_reason|escape }}">
-                        info
-                    </span>
-                {% endif %}
-            </div>
-        </div>
-         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsSubstances" {% else %} class="" {% endif %}>
-            <div class="guide-category-details">
-                 {% if game.substances_gambling_details %}{{ game.substances_gambling_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>{% endif %}
-            </div>
-        </div>
-         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsSubstances" aria-expanded="false" aria-controls="detailsSubstances">{% translate "Show/Hide Details" %}</button></div>{% endif %}
-    </div>
-    {% endif %}
-
-    {# Audio & Music #}
-    {% if game.audio_music_severity != 'N' or game.audio_music_details %}
-     <div class="guide-category-block">
-        <div class="guide-category-header">
-            <span class="category-title-text">{% translate "Audio & Music" %}</span>
-            <div class="severity-display d-flex align-items-center">
-                <span class="severity-circle {{ game.audio_music_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                <span class="severity-text ms-2">{{ game.audio_music_severity_display }}</span>
-                {% if game.audio_music_reason %}
-                    <span class="material-symbols-outlined info-icon ms-2"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          title="{{ game.audio_music_reason|escape }}">
-                        info
-                    </span>
-                {% endif %}
-            </div>
-        </div>
-         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsAudio" {% else %} class="" {% endif %}>
-            <div class="guide-category-details">
-                 {% if game.audio_music_details %}{{ game.audio_music_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>{% endif %}
-            </div>
-        </div>
-         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsAudio" aria-expanded="false" aria-controls="detailsAudio">{% translate "Show/Hide Details" %}</button></div>{% endif %}
-    </div>
-    {% endif %}
-
-    {# Time Commitment & Addiction Potential #}
-    {% if game.time_addiction_severity != 'N' or game.time_addiction_details %}
-     <div class="guide-category-block">
-        <div class="guide-category-header">
-            <span class="category-title-text">{% translate "Time Commitment & Addiction Potential" %}</span>
-            <div class="severity-display d-flex align-items-center">
-                <span class="severity-circle {{ game.time_addiction_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                <span class="severity-text ms-2">{{ game.time_addiction_severity_display }}</span>
-                {% if game.time_addiction_reason %}
-                    <span class="material-symbols-outlined info-icon ms-2"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          title="{{ game.time_addiction_reason|escape }}">
-                        info
-                    </span>
-                {% endif %}
-            </div>
-        </div>
-         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsTime" {% else %} class="" {% endif %}>
-            <div class="guide-category-details">
-                 {% if game.time_addiction_details %}{{ game.time_addiction_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>{% endif %}
-            </div>
-        </div>
-         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsTime" aria-expanded="false" aria-controls="detailsTime">{% translate "Show/Hide Details" %}</button></div>{% endif %}
-    </div>
-    {% endif %}
-
-    {# Online Conduct & Interaction #}
-    {% if game.online_conduct_severity != 'N' or game.online_conduct_details %}
+         <div class="guide-category-header">
+             <span class="category-title-text">{% translate "Violence & Aggression" %}</span>
+             <div class="severity-display d-flex align-items-center">
+                  <span class="d-flex align-items-center">
+                     <span class="severity-circle {{ game.violence_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
+                     <span class="severity-text ms-2">{{ game.violence_severity_display }}</span>
+                  </span>
+                  <button class="btn btn-sm reason-toggle-icon ms-2"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}"
+                          title="{% translate 'Show/Hide Details & Reason' %}">
+                     <span class="material-symbols-outlined">expand_more</span>
+                 </button>
+             </div>
+         </div>
+         <div class="collapse" id="details{{ category_slug }}">
+             <div class="guide-category-details">
+                 {% if category_has_details %}
+                     {{ game.violence_details|linebreaksbr }}
+                 {% endif %}
+                 {% if category_has_reason %}
+                     <div class="category-reason-inline">
+                         {% if category_has_details %}<hr class="reason-separator">{% endif %}
+                         <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
+                         <p class="reason-text">{{ game.violence_reason|linebreaksbr }}</p>
+                     </div>
+                 {% endif %}
+                 {% if not category_has_details and not category_has_reason %}
+                     <p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>
+                 {% endif %}
+             </div>
+         </div>
+         {% if category_has_spoilers %}
+             <div class="guide-category-footer text-end spoiler-toggle-footer">
+                 <button class="btn btn-sm spoiler-toggle-btn" type="button"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#details{{ category_slug }}"
+                         aria-expanded="false"
+                         aria-controls="details{{ category_slug }}">
+                     {% translate "Show/Hide Details" %}
+                 </button>
+             </div>
+         {% endif %}
+     </div>
+     {% endwith %}
+     {% endif %}
+    {# Immorality #}
+      {% if game.immorality_severity != 'N' or game.immorality_details or game.immorality_reason %}
+      {% with category_slug="Immorality" category_has_reason=game.immorality_reason category_has_details=game.immorality_details category_has_spoilers=game.has_spoilers_in_details %}
+      <div class="guide-category-block">
+         <div class="guide-category-header">
+             <span class="category-title-text">{% translate "Immorality & Indecency" %}</span>
+              <div class="severity-display d-flex align-items-center">
+                  <span class="d-flex align-items-center">
+                     <span class="severity-circle {{ game.immorality_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
+                     <span class="severity-text ms-2">{{ game.immorality_severity_display }}</span>
+                  </span>
+                  <button class="btn btn-sm reason-toggle-icon ms-2"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}"
+                          title="{% translate 'Show/Hide Details & Reason' %}">
+                     <span class="material-symbols-outlined">expand_more</span>
+                 </button>
+             </div>
+         </div>
+          <div class="collapse" id="details{{ category_slug }}">
+             <div class="guide-category-details">
+                  {% if category_has_details %}
+                      {{ game.immorality_details|linebreaksbr }}
+                  {% endif %}
+                  {% if category_has_reason %}
+                      <div class="category-reason-inline">
+                          {% if category_has_details %}<hr class="reason-separator">{% endif %}
+                          <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
+                          <p class="reason-text">{{ game.immorality_reason|linebreaksbr }}</p>
+                      </div>
+                  {% endif %}
+                  {% if not category_has_details and not category_has_reason %}
+                      <p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>
+                  {% endif %}
+             </div>
+         </div>
+          {% if category_has_spoilers %}
+              <div class="guide-category-footer text-end spoiler-toggle-footer">
+                  <button class="btn btn-sm spoiler-toggle-btn" type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}">
+                      {% translate "Show/Hide Details" %}
+                  </button>
+              </div>
+          {% endif %}
+     </div>
+     {% endwith %}
+     {% endif %}
+    {# Substances #}
+      {% if game.substances_gambling_severity != 'N' or game.substances_gambling_details or game.substances_gambling_reason %}
+      {% with category_slug="Substances" category_has_reason=game.substances_gambling_reason category_has_details=game.substances_gambling_details category_has_spoilers=game.has_spoilers_in_details %}
+      <div class="guide-category-block">
+         <div class="guide-category-header">
+             <span class="category-title-text">{% translate "Haram Substances & Gambling" %}</span>
+              <div class="severity-display d-flex align-items-center">
+                  <span class="d-flex align-items-center">
+                     <span class="severity-circle {{ game.substances_gambling_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
+                     <span class="severity-text ms-2">{{ game.substances_gambling_severity_display }}</span>
+                  </span>
+                  <button class="btn btn-sm reason-toggle-icon ms-2"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}"
+                          title="{% translate 'Show/Hide Details & Reason' %}">
+                     <span class="material-symbols-outlined">expand_more</span>
+                 </button>
+             </div>
+         </div>
+          <div class="collapse" id="details{{ category_slug }}">
+             <div class="guide-category-details">
+                  {% if category_has_details %}
+                      {{ game.substances_gambling_details|linebreaksbr }}
+                  {% endif %}
+                  {% if category_has_reason %}
+                      <div class="category-reason-inline">
+                          {% if category_has_details %}<hr class="reason-separator">{% endif %}
+                          <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
+                          <p class="reason-text">{{ game.substances_gambling_reason|linebreaksbr }}</p>
+                      </div>
+                  {% endif %}
+                  {% if not category_has_details and not category_has_reason %}
+                      <p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>
+                  {% endif %}
+             </div>
+         </div>
+          {% if category_has_spoilers %}
+              <div class="guide-category-footer text-end spoiler-toggle-footer">
+                  <button class="btn btn-sm spoiler-toggle-btn" type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}">
+                      {% translate "Show/Hide Details" %}
+                  </button>
+              </div>
+          {% endif %}
+     </div>
+     {% endwith %}
+     {% endif %}
+    {# Audio #}
+      {% if game.audio_music_severity != 'N' or game.audio_music_details or game.audio_music_reason %}
+      {% with category_slug="Audio" category_has_reason=game.audio_music_reason category_has_details=game.audio_music_details category_has_spoilers=game.has_spoilers_in_details %}
+      <div class="guide-category-block">
+         <div class="guide-category-header">
+             <span class="category-title-text">{% translate "Audio & Music" %}</span>
+              <div class="severity-display d-flex align-items-center">
+                  <span class="d-flex align-items-center">
+                     <span class="severity-circle {{ game.audio_music_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
+                     <span class="severity-text ms-2">{{ game.audio_music_severity_display }}</span>
+                  </span>
+                  <button class="btn btn-sm reason-toggle-icon ms-2"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}"
+                          title="{% translate 'Show/Hide Details & Reason' %}">
+                     <span class="material-symbols-outlined">expand_more</span>
+                 </button>
+             </div>
+         </div>
+          <div class="collapse" id="details{{ category_slug }}">
+             <div class="guide-category-details">
+                  {% if category_has_details %}
+                      {{ game.audio_music_details|linebreaksbr }}
+                  {% endif %}
+                  {% if category_has_reason %}
+                      <div class="category-reason-inline">
+                          {% if category_has_details %}<hr class="reason-separator">{% endif %}
+                          <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
+                          <p class="reason-text">{{ game.audio_music_reason|linebreaksbr }}</p>
+                      </div>
+                  {% endif %}
+                  {% if not category_has_details and not category_has_reason %}
+                      <p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>
+                  {% endif %}
+             </div>
+         </div>
+          {% if category_has_spoilers %}
+              <div class="guide-category-footer text-end spoiler-toggle-footer">
+                  <button class="btn btn-sm spoiler-toggle-btn" type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}">
+                      {% translate "Show/Hide Details" %}
+                  </button>
+              </div>
+          {% endif %}
+     </div>
+     {% endwith %}
+     {% endif %}
+    {# Time #}
+      {% if game.time_addiction_severity != 'N' or game.time_addiction_details or game.time_addiction_reason %}
+      {% with category_slug="Time" category_has_reason=game.time_addiction_reason category_has_details=game.time_addiction_details category_has_spoilers=game.has_spoilers_in_details %}
+      <div class="guide-category-block">
+         <div class="guide-category-header">
+             <span class="category-title-text">{% translate "Time Commitment & Addiction Potential" %}</span>
+              <div class="severity-display d-flex align-items-center">
+                  <span class="d-flex align-items-center">
+                     <span class="severity-circle {{ game.time_addiction_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
+                     <span class="severity-text ms-2">{{ game.time_addiction_severity_display }}</span>
+                  </span>
+                  <button class="btn btn-sm reason-toggle-icon ms-2"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}"
+                          title="{% translate 'Show/Hide Details & Reason' %}">
+                     <span class="material-symbols-outlined">expand_more</span>
+                 </button>
+             </div>
+         </div>
+          <div class="collapse" id="details{{ category_slug }}">
+             <div class="guide-category-details">
+                  {% if category_has_details %}
+                      {{ game.time_addiction_details|linebreaksbr }}
+                  {% endif %}
+                  {% if category_has_reason %}
+                      <div class="category-reason-inline">
+                          {% if category_has_details %}<hr class="reason-separator">{% endif %}
+                          <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
+                          <p class="reason-text">{{ game.time_addiction_reason|linebreaksbr }}</p>
+                      </div>
+                  {% endif %}
+                  {% if not category_has_details and not category_has_reason %}
+                      <p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>
+                  {% endif %}
+             </div>
+         </div>
+          {% if category_has_spoilers %}
+              <div class="guide-category-footer text-end spoiler-toggle-footer">
+                  <button class="btn btn-sm spoiler-toggle-btn" type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}">
+                      {% translate "Show/Hide Details" %}
+                  </button>
+              </div>
+          {% endif %}
+     </div>
+     {% endwith %}
+     {% endif %}
+    {# Online #}
+     {% if game.online_conduct_severity != 'N' or game.online_conduct_details or game.online_conduct_reason %}
+     {% with category_slug="Online" category_has_reason=game.online_conduct_reason category_has_details=game.online_conduct_details category_has_spoilers=game.has_spoilers_in_details %}
      <div class="guide-category-block">
         <div class="guide-category-header">
             <span class="category-title-text">{% translate "Online Conduct & Interaction" %}</span>
-            <div class="severity-display d-flex align-items-center">
-                <span class="severity-circle {{ game.online_conduct_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
-                <span class="severity-text ms-2">{{ game.online_conduct_severity_display }}</span>
-                {% if game.online_conduct_reason %}
-                    <span class="material-symbols-outlined info-icon ms-2"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          title="{{ game.online_conduct_reason|escape }}">
-                        info
-                    </span>
-                {% endif %}
-            </div>
+             <div class="severity-display d-flex align-items-center">
+                  <span class="d-flex align-items-center">
+                     <span class="severity-circle {{ game.online_conduct_severity_css_class|lower }}" title="{% translate 'Severity Rating' %}"></span>
+                     <span class="severity-text ms-2">{{ game.online_conduct_severity_display }}</span>
+                  </span>
+                  <button class="btn btn-sm reason-toggle-icon ms-2"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#details{{ category_slug }}"
+                          aria-expanded="false"
+                          aria-controls="details{{ category_slug }}"
+                          title="{% translate 'Show/Hide Details & Reason' %}">
+                     <span class="material-symbols-outlined">expand_more</span>
+                 </button>
+             </div>
         </div>
-         <div {% if game.has_spoilers_in_details %} class="collapse" id="detailsOnline" {% else %} class="" {% endif %}>
+         <div class="collapse" id="details{{ category_slug }}">
             <div class="guide-category-details">
-                 {% if game.online_conduct_details %}{{ game.online_conduct_details|linebreaksbr }}{% else %}<p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>{% endif %}
+                  {% if category_has_details %}
+                      {{ game.online_conduct_details|linebreaksbr }}
+                  {% endif %}
+                  {% if category_has_reason %}
+                      <div class="category-reason-inline">
+                          {% if category_has_details %}<hr class="reason-separator">{% endif %}
+                          <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
+                          <p class="reason-text">{{ game.online_conduct_reason|linebreaksbr }}</p>
+                      </div>
+                  {% endif %}
+                  {% if not category_has_details and not category_has_reason %}
+                      <p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>
+                  {% endif %}
             </div>
         </div>
-         {% if game.has_spoilers_in_details %}<div class="guide-category-footer text-end spoiler-toggle-footer"><button class="btn btn-sm spoiler-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#detailsOnline" aria-expanded="false" aria-controls="detailsOnline">{% translate "Show/Hide Details" %}</button></div>{% endif %}
-    </div>
-    {% endif %}
+         {% if category_has_spoilers %}
+             <div class="guide-category-footer text-end spoiler-toggle-footer">
+                 <button class="btn btn-sm spoiler-toggle-btn" type="button"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#details{{ category_slug }}"
+                         aria-expanded="false"
+                         aria-controls="details{{ category_slug }}">
+                     {% translate "Show/Hide Details" %}
+                 </button>
+             </div>
+         {% endif %}
+     </div>
+     {% endwith %}
+     {% endif %}
 
-    {# --- No Concerns Message --- #}
-    {% with has_aqidah=game.aqidah_details has_violence=game.violence_details has_immorality=game.immorality_details has_substances=game.substances_gambling_details has_audio=game.audio_music_details has_time=game.time_addiction_details has_online=game.online_conduct_details %}
-        {% if game.aqidah_severity == 'N' and not has_aqidah and game.violence_severity == 'N' and not has_violence and game.immorality_severity == 'N' and not has_immorality and game.substances_gambling_severity == 'N' and not has_substances and game.audio_music_severity == 'N' and not has_audio and game.time_addiction_severity == 'N' and not has_time and game.online_conduct_severity == 'N' and not has_online %}
-            <p class="text-center text-secondary my-4">{% translate "No significant Islamic concerns noted in the assessed categories." %}</p>
-        {% endif %}
-    {% endwith %}
+    {# --- No Concerns Message (Alternative Structure) --- #}
+    {% if game.aqidah_severity == 'N' and not game.aqidah_details and not game.aqidah_reason %}
+        {% if game.violence_severity == 'N' and not game.violence_details and not game.violence_reason %}
+            {% if game.immorality_severity == 'N' and not game.immorality_details and not game.immorality_reason %}
+                {% if game.substances_gambling_severity == 'N' and not game.substances_gambling_details and not game.substances_gambling_reason %}
+                    {% if game.audio_music_severity == 'N' and not game.audio_music_details and not game.audio_music_reason %}
+                        {% if game.time_addiction_severity == 'N' and not game.time_addiction_details and not game.time_addiction_reason %}
+                            {% if game.online_conduct_severity == 'N' and not game.online_conduct_details and not game.online_conduct_reason %}
+                                <p class="text-center text-secondary my-4">{% translate "No significant Islamic concerns noted in the assessed categories." %}</p>
+                            {% endif %} {# End Online #}
+                        {% endif %} {# End Time #}
+                    {% endif %} {# End Audio #}
+                {% endif %} {# End Substances #}
+            {% endif %} {# End Immorality #}
+        {% endif %} {# End Violence #}
+    {% endif %} {# End Aqidah #}
+    {# --- End Alternative No Concerns Message --- #}
 
 </div>
 {# --- END: Islamic Guidance Section --- #}
 
-{# Translate back link #}
 <a href="{% url 'ratings:game_list' %}" class="back-link mt-4">{% translate "← Back to Game Ratings" %}</a>
 
 {% endblock %}

@@ -5,49 +5,61 @@
 <a href="{{ game.get_absolute_url }}" class="card-link-wrapper">
   <div class="card game-card h-100">
     {% if game.cover_image_url %}
-      {# Translate alt text #}
       <img src="{{ game.cover_image_url }}" class="card-img-top" alt="{% blocktranslate %}{{ game.title }} Cover{% endblocktranslate %}">
     {% else %}
-      {# Translate placeholder text #}
       <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 180px;">
         <span>{% translate "No Image" %}</span>
       </div>
     {% endif %}
 
     <div class="card-body d-flex flex-column">
-      <h4 class="card-title">{{ game.title }}</h4> {# Title comes from DB, not translated here #}
+      <h4 class="card-title">{{ game.title }}</h4>
 
-      <p class="game-meta">
-         {% if game.developer %}{{ game.developer }}{% endif %} {# Comes from DB #}
-         {% if game.developer and game.publisher %} / {% endif %}
-         {% if game.publisher %}{{ game.publisher }}{% endif %} {# Comes from DB #}
-         {% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}
-      </p>
+      {# --- START: Platform Icons --- #}
+      <div class="platform-icons-container mb-2">
+          {% if game.available_pc %}
+              <span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>
+          {% endif %}
+          {% if game.available_ps5 %}
+               <span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>
+          {% elif game.available_ps4 %} {# Show generic PS icon if only PS4 #}
+               <span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>
+          {% endif %}
+          {% if game.available_xbox_series %}
+              <span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>
+           {% elif game.available_xbox_one %} {# Show generic Xbox icon if only Xbox One #}
+               <span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>
+          {% endif %}
+          {% if game.available_switch %}
+              {# Font Awesome doesn't have a direct Switch icon, use a generic gamepad or mobile icon #}
+              <span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><i class="fa-solid fa-gamepad"></i></span>
+          {% endif %}
+          {# Add message if no platforms are checked #}
+          {% if not game.available_pc and not game.available_ps5 and not game.available_ps4 and not game.available_xbox_series and not game.available_xbox_one and not game.available_switch %}
+               <span class="text-secondary small fst-italic">{% translate "Platforms not specified" %}</span>
+          {% endif %}
+      </div>
+      {# --- END: Platform Icons --- #}
 
       <div class="rating-flags-container mt-auto pt-2">
          <span class="rating-badge rating-{{ game.rating_tier.tier_code }}"
                style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};">
              <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>
-             {# --- START: Use the pre-translated variables passed from parent --- #}
              <span class="rating-label">
-                {# Check against the exact English string stored in the DB #}
                 {% if game.rating_tier.display_name == "Haram" %}{{ translated_haram }}
                 {% elif game.rating_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}
                 {% elif game.rating_tier.display_name == "Halal" %}{{ translated_halal }}
                 {% elif game.rating_tier.display_name == "Kufr" %}{{ translated_kufr }}
-                {% else %}{{ game.rating_tier.display_name }} {# Fallback to orMGCnal if no match #}
+                {% else %}{{ game.rating_tier.display_name }}
                 {% endif %}
              </span>
-             {# --- END: Use the pre-translated variables --- #}
          </span>
          {% if game.requires_adjustment %}
-              {# Translate adjustment badge text #}
               <span class="badge adjustment-badge ms-1">{% translate "Adjustable" %}</span>
          {% endif %}
          <br class="mt-1">
          {% for flag in game.flags.all %}
-            {# Flag description (title attribute) might be translated if model field is marked #}
-           <span class="flag-symbol material-symbols-outlined" title="{{ flag.description }}">{{ flag.symbol }}</span> {# Display icon name #}
+           <span class="flag-symbol material-symbols-outlined" title="{{ flag.description }}">{{ flag.symbol }}</span>
          {% endfor %}
       </div>
     </div>

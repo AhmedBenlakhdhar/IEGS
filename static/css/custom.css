@@ -737,10 +737,10 @@ html[dir="rtl"] .article-list-simple .list-group-item small:first-of-type {
     /* order: -1; margin-right: auto; */
 }
 
-/* --- Styles for Severity Text and Reason Tooltip Icon --- */
+/* --- Styles for Severity Text and Reason Handling --- */
 .severity-display {
   /* Uses d-flex align-items-center from HTML */
-  gap: 0.25rem; /* Adds small space between circle/text/icon */
+  gap: 0.25rem; /* Small space between circle/text/icon */
 }
 
 .severity-text {
@@ -752,46 +752,206 @@ html[dir="rtl"] .article-list-simple .list-group-item small:first-of-type {
   line-height: 1; /* Align better with circle */
 }
 
-.info-icon {
-  font-size: 1rem; /* Icon size */
+/* Style for the new optional toggle icon in the header */
+.reason-toggle-icon {
+  padding: 0.1rem 0.25rem;
+  line-height: 1;
   color: var(--text-secondary);
-  cursor: help; /* Indicate it provides help */
-  vertical-align: middle;
-  transition: color 0.2s ease;
-  line-height: 1; /* Align better */
+  background-color: transparent;
+  border: none;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
-
-.info-icon:hover {
+.reason-toggle-icon:hover {
   color: var(--accent-primary);
 }
+.reason-toggle-icon .material-symbols-outlined {
+  font-size: 1.25rem; /* Adjust icon size */
+  vertical-align: middle;
+  transition: transform 0.3s ease;
+}
+/* Rotate icon when expanded */
+.reason-toggle-icon[aria-expanded="true"] .material-symbols-outlined {
+  transform: rotate(180deg);
+}
 
-/* RTL Adjustments for new elements */
+/* Styling for the reason when shown inline */
+.category-reason-inline {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+}
+.reason-separator {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  border-top: 1px dashed var(--border-color);
+  opacity: 0.5;
+}
+.reason-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.reason-text {
+  font-size: 0.9rem; /* Slightly smaller than main details */
+  color: var(--text-secondary); /* Differentiate from main details */
+  margin-bottom: 0;
+}
+
+/* --- REMOVE these old styles --- */
+/* .info-icon { ... } */
+/* .info-icon:hover { ... } */
+/* .tooltip-inner { ... } */
+/* .tooltip.bs-tooltip-top .tooltip-arrow::before { ... } */
+/* html[dir="rtl"] .tooltip-inner { ... } */
+
+
+/* RTL Adjustments */
 html[dir="rtl"] .severity-text.ms-2 {
   margin-left: 0 !important;
   margin-right: 0.5rem !important; /* Flipped ms-2 */
 }
-html[dir="rtl"] .info-icon.ms-2 {
+/* Adjust margin for the new header toggle icon */
+html[dir="rtl"] .reason-toggle-icon.ms-2 {
   margin-left: 0 !important;
   margin-right: 0.5rem !important; /* Flipped ms-2 */
 }
-/* --- End Severity/Tooltip Icon Styles --- */
+html[dir="rtl"] .category-reason-inline {
+  /* Text alignment should be handled by body */
+}
+/* --- End Severity/Reason Styles --- */
 
-/* Optional: Adjust tooltip appearance (Bootstrap default is usually fine) */
-.tooltip-inner {
-max-width: 300px; /* Allow slightly wider tooltips */
-text-align: left; /* Ensure LTR text inside tooltip */
-background-color: var(--bg-element-lighter); /* Match theme */
-color: var(--text-primary);
-border: 1px solid var(--border-color);
+/* --- Platform Icons --- */
+.platform-icons-container {
+  line-height: 1;
+  margin-bottom: 0.5rem; /* Space below icons on card */
 }
-.tooltip.bs-tooltip-top .tooltip-arrow::before {
-border-top-color: var(--border-color); /* Match theme */
+.platform-icon {
+  display: inline-block; /* Or inline-flex if needed */
+  font-size: 1.1rem; /* Adjust icon size */
+  color: var(--text-secondary);
+  margin-right: 6px; /* LTR spacing */
+  padding: 2px; /* Small padding around icon */
+  vertical-align: middle;
+  transition: color 0.2s ease;
 }
-.tooltip.bs-tooltip-end .tooltip-arrow::before {
- border-right-color: var(--border-color);
+.platform-icon:hover {
+  color: var(--text-primary); /* Simple hover effect */
 }
-/* etc. for bottom/start if needed */
+/* Optional: Specific platform colors */
+.platform-icon.platform-ps:hover { color: #0070d1; }
+.platform-icon.platform-xbox:hover { color: #107c10; }
+.platform-icon.platform-switch:hover { color: #e60012; }
+.platform-icon.platform-pc:hover { color: #00a4ef; } /* Windows blue-ish */
 
-html[dir="rtl"] .tooltip-inner {
-  text-align: right; /* RTL text inside tooltip */
+/* Detail Page Platform Section */
+.detail-platform-section {} /* Container */
+.detail-platform-title {
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+.detail-platform-section .platform-icons-container {
+  margin-bottom: 0; /* No extra margin needed below on detail page */
+}
+.detail-platform-section .platform-icon {
+  font-size: 1.3rem; /* Slightly larger on detail page */
+  margin-right: 8px; /* More spacing on detail page */
+}
+
+
+/* --- REMOVE Old Platform Badge Styles --- */
+/* .platform-badge { ... } */
+/* .platform-badge.platform-steam { ... } */
+/* .platform-badge.platform-epic { ... } */
+/* .platform-badge.platform-gog { ... } */
+/* .platform-badge.platform-other { ... } */
+
+
+/* --- RTL Adjustments --- */
+html[dir="rtl"] .platform-icon {
+  margin-right: 0;
+  margin-left: 6px; /* Flipped margin for card */
+}
+html[dir="rtl"] .detail-platform-section .platform-icon {
+  margin-right: 0;
+  margin-left: 8px; /* Flipped margin for detail */
+}
+/* --- End Platform Icon Styles --- */
+
+/* --- Platform Icons on Game Card --- */
+.platform-icons-container {
+  line-height: 1; /* Prevent extra spacing */
+  text-align: start; /* LTR Default */
+  margin-bottom: 0.5rem; /* Add some space below icons */
+}
+
+.platform-badge {
+  font-size: 0.65rem; /* Smaller badge */
+  font-weight: 600;
+  padding: 3px 6px;
+  margin-right: 4px; /* Space between badges (LTR) */
+  margin-bottom: 4px; /* Allow wrapping */
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent; /* Base border */
+  display: inline-block; /* Ensure badges flow inline */
+  vertical-align: middle; /* Align badges if they wrap */
+}
+
+.platform-badge.platform-steam {
+  background-color: #1b2838; /* Dark Steam blue */
+  color: #c7d5e0; /* Light Steam text */
+  border-color: #66c0f4; /* Steam blue accent border */
+}
+.platform-badge.platform-epic {
+  background-color: #333333; /* Epic dark grey */
+  color: #ffffff;
+  border-color: #666666;
+}
+.platform-badge.platform-gog {
+  background-color: #5d3a7a; /* GOG purple */
+  color: #ffffff;
+  border-color: #8a43ce;
+}
+.platform-badge.platform-other {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+/* --- Game Detail Meta Adjustment --- */
+.detail-meta {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  /* margin-bottom: 0.5rem; */ /* Keep default or adjust */
+  text-transform: uppercase;
+  position: relative;
+  /* padding-bottom: 0.75rem; */ /* Remove padding if removing line */
+  /* border-bottom: 1px solid var(--border-color); */ /* Remove line */
+  margin-top: 1rem; /* Add top margin since it's moved down */
+}
+/* Remove the ::after pseudo-element if you don't want the accent line under dev/pub */
+.detail-meta::after {
+  content: none; /* Remove the accent line */
+}
+
+
+/* --- RTL Adjustments --- */
+html[dir="rtl"] .platform-icons-container {
+  text-align: right;
+}
+html[dir="rtl"] .platform-badge {
+  margin-right: 0;
+  margin-left: 4px; /* Flipped margin */
+}
+/* Remove RTL rule for detail-meta::after if ::after is removed */
+/* html[dir="rtl"] .detail-meta::after {
+  left: auto; right: 0;
+} */
+/* --- End Platform/Detail Meta Styles --- */

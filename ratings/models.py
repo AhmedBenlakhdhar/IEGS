@@ -82,6 +82,22 @@ class Game(models.Model):
     developer_slug = models.SlugField(max_length=110, blank=True, help_text=_("Auto-generated slug for developer filtering."))
     publisher_slug = models.SlugField(max_length=110, blank=True, help_text=_("Auto-generated slug for publisher filtering."))
 
+    steam_link = models.URLField(_("Steam Store URL"), max_length=300, blank=True, null=True)
+    epic_link = models.URLField(_("Epic Games Store URL"), max_length=300, blank=True, null=True)
+    gog_link = models.URLField(_("GOG Store URL"), max_length=300, blank=True, null=True)
+    other_store_link = models.URLField(_("Other Store URL"), max_length=300, blank=True, null=True)
+
+    # --- START: Platform Availability Fields ---
+    available_pc = models.BooleanField(_("Available on PC"), default=False)
+    available_ps5 = models.BooleanField(_("Available on PS5"), default=False)
+    available_ps4 = models.BooleanField(_("Available on PS4"), default=False)
+    available_xbox_series = models.BooleanField(_("Available on Xbox Series X|S"), default=False)
+    available_xbox_one = models.BooleanField(_("Available on Xbox One"), default=False)
+    available_switch = models.BooleanField(_("Available on Nintendo Switch"), default=False)
+    available_android = models.BooleanField(_("Available on Android"), default=False)
+    available_ios = models.BooleanField(_("Available on iOS"), default=False)
+
+
     # --- MGC Rating & Flags ---
     rating_tier = models.ForeignKey(
         RatingTier, on_delete=models.PROTECT, related_name='games',

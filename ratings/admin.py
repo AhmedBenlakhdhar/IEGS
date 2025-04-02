@@ -34,28 +34,31 @@ class GameAdmin(admin.ModelAdmin):
     ordering = ('-date_updated',)
     readonly_fields = ('developer_slug', 'publisher_slug', 'date_added', 'date_updated')
 
-    # --- Apply _() to fieldset titles ---
     fieldsets = (
-        (_('Core Information'), { # <--- Use _()
+        (_('Core Information'), {
             'fields': ('title', 'slug', 'cover_image_url',
-                       ('developer', 'developer_slug'), # Ensure this is a tuple
-                       ('publisher', 'publisher_slug'), # Ensure this is a tuple
+                       ('developer', 'developer_slug'),
+                       ('publisher', 'publisher_slug'),
                        'release_date', 'summary')
         }),
-        (_('Overall Rating & Flags'), { # <--- Use _()
+        (_('Platform Availability'), {
+            'fields': (('available_pc', 'available_ps5', 'available_ps4'), # Group them logically
+                       ('available_xbox_series', 'available_xbox_one', 'available_switch'))
+        }),
+        (_('Store Links'), { # Optional: Group store links
+            'classes': ('collapse',),
+            'fields': ('steam_link', 'epic_link', 'gog_link', 'other_store_link')
+        }),
+        (_('Overall Rating & Flags'), {
             'fields': ('rating_tier', 'requires_adjustment', 'flags', 'rationale', 'has_spoilers_in_details')
         }),
-        (_('Additional Info'), { # <--- Use _()
+        (_('Additional Info'), {
              'classes': ('collapse',),
-             # Ensure all items here are strings
-             'fields': ('adjustment_guide', 'steam_link', 'epic_link', 'gog_link', 'other_store_link',
-                        'critic_reviews')
+             'fields': ('adjustment_guide', 'critic_reviews') # Removed store links from here
         }),
-        (_('Detailed MGC Breakdown'), { # <--- Use _()
+        (_('Detailed MGC Breakdown'), {
             'classes': ('collapse',),
-            # Ensure this is a tuple (or list) of tuples (or strings)
             'fields': (
-                # Ensure each of these is a tuple of strings
                 ('aqidah_severity', 'aqidah_details', 'aqidah_reason'),
                 ('violence_severity', 'violence_details', 'violence_reason'),
                 ('immorality_severity', 'immorality_details', 'immorality_reason'),
@@ -63,8 +66,6 @@ class GameAdmin(admin.ModelAdmin):
                 ('audio_music_severity', 'audio_music_details', 'audio_music_reason'),
                 ('time_addiction_severity', 'time_addiction_details', 'time_addiction_reason'),
                 ('online_conduct_severity', 'online_conduct_details', 'online_conduct_reason'),
-                # --- CRITICAL: Check your actual file for typos here ---
-                # --- Make sure there are no {} or [] used inside 'fields' ---
             )
         }),
     )
