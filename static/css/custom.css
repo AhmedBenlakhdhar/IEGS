@@ -1020,3 +1020,16 @@ html[dir="rtl"] .platform-badge {
   left: auto; right: 0;
 } */
 /* --- End Platform/Detail Meta Styles --- */
+
+img.platform-icon {
+  width: 20px;
+  position: relative;
+  top: -2px;
+  filter: invert(0.6);
+}
+.light-mode img.platform-icon {
+    width: 20px;
+    position: relative;
+    top: -2px;
+    filter: invert(0.6) sepia(1) saturate(1.2) hue-rotate(175deg);
+}
