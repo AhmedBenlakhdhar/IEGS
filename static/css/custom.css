@@ -157,7 +157,7 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .flag-symbol:hover { color: var(--accent-primary); border-color: var(--accent-primary); background-color: var(--bg-secondary); cursor: default; }
 .rating-icon { font-size: 1.7em; vertical-align: -2px; margin-right: 4px; position: relative; top: 1px; }
 .badge.adjustment-badge { background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); font-family: var(--font-primary); font-weight: 600; font-size: 0.75rem; padding: 7px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; }
-.rating-label { position: relative; top: -2px; }
+.rating-label { position: relative; top: 0; }
 
 /* 6. Game Detail Page */
 .detail-image-wrapper { background-color: var(--bg-element-lighter); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 6px; margin-bottom: 1.5rem; }
