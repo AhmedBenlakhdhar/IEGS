@@ -36,14 +36,19 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    # --- Ensure modeltranslation is loaded EARLY ---
+    'modeltranslation',
+    # ----------------------------------------------
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # --- Your apps AFTER modeltranslation and admin ---
     'ratings.apps.RatingsConfig',
     'articles.apps.ArticlesConfig',
+    # --- Other third-party apps ---
     'django_recaptcha',
     'widget_tweaks',
 ]
@@ -52,7 +57,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    # --- ADD LocaleMiddleware (After Session, Before Common) ---
+    # --- LocaleMiddleware (After Session, Before Common) ---
     'django.middleware.locale.LocaleMiddleware',
     # ---------------------------------------------------------
     'django.middleware.common.CommonMiddleware',
@@ -75,6 +80,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # --- ADD context processor for languages ---
+                'django.template.context_processors.i18n',
+                # ------------------------------------------
             ],
         },
     },
@@ -108,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization (i18n) & Localization (L10n)
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us' # Default language
+LANGUAGE_CODE = 'en' # Default language code (e.g., 'en', 'en-us')
 
 # --- Define available languages ---
 LANGUAGES = [
@@ -123,9 +131,17 @@ LOCALE_PATHS = [
 ]
 # ------------------------------------
 
+# --- Modeltranslation settings ---
+MODELTRANSLATION_DEFAULT_LANGUAGE = LANGUAGE_CODE
+# Optional: specify languages explicitly if different from LANGUAGES
+# MODELTRANSLATION_LANGUAGES = ('en', 'ar')
+# Optional: configure fallback behavior
+# MODELTRANSLATION_FALLBACK_LANGUAGES = {'default': ('en',)} # Default behavior is usually good
+# --------------------------------
+
 TIME_ZONE = 'UTC'
 
-USE_I18N = True # --- Enable Internationalization ---
+USE_I18N = True # --- Ensure Internationalization is Enabled ---
 
 USE_TZ = True
 
@@ -135,8 +151,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [ BASE_DIR / 'static', ]
-STATIC_ROOT = '/home/pixeladder/MGC/venv/Lib/site-packages/django/contrib/staticfiles'
-
+# STATIC_ROOT = '/home/pixeladder/MGC/staticfiles_collected' # Set your production static root
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

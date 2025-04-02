@@ -4,6 +4,9 @@ gunicorn
 whitenoise
 sqlparse
 tzdata
+django-modeltranslation
+django-recaptcha
+
 # pillow # Add if needed by your project or other dependencies
 # python-dotenv # Add if using .env files
 # psycopg2-binary # Add ONLY if using PostgreSQL
