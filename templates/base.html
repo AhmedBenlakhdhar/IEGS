@@ -131,16 +131,18 @@
     {% endblock %}
   </main>
 
-  <footer class="site-footer mt-auto">
-    <div class="container">
-       {# Get the current year into a variable BEFORE the blocktranslate #}
-       {% now "Y" as current_year %}
-       <p class="footer-text">
-         {# Use the variable inside the blocktranslate #}
-         {% blocktranslate %}Muslim Game Classification © {{ current_year }}.{% endblocktranslate %}
-       </p>
-    </div>
- </footer>
+  {# templates/base.html - Footer Snippet #}
+    <footer class="site-footer mt-auto">
+        <div class="container">
+        {% now "Y" as current_year %}
+        <p class="footer-text">
+            {% blocktranslate %}Muslim Game Classification © {{ current_year }}.{% endblocktranslate %}
+            {# --- ADD LINK HERE --- #}
+            <a href="{% url 'ratings:methodology' %}" class="text-secondary ms-2">{% translate "Rating Methodology" %}</a>
+        </p>
+        </div>
+    </footer>
+
 
   <!-- Bootstrap Bundle JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>

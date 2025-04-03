@@ -3,18 +3,26 @@
 
 # articles/admin.py
 from django.contrib import admin
+# --- Import TranslationAdmin ---
+from modeltranslation.admin import TranslationAdmin
 from .models import Article
 
+# --- Inherit from TranslationAdmin ---
 @admin.register(Article)
-class ArticleAdmin(admin.ModelAdmin):
+class ArticleAdmin(TranslationAdmin): # Changed from ModelAdmin
+    # --- Use original field names ---
     list_display = ('title', 'author_name', 'published_date', 'updated_date')
     search_fields = ('title', 'content', 'author_name')
-    prepopulated_fields = {'slug': ('title',)}
+    # --------------------------------
+    prepopulated_fields = {'slug': ('title',)} # May need adjustment based on default lang
     date_hierarchy = 'published_date'
     ordering = ('-published_date',)
-    # Add fields to admin form
-    fields = ('title', 'slug', 'header_image_url', 'author_name', 'published_date', 'content') # Added header_image_url
+    # --- Use original field names ---
+    fields = ('title', 'slug', 'header_image_url', 'author_name', 'published_date', 'content')
+    # --------------------------------
 
+    # Customize group fieldsets if needed (optional)
+    # group_fieldsets = True
 
 === FILE: C:\Job\MGC\articles\apps.py ===
 
@@ -85,6 +93,17 @@ from django.test import TestCase
 
 # Create your tests here.
 
+
+=== FILE: C:\Job\MGC\articles\translation.py ===
+
+# articles/translation.py
+from modeltranslation.translator import register, TranslationOptions
+from .models import Article
+
+@register(Article)
+class ArticleTranslationOptions(TranslationOptions):
+    fields = ('title', 'content', 'author_name')
+    # Exclude 'slug' if you want it generated only from the default language title
 
 === FILE: C:\Job\MGC\articles\urls.py ===
 
@@ -5390,7 +5409,7 @@ GITHUB_WEBHOOK_SECRET = 'M@a=pUN-8W}J6*E?Y;D{()' # Must match GitHub
 REPO_PATH = '/home/pixeladder/MGC'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True # Keep True for development
+DEBUG = True # Keep True for development, SET TO FALSE FOR PRODUCTION
 
 ALLOWED_HOSTS = [
     'pixeladder.pythonanywhere.com', # Your live domain
@@ -5402,14 +5421,19 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    # --- Ensure modeltranslation is loaded EARLY ---
+    'modeltranslation',
+    # ----------------------------------------------
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', # Django's staticfiles app must be here
+    # --- Your apps AFTER modeltranslation and admin ---
     'ratings.apps.RatingsConfig',
     'articles.apps.ArticlesConfig',
+    # --- Other third-party apps ---
     'django_recaptcha',
     'widget_tweaks',
 ]
@@ -5417,8 +5441,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Add whitenoise if not using PA static files mapping
     'django.contrib.sessions.middleware.SessionMiddleware',
-    # --- ADD LocaleMiddleware (After Session, Before Common) ---
+    # --- LocaleMiddleware (After Session, Before Common) ---
     'django.middleware.locale.LocaleMiddleware',
     # ---------------------------------------------------------
     'django.middleware.common.CommonMiddleware',
@@ -5441,6 +5466,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # --- ADD context processor for languages ---
+                'django.template.context_processors.i18n',
+                # ------------------------------------------
             ],
         },
     },
@@ -5474,7 +5502,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization (i18n) & Localization (L10n)
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us' # Default language
+LANGUAGE_CODE = 'en' # Default language code (e.g., 'en', 'en-us')
 
 # --- Define available languages ---
 LANGUAGES = [
@@ -5489,9 +5517,17 @@ LOCALE_PATHS = [
 ]
 # ------------------------------------
 
+# --- Modeltranslation settings ---
+MODELTRANSLATION_DEFAULT_LANGUAGE = LANGUAGE_CODE
+# Optional: specify languages explicitly if different from LANGUAGES
+# MODELTRANSLATION_LANGUAGES = ('en', 'ar')
+# Optional: configure fallback behavior
+# MODELTRANSLATION_FALLBACK_LANGUAGES = {'default': ('en',)} # Default behavior is usually good
+# --------------------------------
+
 TIME_ZONE = 'UTC'
 
-USE_I18N = True # --- Enable Internationalization ---
+USE_I18N = True # --- Ensure Internationalization is Enabled ---
 
 USE_TZ = True
 
@@ -5499,9 +5535,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [ BASE_DIR / 'static', ]
-STATIC_ROOT = '/home/pixeladder/MGC/venv/Lib/site-packages/django/contrib/staticfiles'
+STATIC_URL = 'static/' # URL prefix for static files
+STATICFILES_DIRS = [ BASE_DIR / 'static', ] # For YOUR app's static files during development
+
+# --- CORRECTED STATIC_ROOT ---
+# This is where `collectstatic` will copy ALL static files (yours + admin + others)
+STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
+# -----------------------------
+
+# Optional: If using WhiteNoise (simpler setup sometimes)
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Default primary key field type
@@ -6160,61 +6203,89 @@ class Command(BaseCommand):
 
 === FILE: C:\Job\MGC\ratings\admin.py ===
 
-# ratings/admin.py - FINAL VERSION (with ban/flag features)
-from django.contrib import admin, messages # Import messages
+# ratings/admin.py
+from django.contrib import admin, messages
+from django.urls import reverse
+# --- Import TranslationAdmin ---
+from modeltranslation.admin import TranslationAdmin
+# -------------------------------
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from .models import RatingTier, Flag, Game, CriticReview, GameComment
 from django.utils.translation import gettext_lazy as _
-from django.utils.html import format_html # For flag count display
+from django.utils.html import format_html
 
-# --- Existing Admins (RatingTier, Flag, CriticReview, Game) ---
+# --- Inherit from TranslationAdmin where needed ---
+
 @admin.register(RatingTier)
-class RatingTierAdmin(admin.ModelAdmin):
+class RatingTierAdmin(TranslationAdmin): # Changed from ModelAdmin
+    # --- Use original field names ---
     list_display = ('tier_code', 'icon_name', 'display_name', 'color_hex', 'order')
+    # --------------------------------
     ordering = ('order',)
     readonly_fields = ('tier_code',)
 
 @admin.register(Flag)
-class FlagAdmin(admin.ModelAdmin):
+class FlagAdmin(TranslationAdmin): # Changed from ModelAdmin
+    # --- Use original field names ---
     list_display = ('symbol', 'description')
     search_fields = ('symbol', 'description')
+    # --------------------------------
 
 @admin.register(CriticReview)
-class CriticReviewAdmin(admin.ModelAdmin):
-    list_display = ('reviewer_name', 'score', 'review_url')
+class CriticReviewAdmin(TranslationAdmin): # Changed from ModelAdmin
+    # --- Use original field names ---
+    list_display = ('reviewer_name', 'score', 'review_url', 'summary')
     search_fields = ('reviewer_name', 'summary')
+    # --------------------------------
     list_filter = ('reviewer_name',)
 
 @admin.register(Game)
-class GameAdmin(admin.ModelAdmin):
+class GameAdmin(TranslationAdmin): # Changed from ModelAdmin
+    # --- Use original field names ---
     list_display = ('title', 'rating_tier', 'requires_adjustment', 'developer', 'publisher', 'date_updated')
     list_filter = ('rating_tier', 'requires_adjustment', 'developer', 'publisher')
-    search_fields = ('title', 'developer', 'publisher', 'summary')
-    prepopulated_fields = {'slug': ('title',)}
+    search_fields = ('title', 'developer', 'publisher', 'summary', 'rationale') # Add searchable translated fields
+    # --------------------------------
+    prepopulated_fields = {'slug': ('title',)} # May need adjustment
     filter_horizontal = ('flags', 'critic_reviews')
     date_hierarchy = 'date_added'
     ordering = ('-date_updated',)
     readonly_fields = ('developer_slug', 'publisher_slug', 'date_added', 'date_updated')
+
+    # --- Use original field names in fieldsets ---
     fieldsets = (
         (_('Core Information'), {'fields': ('title', 'slug', 'cover_image_url', ('developer', 'developer_slug'), ('publisher', 'publisher_slug'), 'release_date', 'summary')}),
-        (_('Platform Availability'), {'fields': (('available_pc', 'available_ps5', 'available_ps4'), ('available_xbox_series', 'available_xbox_one', 'available_switch'), ('available_android', 'available_ios'))}),
+        (_('Platform Availability'), {'fields': (('available_pc', 'available_ps5', 'available_ps4'), ('available_xbox_series', 'available_xbox_one', 'available_switch'), ('available_android', 'available_ios', 'available_quest'))}),
         (_('Store Links'), {'classes': ('collapse',), 'fields': ('steam_link', 'epic_link', 'gog_link', 'other_store_link')}),
         (_('Overall Rating & Flags'), {'fields': ('rating_tier', 'requires_adjustment', 'flags', 'rationale', 'has_spoilers_in_details')}),
         (_('Additional Info'), {'classes': ('collapse',), 'fields': ('adjustment_guide', 'critic_reviews')}),
-        (_('Detailed MGC Breakdown'), {'classes': ('collapse',), 'fields': (('aqidah_severity', 'aqidah_details', 'aqidah_reason'), ('violence_severity', 'violence_details', 'violence_reason'), ('immorality_severity', 'immorality_details', 'immorality_reason'), ('substances_gambling_severity', 'substances_gambling_details', 'substances_gambling_reason'), ('audio_music_severity', 'audio_music_details', 'audio_music_reason'), ('time_addiction_severity', 'time_addiction_details', 'time_addiction_reason'), ('online_conduct_severity', 'online_conduct_details', 'online_conduct_reason'),)}),
+        # Use original names for details/reason fields
+        (_('Detailed MGC Breakdown'), {'classes': ('collapse',), 'fields': (
+            ('aqidah_severity', 'aqidah_details', 'aqidah_reason'),
+            ('violence_severity', 'violence_details', 'violence_reason'),
+            ('immorality_severity', 'immorality_details', 'immorality_reason'),
+            ('substances_gambling_severity', 'substances_gambling_details', 'substances_gambling_reason'),
+            ('audio_music_severity', 'audio_music_details', 'audio_music_reason'),
+            ('time_addiction_severity', 'time_addiction_details', 'time_addiction_reason'),
+            ('online_conduct_severity', 'online_conduct_details', 'online_conduct_reason'),
+        )}),
     )
+    # ------------------------------------------
+
+    # Customize group fieldsets if needed (optional)
+    # group_fieldsets = True
 
 
-# --- Game Comment Admin (Updated) ---
+# --- Game Comment Admin (User content - usually NOT translated via modeltranslation) ---
 @admin.register(GameComment)
-class GameCommentAdmin(admin.ModelAdmin):
+class GameCommentAdmin(admin.ModelAdmin): # Stays as ModelAdmin
     list_display = ('game', 'user_link', 'created_date', 'approved', 'moderator_attention_needed', 'flag_count_display', 'content_preview')
     list_filter = ('approved', 'moderator_attention_needed', 'created_date', 'game')
     search_fields = ('content', 'user__username', 'game__title')
-    actions = ['approve_comments', 'unapprove_comments', 'mark_reviewed', 'deactivate_commenter', 'reactivate_commenter'] # Added actions
-    readonly_fields = ('user', 'game', 'created_date', 'flagged_by') # Make flagged_by readonly too
-    list_display_links = ('content_preview',) # Link from preview
+    actions = ['approve_comments', 'unapprove_comments', 'mark_reviewed', 'deactivate_commenter', 'reactivate_commenter']
+    readonly_fields = ('user', 'game', 'created_date', 'flagged_by')
+    list_display_links = ('content_preview',)
 
     fieldsets = (
         (None, {'fields': ('game', 'user', 'created_date')}),
@@ -6222,7 +6293,6 @@ class GameCommentAdmin(admin.ModelAdmin):
     )
 
     def user_link(self, obj):
-        # Link to the user change page in admin
         user_admin_url = reverse("admin:auth_user_change", args=[obj.user.pk])
         return format_html('<a href="{}">{}</a>', user_admin_url, obj.user.username)
     user_link.short_description = _('User')
@@ -6233,10 +6303,10 @@ class GameCommentAdmin(admin.ModelAdmin):
     content_preview.short_description = _('Comment Preview')
 
     def flag_count_display(self, obj):
-        count = obj.flag_count
+        count = obj.flagged_by.count() # Use related manager count()
         return count
     flag_count_display.short_description = _('Flags')
-    flag_count_display.admin_order_field = 'flagged_by__count' # Allow sorting if using annotations
+    # flag_count_display.admin_order_field = 'flag_count' # Requires annotation to sort
 
     @admin.action(description=_('Approve selected comments'))
     def approve_comments(self, request, queryset):
@@ -6417,6 +6487,7 @@ class Game(models.Model):
     available_switch = models.BooleanField(_("Available on Nintendo Switch"), default=False)
     available_android = models.BooleanField(_("Available on Android"), default=False)
     available_ios = models.BooleanField(_("Available on iOS"), default=False)
+    available_quest = models.BooleanField(_("Available on Meta Quest"), default=False)
 
 
     # --- MGC Rating & Flags ---
@@ -6581,6 +6652,55 @@ from django.test import TestCase
 
 # Create your tests here.
 
+
+=== FILE: C:\Job\MGC\ratings\translation.py ===
+
+# ratings/translation.py
+from modeltranslation.translator import register, TranslationOptions
+from .models import RatingTier, Flag, Game, CriticReview, GameComment
+
+@register(RatingTier)
+class RatingTierTranslationOptions(TranslationOptions):
+    fields = ('display_name', 'description')
+
+@register(Flag)
+class FlagTranslationOptions(TranslationOptions):
+    fields = ('description',)
+
+@register(CriticReview)
+class CriticReviewTranslationOptions(TranslationOptions):
+    fields = ('summary',) # Only translate the summary quote
+
+@register(Game)
+class GameTranslationOptions(TranslationOptions):
+    fields = (
+        'title',
+        'summary',
+        'rationale',
+        'adjustment_guide',
+        'aqidah_details',
+        'aqidah_reason',
+        'violence_details',
+        'violence_reason',
+        'immorality_details',
+        'immorality_reason',
+        'substances_gambling_details',
+        'substances_gambling_reason',
+        'audio_music_details',
+        'audio_music_reason',
+        'time_addiction_details',
+        'time_addiction_reason',
+        'online_conduct_details',
+        'online_conduct_reason',
+    )
+    # Exclude 'slug', 'developer', 'publisher' if they should remain constant
+
+# Note: GameComment content is usually user-generated and might not need modeltranslation
+# unless you specifically want admin-translatable comments. Typically, you wouldn't translate user input this way.
+# If you needed admin translation for comments (unlikely):
+# @register(GameComment)
+# class GameCommentTranslationOptions(TranslationOptions):
+#     fields = ('content',)
 
 === FILE: C:\Job\MGC\ratings\urls.py ===
 
@@ -7436,12 +7556,6 @@ html[dir="rtl"] .page-header .search-form {
    margin-left: 0 !important;
 }
 
-/* Flip the margin utility for the search input field */
-html[dir="rtl"] .search-form .me-2 {
-    margin-left: 0.5rem !important;
-    margin-right: 0 !important;
-}
-
 /* --- Filter/Sort Controls --- */
 
 /* Align the "Apply Filters" button container to the left */
@@ -7503,7 +7617,7 @@ html[dir="rtl"] .badge.adjustment-badge.ms-2 { /* For detail page */
 html[dir="rtl"] .detail-overall-rating {
   text-align: right;
 }
-html[dir="rtl"] .detail-overall-rating .me-2 { /* Bootstrap class used here */
+html[dir="rtl"] .me-2 { /* Bootstrap class used here */
     margin-left: 0.5rem !important;
     margin-right: 0 !important;
 }
@@ -7974,6 +8088,24 @@ html[dir="rtl"] .platform-badge {
 } */
 /* --- End Platform/Detail Meta Styles --- */
 
+.platform-icon img {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  top: -2px;
+  filter: hue-rotate(231deg) saturate(0.22) brightness(3);
+  transition: filter 0.2s ease;
+}
+.card-body .platform-icon img {
+  width: 16px;
+  height: 16px;
+}
+.light-mode .platform-icon img {
+  filter: hue-rotate(208deg) saturate(0.07) brightness(1.5);
+}
+.platform-icon.platform-switch img:hover {
+  filter: hue-rotate(0deg) saturate(1) brightness(1);
+}
 
 === FILE: C:\Job\MGC\templates\articles\article_detail.html ===
 
@@ -8117,7 +8249,16 @@ document.addEventListener('DOMContentLoaded', function() {
           {% endif %}
           {% if game.available_switch %}
               {# Font Awesome doesn't have a direct Switch icon, use a generic gamepad or mobile icon #}
-              <span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><i class="fa-solid fa-gamepad"></i></span>
+               <span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>
+          {% endif %}
+          {% if game.available_android %}
+              <span class="platform-icon platform-android" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>
+          {% endif %}
+          {% if game.available_ios %}
+              <span class="platform-icon platform-ios" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>
+          {% endif %}
+          {% if game.available_meta_quest %}
+              <span class="platform-icon platform-meta-quest" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>
           {% endif %}
           {# Add message if no platforms are checked #}
           {% if not game.available_pc and not game.available_ps5 and not game.available_ps4 and not game.available_xbox_series and not game.available_xbox_one and not game.available_switch %}
@@ -8168,7 +8309,16 @@ document.addEventListener('DOMContentLoaded', function() {
         {# Image #}
         <div class="detail-image-wrapper mb-3 mb-md-0">{% if game.cover_image_url %}<img src="{{ game.cover_image_url }}" class="img-fluid" alt="{% blocktranslate %}{{ game.title }} Cover{% endblocktranslate %}">{% else %}<div class="img-fluid rounded shadow"><span>{% translate "No Image" %}</span></div>{% endif %}</div>
         {# Platforms #}
-        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios %}<div class="detail-platform-section mt-3"><h6 class="detail-platform-title">{% translate "Available On:" %}</h6><div class="platform-icons-container">{% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}{% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}{% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}{% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><i class="fa-solid fa-gamepad"></i></span>{% endif %}{% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}{% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}</div></div>{% endif %}
+        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios %}<div class="detail-platform-section mt-3"><h6 class="detail-platform-title">{% translate "Available On:" %}</h6><div class="platform-icons-container">
+            {% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}
+            {% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}
+            {% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}
+            {% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>{% endif %}
+            {% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}
+            {% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}
+            {% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}
+        </div>
+    </div>{% endif %}
         {# Store Links #}
         {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}{% if game.rating_tier.tier_code != 'KFR' and game.rating_tier.tier_code != 'HRM' %}<div class="store-links-section mt-3">{% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}{% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}{% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}{% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}</div>{% endif %}{% endif %}
     </div>
@@ -9252,6 +9402,10 @@ gunicorn
 whitenoise
 sqlparse
 tzdata
+django-modeltranslation
+django-recaptcha
+django-widget-tweaks
+
 # pillow # Add if needed by your project or other dependencies
 # python-dotenv # Add if using .env files
 # psycopg2-binary # Add ONLY if using PostgreSQL

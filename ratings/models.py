@@ -93,6 +93,7 @@ class Game(models.Model):
     available_switch = models.BooleanField(_("Available on Nintendo Switch"), default=False)
     available_android = models.BooleanField(_("Available on Android"), default=False)
     available_ios = models.BooleanField(_("Available on iOS"), default=False)
+    available_quest = models.BooleanField(_("Available on Meta Quest"), default=False)
 
 
     # --- MGC Rating & Flags ---

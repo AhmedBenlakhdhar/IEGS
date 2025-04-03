@@ -13,6 +13,7 @@ from django.utils.translation import gettext
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
+from django.shortcuts import render
 
 # ... (homepage and game_list views remain the same as previous version) ...
 # --- Homepage View ---
@@ -214,3 +215,10 @@ def flag_comment(request, comment_id):
 
     messages.success(request, _("Comment flagged for moderator review. Thank you."))
     return redirect(game_url)
+
+# --- NEW: Methodology View ---
+def methodology_view(request):
+    """Displays the MGC rating methodology page."""
+    # No context needed for a static page like this yet
+    context = {}
+    return render(request, 'ratings/methodology.html', context)

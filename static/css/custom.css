@@ -157,7 +157,7 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .flag-symbol:hover { color: var(--accent-primary); border-color: var(--accent-primary); background-color: var(--bg-secondary); cursor: default; }
 .rating-icon { font-size: 1.7em; vertical-align: -2px; margin-right: 4px; position: relative; top: 1px; }
 .badge.adjustment-badge { background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); font-family: var(--font-primary); font-weight: 600; font-size: 0.75rem; padding: 7px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; }
-.rating-label { position: relative; top: 0; }
+.rating-label { position: relative; top: -2px; }
 
 /* 6. Game Detail Page */
 .detail-image-wrapper { background-color: var(--bg-element-lighter); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 6px; margin-bottom: 1.5rem; }
@@ -483,12 +483,6 @@ html[dir="rtl"] .page-header .search-form {
    margin-left: 0 !important;
 }
 
-/* Flip the margin utility for the search input field */
-html[dir="rtl"] .search-form .me-2 {
-    margin-left: 0.5rem !important;
-    margin-right: 0 !important;
-}
-
 /* --- Filter/Sort Controls --- */
 
 /* Align the "Apply Filters" button container to the left */
@@ -550,7 +544,7 @@ html[dir="rtl"] .badge.adjustment-badge.ms-2 { /* For detail page */
 html[dir="rtl"] .detail-overall-rating {
   text-align: right;
 }
-html[dir="rtl"] .detail-overall-rating .me-2 { /* Bootstrap class used here */
+html[dir="rtl"] .me-2 { /* Bootstrap class used here */
     margin-left: 0.5rem !important;
     margin-right: 0 !important;
 }
@@ -1023,14 +1017,19 @@ html[dir="rtl"] .platform-badge {
 
 .platform-icon img {
   width: 20px;
+  height: 20px;
   position: relative;
   top: -2px;
-  filter: invert(0.6) sepia(1) saturate(1.2) hue-rotate(175deg);
+  filter: hue-rotate(231deg) saturate(0.22) brightness(3);
   transition: filter 0.2s ease;
 }
-.light-mode .platform-icon img {
-  filter: invert(0.6);
+.card-body .platform-icon img {
+  width: 16px;
+  height: 16px;
 }
-.platform-icon img:hover {
-  filter: invert(1) sepia(100) saturate(100) hue-rotate(290deg);
+.light-mode .platform-icon img {
+  filter: hue-rotate(208deg) saturate(0.07) brightness(1.5);
+}
+.platform-icon.platform-switch img:hover {
+  filter: hue-rotate(0deg) saturate(1) brightness(1);
 }

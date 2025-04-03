@@ -2749,3 +2749,416 @@ msgstr "سيكون تعليقك مرئياً بعد الموافقة عليه."
 #, python-format
 msgid "Please <a href=\"%(login_url)s\" class=\"text-primary\">login</a> to post a comment."
 msgstr "يرجى <a href=\"%(login_url)s\" class=\"text-primary\">تسجيل الدخول</a> لنشر تعليق."
+
+#: .\templates\ratings\methodology.html:6
+msgid "MGC Rating Methodology"
+msgstr "منهجية تقييم MGC"
+
+#: .\templates\ratings\methodology.html:11
+#, python-format
+msgid "Version 1.1 (2025-04-01)"
+msgstr "الإصدار 1.1 (2025-04-01)"
+
+#: .\templates\ratings\methodology.html:15
+msgid "1. Introduction & Purpose"
+msgstr "1. المقدمة والغرض"
+
+#: .\templates\ratings\methodology.html:16
+msgid "The Muslim Game Classification (MGC) system provides structured guidance for Muslims seeking to evaluate video games according to Islamic principles. Its primary purpose is to enable users to make informed decisions about game engagement, aligning their choices with the teachings of the Quran, the authentic Sunnah (Prophetic tradition), and the understanding of the As-Salaf As-Salih (Pious Predecessors)."
+msgstr "يقدم نظام تصنيف الألعاب الإسلامي (MGC) إرشادات منظمة للمسلمين الذين يسعون لتقييم ألعاب الفيديو وفقاً للمبادئ الإسلامية. هدفه الأساسي هو تمكين المستخدمين من اتخاذ قرارات مستنيرة بشأن مشاركتهم في الألعاب، ومواءمة اختياراتهم مع تعاليم القرآن والسنة النبوية الصحيحة وفهم السلف الصالح."
+
+#: .\templates\ratings\methodology.html:17
+msgid "This document outlines the methodology used by MGC assessors to analyze games and assign ratings, ensuring consistency, transparency, and adherence to core Islamic values."
+msgstr "تحدد هذه الوثيقة المنهجية التي يستخدمها مقيمو MGC لتحليل الألعاب وتعيين التقييمات، مما يضمن الاتساق والشفافية والالتزام بالقيم الإسلامية الأساسية."
+
+#: .\templates\ratings\methodology.html:20
+msgid "2. Core Principles"
+msgstr "2. المبادئ الأساسية"
+
+#: .\templates\ratings\methodology.html:22
+msgid "Foundation:"
+msgstr "الأساس:"
+
+#: .\templates\ratings\methodology.html:22
+msgid "All assessments are grounded in the Quran and the authentic Sunnah, interpreted according to the understanding and consensus of the As-Salaf As-Salih. Where matters require <em>ijtihad</em> (scholarly reasoning), established principles of Fiqh (Islamic jurisprudence), such as <em>Maqasid al-Shari'ah</em> (Objectives of Islamic Law) and <em>Sadd al-Dhara'i</em> (Blocking the Means to Evil), are applied."
+msgstr "جميع التقييمات تستند إلى القرآن والسنة الصحيحة، مفسرة وفقاً لفهم وإجماع السلف الصالح. وحيثما تتطلب الأمور <em>الاجتهاد</em> (الاستدلال الفقهي)، يتم تطبيق مبادئ الفقه الراسخة، مثل <em>مقاصد الشريعة</em> و<em>سد الذرائع</em> (منع الوسائل المؤدية إلى المحرم)."
+
+#: .\templates\ratings\methodology.html:23
+msgid "Objectivity & Consistency:"
+msgstr "الموضوعية والاتساق:"
+
+#: .\templates\ratings\methodology.html:23
+msgid "Assessors strive for objective analysis based on demonstrable game content and mechanics, applying the criteria consistently across all titles."
+msgstr "يسعى المقيمون جاهدين إلى تحليل موضوعي بناءً على محتوى وآليات اللعبة التي يمكن إثباتها، وتطبيق المعايير باستمرار عبر جميع العناوين."
+
+#: .\templates\ratings\methodology.html:24
+msgid "Scope:"
+msgstr "النطاق:"
+
+#: .\templates\ratings\methodology.html:24
+msgid "The primary focus is the game's content, themes, mechanics, required player actions, and potential impact (including normalization of values). Player behavior is generally outside the scope, unless directly necessitated or heavily incentivized by the game design."
+msgstr "التركيز الأساسي هو على محتوى اللعبة، وموضوعاتها، وآلياتها، والإجراءات المطلوبة من اللاعب، والتأثير المحتمل (بما في ذلك تطبيع القيم). سلوك اللاعب بشكل عام خارج النطاق، ما لم يكن مطلوباً بشكل مباشر أو محفزاً بشدة من خلال تصميم اللعبة."
+
+#: .\templates\ratings\methodology.html:25
+msgid "Caution & Avoiding Doubt:"
+msgstr "الحذر وتجنب الشبهات:"
+
+#: .\templates\ratings\methodology.html:25
+msgid "In cases of ambiguity or differing scholarly opinions on minor matters, a cautious approach is favored, often reflected in a 'Mashbouh' rating or detailed notes."
+msgstr "في حالات الغموض أو اختلاف آراء العلماء في المسائل الفرعية، يفضل اتباع نهج حذر، وغالباً ما ينعكس ذلك في تصنيف 'مشبوه' أو ملاحظات مفصلة."
+
+#: .\templates\ratings\methodology.html:26
+msgid "Transparency:"
+msgstr "الشفافية:"
+
+#: .\templates\ratings\methodology.html:26
+msgid "The methodology aims for clarity. Justifications for ratings, especially the severity levels and overall tier, are documented and made accessible where appropriate."
+msgstr "تهدف المنهجية إلى الوضوح. يتم توثيق مبررات التقييمات، وخاصة مستويات الشدة والفئة العامة، وإتاحتها عند الاقتضاء."
+
+#: .\templates\ratings\methodology.html:29
+msgid "3. The MGC Rating Process"
+msgstr "3. عملية تقييم MGC"
+
+#: .\templates\ratings\methodology.html:31
+msgid "Game Selection & Initial Review:"
+msgstr "اختيار اللعبة والمراجعة الأولية:"
+
+#: .\templates\ratings\methodology.html:31
+msgid "Games are chosen based on factors like popularity, community requests, or potential Islamic relevance. An initial playthrough and research identify key themes and potential areas requiring detailed analysis."
+msgstr "يتم اختيار الألعاب بناءً على عوامل مثل الشعبية أو طلبات المجتمع أو الأهمية الإسلامية المحتملة. تحدد جولة اللعب الأولية والبحث الموضوعات الرئيسية والمجالات المحتملة التي تتطلب تحليلاً مفصلاً."
+
+#: .\templates\ratings\methodology.html:32
+msgid "Detailed Content Analysis:"
+msgstr "تحليل المحتوى التفصيلي:"
+
+#: .\templates\ratings\methodology.html:32
+msgid "The game is systematically evaluated against the <strong>MGC Breakdown Categories</strong> (Section 4). For each category, a <strong>Severity Level</strong> is assigned based on specific criteria (Section 5), documenting concrete examples (<code>_details</code>) and reasoning (<code>_reason</code>). Both direct simulation/engagement and normalization/promotion aspects are considered."
+msgstr "يتم تقييم اللعبة بشكل منهجي وفقاً <strong>لفئات تحليل MGC</strong> (القسم 4). لكل فئة، يتم تعيين <strong>مستوى الشدة</strong> بناءً على معايير محددة (القسم 5)، مع توثيق أمثلة ملموسة (<code>_details</code>) والأسباب (<code>_reason</code>). يتم النظر في كل من جوانب المحاكاة/المشاركة المباشرة والتطبيع/الترويج."
+
+#: .\templates\ratings\methodology.html:33
+msgid "Assessment of Positive Aspects:"
+msgstr "تقييم الجوانب الإيجابية:"
+
+#: .\templates\ratings\methodology.html:33
+msgid "Assessors identify and document any noteworthy positive or beneficial elements within the game (Section 8.4)."
+msgstr "يحدد المقيمون ويوثقون أي عناصر إيجابية أو مفيدة جديرة بالملاحظة داخل اللعبة (القسم 8.4)."
+
+#: .\templates\ratings\methodology.html:34
+msgid "Overall Tier Determination:"
+msgstr "تحديد الفئة العامة:"
+
+#: .\templates\ratings\methodology.html:34
+msgid "Based on the highest severity levels reached (especially in critical categories like Aqidah), the pervasiveness of problematic content, and the balance of concerns (considering normalization risks), the <strong>Overall MGC Rating Tier</strong> (Halal, Mashbouh, Haram, Kufr) is assigned according to the logic in Section 6."
+msgstr "بناءً على أعلى مستويات الشدة التي تم التوصل إليها (خاصة في الفئات الحرجة مثل العقيدة)، ومدى انتشار المحتوى الإشكالي، وتوازن المخاوف (مع مراعاة مخاطر التطبيع)، يتم تعيين <strong>فئة تقييم MGC العامة</strong> (حلال، مشبوه، حرام، كفر) وفقاً للمنطق الوارد في القسم 6."
+
+#: .\templates\ratings\methodology.html:35
+msgid "Assigning Supporting Elements:"
+msgstr "تعيين العناصر الداعمة:"
+
+#: .\templates\ratings\methodology.html:35
+msgid "Relevant <strong>Content Flags</strong> are selected, the <strong>Requires Adjustment</strong> status is determined (and <code>adjustment_guide</code> filled if True), <strong>Suitability Notes</strong> are added, and the <strong>Is Recommended</strong> status is set where applicable (Section 8)."
+msgstr "يتم اختيار <strong>علامات المحتوى</strong> ذات الصلة، وتحديد حالة <strong>يتطلب تعديل</strong> (ويتم ملء <code>adjustment_guide</code> إذا كانت القيمة True)، وإضافة <strong>ملاحظات الملاءمة</strong>، وتعيين حالة <strong>موصى به</strong> عند الاقتضاء (القسم 8)."
+
+#: .\templates\ratings\methodology.html:36
+msgid "Rationale & Documentation:"
+msgstr "الأساس المنطقي والتوثيق:"
+
+#: .\templates\ratings\methodology.html:36
+msgid "The overall reasoning is summarized in the <code>rationale</code> field. Key assessor information (<code>rated_by</code>, <code>rating_date</code>) is recorded."
+msgstr "يتم تلخيص المنطق العام في حقل <code>rationale</code>. يتم تسجيل معلومات المقيم الرئيسية (<code>rated_by</code>، <code>rating_date</code>)."
+
+#: .\templates\ratings\methodology.html:37
+msgid "Review & Publication:"
+msgstr "المراجعة والنشر:"
+
+#: .\templates\ratings\methodology.html:37
+msgid "Ratings undergo an internal review for consistency and accuracy before being published on the MGC platform. Ratings may be updated following significant game changes or new insights."
+msgstr "تخضع التقييمات لمراجعة داخلية للتأكد من الاتساق والدقة قبل نشرها على منصة MGC. قد يتم تحديث التقييمات بعد تغييرات كبيرة في اللعبة أو رؤى جديدة."
+
+#: .\templates\ratings\methodology.html:41
+msgid "4. MGC Breakdown Categories"
+msgstr "4. فئات تحليل MGC"
+
+#: .\templates\ratings\methodology.html:42
+msgid "Each game is analyzed across these key areas of potential Islamic concern:"
+msgstr "يتم تحليل كل لعبة عبر هذه المجالات الرئيسية ذات الاهتمام الإسلامي المحتمل:"
+
+#: .\templates\ratings\methodology.html:44
+msgid "Aqidah & Ideology:"
+msgstr "العقيدة والفكر:"
+
+#: .\templates\ratings\methodology.html:44
+msgid "Content related to core Islamic beliefs (Tawhid), Shirk (polytheism), Kufr (disbelief), magic (Sihr), veneration of false deities, blasphemy, atheism (Ilhad), problematic ideologies, or distortion of Islamic tenets."
+msgstr "المحتوى المتعلق بالمعتقدات الإسلامية الأساسية (التوحيد)، الشرك، الكفر، السحر، تبجيل الآلهة الباطلة، التجديف، الإلحاد، الأيديولوجيات الإشكالية، أو تشويه المبادئ الإسلامية."
+
+#: .\templates\ratings\methodology.html:45
+msgid "Violence & Aggression:"
+msgstr "العنف والعدوانية:"
+
+#: .\templates\ratings\methodology.html:45
+msgid "Depiction and context of violence, gore, brutality, killing, torture, and promotion of aggression."
+msgstr "تصوير وسياق العنف، الدموية، الوحشية، القتل، التعذيب، والترويج للعدوانية."
+
+#: .\templates\ratings\methodology.html:46
+msgid "Immorality & Indecency:"
+msgstr "اللاأخلاقية والفحش:"
+
+#: .\templates\ratings\methodology.html:46
+msgid "Content related to Zina (unlawful intercourse), Liwat (sodomy), exposure of 'Awrah (nudity/improper attire), Tabarruj (immodest display), promotion of impermissible relationships/lifestyles, Ikhtilat (casual free-mixing between unrelated genders), foul language (Fahisha), slander (Qadhf), backbiting (Ghibah), and general promotion of Fisq (open sinfulness)."
+msgstr "المحتوى المتعلق بالزنا، اللواط، كشف العورة (التعري/اللباس غير اللائق)، التبرج، الترويج للعلاقات/أنماط الحياة غير المباحة، الاختلاط (الاختلاط العرضي بين الجنسين غير المحارم)، اللغة البذيئة (الفاحشة)، القذف، الغيبة، والترويج العام للفسق."
+
+#: .\templates\ratings\methodology.html:47
+msgid "Haram Substances & Gambling:"
+msgstr "المواد المحرمة والقمار:"
+
+#: .\templates\ratings\methodology.html:47
+msgid "Depiction, use, promotion, or normalization of Khamr (intoxicants), drugs, or mechanics involving Maysir/Qimar (gambling)."
+msgstr "تصوير أو استخدام أو ترويج أو تطبيع الخمر (المسكرات)، المخدرات، أو الآليات التي تنطوي على الميسر/القمار."
+
+#: .\templates\ratings\methodology.html:48
+msgid "Audio & Music:"
+msgstr "الصوت والموسيقى:"
+
+#: .\templates\ratings\methodology.html:48
+msgid "Presence and nature of background music (Ma'azif), lyrical content (Ghina'), sound effects, and the ability to mute audio elements. Considers potential impermissibility based on instrumentation, themes, or association."
+msgstr "وجود وطبيعة موسيقى الخلفية (المعازف)، محتوى الكلمات (الغناء)، المؤثرات الصوتية، والقدرة على كتم عناصر الصوت. يأخذ في الاعتبار عدم الجواز المحتمل بناءً على الآلات الموسيقية، الموضوعات، أو الارتباط."
+
+#: .\templates\ratings\methodology.html:49
+msgid "Time Commitment & Addiction Potential:"
+msgstr "الالتزام بالوقت واحتمالية الإدمان:"
+
+#: .\templates\ratings\methodology.html:49
+msgid "Analysis of gameplay loops, time investment required, potential for Israf (wastefulness) of time, and mechanics designed to be addictive, potentially leading to neglect of religious or worldly duties."
+msgstr "تحليل حلقات اللعب، الوقت المطلوب، احتمالية الإسراف في الوقت، والآليات المصممة لتكون مسببة للإدمان، مما قد يؤدي إلى إهمال الواجبات الدينية أو الدنيوية."
+
+#: .\templates\ratings\methodology.html:50
+msgid "Online Conduct & Interaction:"
+msgstr "السلوك والتفاعل عبر الإنترنت:"
+
+#: .\templates\ratings\methodology.html:50
+msgid "Risks associated with online multiplayer features, including exposure to Fitnah, Laghw (idle talk), toxic behavior, poor moderation, and potential for inappropriate interactions."
+msgstr "المخاطر المرتبطة بميزات اللعب الجماعي عبر الإنترنت، بما في ذلك التعرض للفتنة، اللغو (الكلام الباطل)، السلوك السام، الإشراف الضعيف، واحتمالية التفاعلات غير اللائقة."
+
+#: .\templates\ratings\methodology.html:53
+msgid "5. Severity Level Definitions"
+msgstr "5. تعريفات مستويات الشدة"
+
+#: .\templates\ratings\methodology.html:54
+msgid "For each Breakdown Category, a severity level is assigned:"
+msgstr "لكل فئة من فئات التحليل، يتم تعيين مستوى شدة:"
+
+#: .\templates\ratings\methodology.html:57
+msgid "No significant concerns identified. Content is either absent or entirely permissible."
+msgstr "لم يتم تحديد مخاوف كبيرة. المحتوى إما غائب أو مباح بالكامل."
+
+#: .\templates\ratings\methodology.html:60
+msgid "Minor issues present. May involve infrequent, easily avoidable, non-graphic depiction of potentially problematic elements; presence of elements <em>not</em> presented positively or normalized; minimal risk of negative influence."
+msgstr "توجد مشاكل بسيطة. قد تنطوي على تصوير غير متكرر، يمكن تجنبه بسهولة، وغير مصور لعناصر قد تكون إشكالية؛ وجود عناصر <em>غير</em> مقدمة بشكل إيجابي أو طبيعي؛ الحد الأدنى من مخاطر التأثير السلبي."
+
+#: .\templates\ratings\methodology.html:63
+msgid "Moderate concerns. May involve optional engagement with problematic elements (not major sins/Kufr), OR notable presence and <em>neutral or slightly positive normalization</em> of impermissible acts or lifestyles (not core focus). Requires player vigilance."
+msgstr "مخاوف متوسطة. قد تنطوي على مشاركة اختيارية في عناصر إشكالية (ليست كبائر/كفر)، أو وجود ملحوظ و<em>تطبيع محايد أو إيجابي قليلاً</em> لأفعال أو أنماط حياة غير مباحة (ليست محور التركيز الأساسي). يتطلب يقظة اللاعب."
+
+#: .\templates\ratings\methodology.html:66
+msgid "Severe concerns. May involve strong encouragement/reward for problematic actions (short of major sins/Kufr), significant difficulty avoiding Haram elements, OR active, positive <em>promotion or normalization</em> of impermissible lifestyles/beliefs (short of Kufr/Shirk) or major sins, making negative influence or <em>Tashabbuh</em> likely."
+msgstr "مخاوف شديدة. قد تنطوي على تشجيع/مكافأة قوية على الأفعال الإشكالية (دون الكبائر/الكفر)، صعوبة كبيرة في تجنب عناصر الحرام، أو ترويج/تطبيع <em>إيجابي نشط</em> لأنماط حياة/معتقدات غير مباحة (دون الكفر/الشرك) أو كبائر، مما يجعل التأثير السلبي أو <em>التشبه</em> محتملاً."
+
+#: .\templates\ratings\methodology.html:69
+msgid "Explicitly involves actions/themes categorized as major sins, Kufr, or Shirk. May involve *required or unavoidable* direct simulation/engagement/viewing, OR central, inescapable, and *positive promotion/normalization* of Kufr/Shirk, major sins, or anti-Islamic ideologies."
+msgstr "ينطوي صراحة على أفعال/موضوعات مصنفة على أنها كبائر أو كفر أو شرك. قد تنطوي على محاكاة/مشاركة/مشاهدة مباشرة *مطلوبة أو لا مفر منها*، أو ترويج/تطبيع <em>إيجابي</em> مركزي لا مفر منه للكفر/الشرك أو الكبائر أو الأيديولوجيات المعادية للإسلام."
+
+#: .\templates\ratings\methodology.html:71
+msgid "Documentation Requirement: For any category rated L, M, H, or P, the assessor must provide specific examples and justification, noting whether the concern is direct action or normalization."
+msgstr "متطلب التوثيق: لأي فئة تم تقييمها L أو M أو H أو P، يجب على المقيم تقديم أمثلة محددة وتبرير، مع الإشارة إلى ما إذا كان القلق هو الفعل المباشر أم التطبيع."
+
+#: .\templates\ratings\methodology.html:74
+msgid "6. Overall MGC Rating Tier Determination Logic"
+msgstr "6. منطق تحديد فئة تقييم MGC العامة"
+
+#: .\templates\ratings\methodology.html:76
+msgid "Kufr (KFR):"
+msgstr "كفر (KFR):"
+
+#: .\templates\ratings\methodology.html:76
+msgid "Assigned if and only if Aqidah & Ideology Severity is 'P'."
+msgstr "يُعين إذا وفقط إذا كان مستوى شدة العقيدة والفكر هو 'P'."
+
+#: .\templates\ratings\methodology.html:77
+msgid "Haram (HRM):"
+msgstr "حرام (HRM):"
+
+#: .\templates\ratings\methodology.html:77
+msgid "Assigned if any category reaches 'P' (excluding Aqidah 'P'), OR Aqidah is 'H', OR multiple key categories are 'H' (due to action or strong positive normalization), OR core gameplay necessitates Haram, OR cumulative normalization effect is fundamentally contrary to Islamic values."
+msgstr "يُعين إذا وصلت أي فئة إلى 'P' (باستثناء العقيدة 'P')، أو كانت العقيدة 'H'، أو وصلت فئات رئيسية متعددة إلى 'H' (بسبب الفعل أو التطبيع الإيجابي القوي)، أو تتطلب طريقة اللعب الأساسية الحرام، أو كان التأثير التراكمي للتطبيع يتعارض بشكل أساسي مع القيم الإسلامية."
+
+#: .\templates\ratings\methodology.html:78
+msgid "Mashbouh (MSH):"
+msgstr "مشبوه (MSH):"
+
+#: .\templates\ratings\methodology.html:78
+msgid "Assigned if 'M' concerns (esp. Immorality, Aqidah) are present and potentially pervasive/normalized but below Haram threshold, OR 'H' concerns exist in non-critical categories, OR significant scholarly differences exist, OR player vigilance/adjustment is often necessary."
+msgstr "يُعين إذا كانت مخاوف 'M' (خاصة اللاأخلاقية، العقيدة) موجودة وقد تكون منتشرة/طبيعية ولكنها أقل من عتبة الحرام، أو توجد مخاوف 'H' في فئات غير حرجة، أو توجد اختلافات علمية كبيرة، أو غالباً ما تكون يقظة/تعديل اللاعب ضرورياً."
+
+#: .\templates\ratings\methodology.html:79
+msgid "Halal (HAL):"
+msgstr "حلال (HAL):"
+
+#: .\templates\ratings\methodology.html:79
+msgid "Assigned if most categories are 'N' or 'L', any 'M' concerns are minor/incidental/avoidable and not positive normalization of Haram or core Aqidah issues, and core themes/actions are permissible."
+msgstr "يُعين إذا كانت معظم الفئات 'N' أو 'L'، وأي مخاوف 'M' بسيطة/عرضية/يمكن تجنبها وليست تطبيعاً إيجابياً للحرام أو قضايا العقيدة الأساسية، وكانت الموضوعات/الأفعال الأساسية مباحة."
+
+#: .\templates\ratings\methodology.html:82
+msgid "7. Supporting Elements Definitions"
+msgstr "7. تعريفات العناصر الداعمة"
+
+#: .\templates\ratings\methodology.html:84
+msgid "Quick visual indicators based on documented details."
+msgstr "مؤشرات مرئية سريعة بناءً على التفاصيل الموثقة."
+
+#: .\templates\ratings\methodology.html:85
+msgid "Requires Adjustment:"
+msgstr "يتطلب تعديل:"
+
+#: .\templates\ratings\methodology.html:85
+msgid "Set to True if a Halal/Mashbouh game needs user action (settings, mods, avoidance) to align with its rating."
+msgstr "يتم التعيين إلى True إذا كانت لعبة حلال/مشبوهة تحتاج إلى إجراء من المستخدم (إعدادات، تعديلات، تجنب) لتتوافق مع تقييمها."
+
+#: .\templates\ratings\methodology.html:86
+msgid "Adjustment Guide:"
+msgstr "دليل التعديل:"
+
+#: .\templates\ratings\methodology.html:86
+msgid "Required if Requires Adjustment is True; provides specific instructions."
+msgstr "مطلوب إذا كانت قيمة يتطلب تعديل هي True؛ يوفر تعليمات محددة."
+
+#: .\templates\ratings\methodology.html:87
+msgid "Suitability Notes (Parental Guidance):"
+msgstr "ملاحظات الملاءمة (إرشادات للوالدين):"
+
+#: .\templates\ratings\methodology.html:87
+msgid "Provides context beyond the tier, addressing maturity, complexity, intensity, or normalization risks for different audiences."
+msgstr "يوفر سياقاً يتجاوز الفئة، ويتناول النضج أو التعقيد أو الشدة أو مخاطر التطبيع لجماهير مختلفة."
+
+#: .\templates\ratings\methodology.html:88
+msgid "Positive Aspects:"
+msgstr "الجوانب الإيجابية:"
+
+#: .\templates\ratings\methodology.html:88
+msgid "Documents potential benefits (education, skill development) consistent with Islamic values."
+msgstr "يوثق الفوائد المحتملة (التعليم، تنمية المهارات) بما يتفق مع القيم الإسلامية."
+
+#: .\templates\ratings\methodology.html:89
+msgid "Is Recommended:"
+msgstr "موصى به:"
+
+#: .\templates\ratings\methodology.html:89
+msgid "Set to True only for Halal/Mashbouh games with minimal concerns, notable positive aspects, and no significant adjustments needed."
+msgstr "يتم التعيين إلى True فقط للألعاب الحلال/المشبوهة ذات المخاوف الضئيلة والجوانب الإيجابية الملحوظة وعدم الحاجة إلى تعديلات كبيرة."
+
+#: .\templates\ratings\methodology.html:92
+msgid "8. Transparency & Review"
+msgstr "8. الشفافية والمراجعة"
+
+#: .\templates\ratings\methodology.html:93
+msgid "Ratings record the primary assessor (<code>rated_by</code>) and the rating date (<code>rating_date</code>). Ratings undergo internal review before publication and may be updated based on game changes or new evidence."
+msgstr "تسجل التقييمات المقيم الأساسي (<code>rated_by</code>) وتاريخ التقييم (<code>rating_date</code>). تخضع التقييمات لمراجعة داخلية قبل النشر وقد يتم تحديثها بناءً على تغييرات اللعبة أو الأدلة الجديدة."
+
+#: .\templates\ratings\methodology.html:96
+msgid "9. Disclaimer"
+msgstr "9. إخلاء المسؤولية"
+
+#: .\templates\ratings\methodology.html:97
+msgid "MGC ratings are provided as guidance based on <em>ijtihad</em> following the stated methodology. They are not legally binding fatwas and do not represent the sole correct Islamic viewpoint on every nuanced issue. Variation in scholarly opinion exists. Users are ultimately responsible for their choices and are encouraged to exercise personal Taqwa (God-consciousness) and consult with knowledgeable individuals if in doubt. MGC aims to assist, not replace, individual responsibility before Allah."
+msgstr "يتم تقديم تقييمات MGC كإرشادات بناءً على <em>الاجتهاد</em> وفقاً للمنهجية المذكورة. وهي ليست فتاوى ملزمة شرعاً ولا تمثل وجهة النظر الإسلامية الصحيحة الوحيدة في كل قضية دقيقة. يوجد تباين في آراء العلماء. المستخدمون مسؤولون في النهاية عن اختياراتهم ويتم تشجيعهم على ممارسة التقوى الشخصية والتشاور مع أهل العلم إذا كانوا في شك. يهدف MGC إلى المساعدة، وليس استبدال المسؤولية الفردية أمام الله."
+
+#: .\templates\ratings\glossary.html:13
+msgid "Understanding the terms used in the Muslim Game Classification (MGC). For the full detailed process, see our <a href=\"%(url)s\">Rating Methodology</a>."
+msgstr "فهم المصطلحات المستخدمة في تصنيف الألعاب الإسلامي (MGC). للاطلاع على العملية التفصيلية الكاملة، انظر <a href=\"%(url)s\">منهجية التقييم</a>."
+
+#: .\templates\ratings\glossary.html:25
+msgid "Permissible. Games assessed to have minimal concerns. Any potentially problematic elements are minor, incidental, easily avoidable, and not positively normalized. Core themes and required actions are permissible."
+msgstr "جائز / مباح. ألعاب تم تقييمها بأنها ذات مخاوف ضئيلة. أي عناصر إشكالية محتملة تكون بسيطة أو عرضية أو يمكن تجنبها بسهولة ولا يتم تطبيعها بشكل إيجابي. الموضوعات الأساسية والإجراءات المطلوبة مباحة."
+
+#: .\templates\ratings\glossary.html:34
+msgid "Doubtful / Caution Advised. Games contain elements of moderate concern ('M' severity) that may be difficult to avoid or are somewhat normalized, OR significant scholarly differences exist regarding key elements. Player vigilance or adjustments are often required to mitigate risks (e.g., Fitnah, normalization). Falls short of the Haram threshold."
+msgstr "مشبوه / ينصح بالحذر. تحتوي الألعاب على عناصر ذات قلق متوسط (شدة 'M') قد يكون من الصعب تجنبها أو يتم تطبيعها إلى حد ما، أو توجد اختلافات علمية كبيرة بشأن العناصر الرئيسية. غالباً ما تكون يقظة اللاعب أو التعديلات مطلوبة للتخفيف من المخاطر (مثل الفتنة، التطبيع). لا تصل إلى عتبة الحرام."
+
+#: .\templates\ratings\glossary.html:43
+msgid "Impermissible. Games feature clear and significant problematic content. This includes: unavoidable simulation or required engagement in major sins ('P' severity), high-level Aqidah concerns ('H' severity), multiple severe issues ('H' severity in key categories), or pervasive positive normalization/promotion of Haram making the game's environment contrary to Islamic values."
+msgstr "حرام / غير جائز. تتميز الألعاب بمحتوى إشكالي واضح وهام. وهذا يشمل: المحاكاة التي لا مفر منها أو المشاركة المطلوبة في الكبائر (شدة 'P')، مخاوف عالية المستوى تتعلق بالعقيدة (شدة 'H')، قضايا خطيرة متعددة (شدة 'H' في الفئات الرئيسية)، أو تطبيع/ترويج إيجابي منتشر للحرام مما يجعل بيئة اللعبة تتعارض مع القيم الإسلامية."
+
+#: .\templates\ratings\glossary.html:52
+msgid "Disbelief / Polytheism. Games containing required participation in, or unavoidable positive promotion/normalization of, acts of Shirk (associating partners with Allah), Kufr (disbelief), ritualistic magic (Sihr), blasphemy, or direct attacks on core Islamic tenets ('P' severity in Aqidah)."
+msgstr "كفر / شرك. ألعاب تحتوي على مشاركة مطلوبة في، أو ترويج/تطبيع إيجابي لا مفر منه لأعمال الشرك (إشراك شركاء مع الله)، أو الكفر، أو السحر الشعائري، أو التجديف، أو هجمات مباشرة على المبادئ الإسلامية الأساسية (شدة 'P' في العقيدة)."
+
+#: .\templates\ratings\glossary.html:58
+msgid "No significant concerns identified regarding direct action or normalization."
+msgstr "لم يتم تحديد مخاوف كبيرة فيما يتعلق بالفعل المباشر أو التطبيع."
+
+#: .\templates\ratings\glossary.html:61
+msgid "Minor issues present, potentially avoidable, infrequent, or contextually less impactful. Not presented positively or normalized. Minimal risk."
+msgstr "توجد مشاكل بسيطة، قد يمكن تجنبها، غير متكررة، أو أقل تأثيراً من الناحية السياقية. غير مقدمة بشكل إيجابي أو طبيعي. الحد الأدنى من المخاطر."
+
+#: .\templates\ratings\glossary.html:64
+msgid "Moderate concerns. Problematic elements (not major sins/Kufr) may be present and optional OR somewhat normalized neutrally/slightly positively. Requires player vigilance."
+msgstr "مخاوف متوسطة. قد تكون العناصر الإشكالية (ليست كبائر/كفر) موجودة واختيارية أو يتم تطبيعها إلى حد ما بشكل محايد/إيجابي قليلاً. يتطلب يقظة اللاعب."
+
+#: .\templates\ratings\glossary.html:67
+msgid "Severe concerns. Problematic actions (short of major sins/Kufr) strongly encouraged/rewarded OR Haram elements difficult to avoid OR impermissible lifestyles/beliefs (short of Kufr/Shirk) actively promoted/normalized. High risk of negative influence/Tashabbuh."
+msgstr "مخاوف شديدة. يتم تشجيع/مكافأة الأفعال الإشكالية (دون الكبائر/الكفر) بشدة أو يصعب تجنب عناصر الحرام أو يتم ترويج/تطبيع أنماط الحياة/المعتقدات غير المباحة (دون الكفر/الشرك) بنشاط. مخاطر عالية للتأثير السلبي/التشبه."
+
+#: .\templates\ratings\glossary.html:70
+msgid "Explicitly involves required/unavoidable simulation/engagement in major sins or acts of Kufr/Shirk, OR central, inescapable, positive promotion/normalization of such."
+msgstr "ينطوي صراحة على محاكاة/مشاركة مطلوبة/لا مفر منها في الكبائر أو أعمال الكفر/الشرك، أو ترويج/تطبيع إيجابي مركزي لا مفر منه لمثل هذه الأمور."
+
+#: .\templates\ratings\glossary.html:96
+msgid "Ikhtilat"
+msgstr "اختلاط"
+
+#: .\templates\ratings\glossary.html:97
+msgid "Casual, unnecessary free-mixing between non-Mahram men and women."
+msgstr "الاختلاط العرضي وغير الضروري بين الرجال والنساء غير المحارم."
+
+#: .\templates\ratings\glossary.html:99
+msgid "Tabarruj"
+msgstr "تبرج"
+
+#: .\templates\ratings\glossary.html:100
+msgid "Immodest display of beauty or adornments by women (or men where applicable)."
+msgstr "إظهار الزينة أو الجمال بشكل غير محتشم من قبل النساء (أو الرجال عند الاقتضاء)."
+
+#: .\templates\ratings\glossary.html:102
+msgid "Tashabbuh"
+msgstr "تشبه"
+
+#: .\templates\ratings\glossary.html:103
+msgid "Imitation, particularly imitating the disbelievers or open sinners in their specific customs, appearance, or sinful behaviours."
+msgstr "التقليد، وخاصة تقليد الكفار أو الفساق في عاداتهم الخاصة أو مظهرهم أو سلوكياتهم الآثمة."
+
+#: .\templates\ratings\glossary.html:105
+msgid "Sadd al-Dhara'i"
+msgstr "سد الذرائع"
+
+#: .\templates\ratings\glossary.html:106
+msgid "Blocking the means (to evil); an Islamic legal principle of prohibiting permissible actions if they reliably lead to impermissible outcomes."
+msgstr "منع الوسائل (المؤدية إلى الشر)؛ مبدأ فقهي إسلامي يقضي بتحريم الأفعال المباحة إذا كانت تؤدي بشكل موثوق إلى نتائج غير مباحة."
+
+#: .\templates\ratings\glossary.html:108
+msgid "Fitnah"
+msgstr "فتنة"
+
+#: .\templates\ratings\glossary.html:109
+msgid "Trial, temptation, or affliction; often used to describe things that may lead one astray from the religion."
+msgstr "ابتلاء أو إغراء أو محنة؛ غالبًا ما تستخدم لوصف الأشياء التي قد تضل المرء عن الدين."
+
+#: .\templates\homepage.html:31
+msgid "The Muslim Game Classification (MGC) provides guidance for video games based on the Quran, Sunnah, and understanding of the Salaf-us-Salih. We analyze game content across detailed categories (like Aqidah, Immorality, Violence), assess severity levels considering direct actions and normalization, assign an overall ruling (Halal, Mashbouh, Haram, Kufr), and offer suitability notes to help Muslims make informed choices."
+msgstr "يقدم تصنيف الألعاب الإسلامي (MGC) إرشادات لألعاب الفيديو بناءً على القرآن والسنة وفهم السلف الصالح. نقوم بتحليل محتوى اللعبة عبر فئات مفصلة (مثل العقيدة، اللاأخلاقية، العنف)، وتقييم مستويات الشدة مع مراعاة الأفعال المباشرة والتطبيع، وتعيين حكم عام (حلال، مشبوه، حرام، كفر)، وتقديم ملاحظات الملاءمة لمساعدة المسلمين على اتخاذ خيارات مستنيرة."
+
+#: .\templates\homepage.html:35
+msgid "View Full Rating Methodology"
+msgstr "عرض منهجية التقييم الكاملة"
+
+#: .\templates\base.html:141
+msgid "Rating Methodology"
+msgstr "منهجية التقييم"

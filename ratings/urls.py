@@ -1,4 +1,4 @@
-# ratings/urls.py - FULL FILE (with comment action URLs)
+# ratings/urls.py - FULL FILE (with methodology URL)
 from django.urls import path
 from . import views
 
@@ -10,8 +10,9 @@ urlpatterns = [
     path('developer/<slug:developer_slug>/', views.game_list, name='games_by_developer'),
     path('publisher/<slug:publisher_slug>/', views.game_list, name='games_by_publisher'),
 
-    # Glossary
+    # Glossary & Methodology
     path('glossary/', views.glossary_view, name='glossary'),
+    path('methodology/', views.methodology_view, name='methodology'),
 
     # Comment actions
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),

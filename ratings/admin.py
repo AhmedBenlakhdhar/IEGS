@@ -51,7 +51,7 @@ class GameAdmin(TranslationAdmin): # Changed from ModelAdmin
     # --- Use original field names in fieldsets ---
     fieldsets = (
         (_('Core Information'), {'fields': ('title', 'slug', 'cover_image_url', ('developer', 'developer_slug'), ('publisher', 'publisher_slug'), 'release_date', 'summary')}),
-        (_('Platform Availability'), {'fields': (('available_pc', 'available_ps5', 'available_ps4'), ('available_xbox_series', 'available_xbox_one', 'available_switch'), ('available_android', 'available_ios'))}),
+        (_('Platform Availability'), {'fields': (('available_pc', 'available_ps5', 'available_ps4'), ('available_xbox_series', 'available_xbox_one', 'available_switch'), ('available_android', 'available_ios', 'available_quest'))}),
         (_('Store Links'), {'classes': ('collapse',), 'fields': ('steam_link', 'epic_link', 'gog_link', 'other_store_link')}),
         (_('Overall Rating & Flags'), {'fields': ('rating_tier', 'requires_adjustment', 'flags', 'rationale', 'has_spoilers_in_details')}),
         (_('Additional Info'), {'classes': ('collapse',), 'fields': ('adjustment_guide', 'critic_reviews')}),

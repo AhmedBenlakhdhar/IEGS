@@ -1,3 +1,4 @@
+{# templates/homepage.html - UPDATED #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -6,18 +7,12 @@
 
 {% block content %}
 
-
-  {# --- END: Filter/Sort Controls --- #}
-
-  {# --- START: Pre-translate known rating strings (Workaround) --- #}
+  {# Pre-translate Rating Tiers for the Cards #}
   {% get_current_language as LANGUAGE_CODE_CURRENT %}
-
   {% translate "Haram" as translated_haram %}
   {% translate "Mashbouh" as translated_mashbouh %}
   {% translate "Halal" as translated_halal %}
   {% translate "Kufr" as translated_kufr %}
-  {# --- END: Pre-translate --- #}
-
 
   {# --- 1. Hero Section --- #}
   <div class="homepage-hero text-center py-5 mb-5">
@@ -35,11 +30,12 @@
   <section id="what-is-mgc" class="py-5 text-center bg-element rounded mb-5">
     <div class="container">
         <h2 class="section-title mb-4">{% translate "What is MGC?" %}</h2>
+        {# UPDATED DESCRIPTION #}
         <p class="lead text-secondary col-lg-8 mx-auto">
-            {% blocktranslate %}The Muslim Game Classification (MGC) provides ratings and detailed guidance for video games based on the principles of the Quran and the Sunnah, following the understanding of the As-Salaf-us-Salih (Pious Predecessors). Our goal is to help Muslims make informed decisions about the games they play according to the Islamic rulings.{% endblocktranslate %}
+            {% blocktranslate %}The Muslim Game Classification (MGC) provides guidance for video games based on the Quran, Sunnah, and understanding of the Salaf-us-Salih. We analyze game content across detailed categories (like Aqidah, Immorality, Violence), assess severity levels considering direct actions and normalization, assign an overall ruling (Halal, Mashbouh, Haram, Kufr), and offer suitability notes to help Muslims make informed choices.{% endblocktranslate %}
         </p>
-        {# Optional: Link to a future 'About' page #}
-        {# <a href="#" class="btn btn-sm btn-outline-info mt-3">{% translate "Learn More About Our Methodology" %}</a> #}
+        {# ADDED Link to Methodology #}
+        <a href="{% url 'ratings:methodology' %}" class="btn btn-sm btn-outline-info mt-3">{% translate "View Full Rating Methodology" %}</a>
     </div>
   </section>
 
@@ -51,8 +47,8 @@
             {% if top_halal_games %}
                 {% for game in top_halal_games %}
                    <div class="col">
-                       {# Include the existing card snippet #}
-                       {% include 'ratings/includes/game_card_snippet.html' with game=game %}
+                       {# Pass translated tiers to snippet #}
+                       {% include 'ratings/includes/game_card_snippet.html' with game=game translated_haram=translated_haram translated_mashbouh=translated_mashbouh translated_halal=translated_halal translated_kufr=translated_kufr %}
                    </div>
                 {% endfor %}
             {% else %}
@@ -61,7 +57,6 @@
        </div>
        {% if top_halal_games %}
        <div class="text-center mt-4">
-            {# Link to the game list filtered by Halal tier #}
             <a href="{% url 'ratings:game_list' %}?tier=HAL" class="btn btn-sm btn-outline-secondary">{% translate "View All Halal Rated Games" %}</a>
         </div>
         {% endif %}
@@ -78,7 +73,7 @@
                   <a href="{{ article.get_absolute_url }}" class="list-group-item list-group-item-action bg-transparent article-summary-simple">
                       <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1 article-summary-title">{{ article.title }}</h5>
-                        <small class="text-secondary">{{ article.published_date|date:"M d" }}</small> {# Shorter date #}
+                        <small class="text-secondary">{{ article.published_date|date:"M d" }}</small>
                       </div>
                       <p class="mb-1 text-secondary article-summary-excerpt">{{ article.content|striptags|truncatewords:20 }}</p>
                       {% if article.author_name %}

@@ -32,7 +32,16 @@
           {% endif %}
           {% if game.available_switch %}
               {# Font Awesome doesn't have a direct Switch icon, use a generic gamepad or mobile icon #}
-               <span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="https://www.svgrepo.com/show/342069/nintendo-switch.svg" alt="{% translate 'Nintendo Switch' %}"></span>
+               <span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>
+          {% endif %}
+          {% if game.available_android %}
+              <span class="platform-icon platform-android" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>
+          {% endif %}
+          {% if game.available_ios %}
+              <span class="platform-icon platform-ios" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>
+          {% endif %}
+          {% if game.available_meta_quest %}
+              <span class="platform-icon platform-meta-quest" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>
           {% endif %}
           {# Add message if no platforms are checked #}
           {% if not game.available_pc and not game.available_ps5 and not game.available_ps4 and not game.available_xbox_series and not game.available_xbox_one and not game.available_switch %}
