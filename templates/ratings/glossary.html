@@ -14,7 +14,7 @@
     {# --- FIX: Generate URL outside blocktranslate --- #}
     {% url 'ratings:methodology' as methodology_url %}
     <p class="lead text-secondary">
-        {% blocktranslate %}Understanding the terms used in the Muslim Game Classification (MGC). For the full detailed process, see our <a href="{{ methodology_url }}">Rating Methodology</a>.{% endblocktranslate %}
+        {% blocktranslate %}Understanding the terms used in the Muslim Game Classification (MGC). For the full detailed process, see our{% endblocktranslate %} <a href="{{ methodology_url }}">{% blocktranslate %}Rating Methodology{% endblocktranslate %}</a>.
     </p>
     {# --- END FIX --- #}
 

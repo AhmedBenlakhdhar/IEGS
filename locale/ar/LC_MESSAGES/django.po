@@ -3072,8 +3072,8 @@ msgid "MGC ratings are provided as guidance based on <em>ijtihad</em> following 
 msgstr "يتم تقديم تقييمات MGC كإرشادات بناءً على <em>الاجتهاد</em> وفقاً للمنهجية المذكورة. وهي ليست فتاوى ملزمة شرعاً ولا تمثل وجهة النظر الإسلامية الصحيحة الوحيدة في كل قضية دقيقة. يوجد تباين في آراء العلماء. المستخدمون مسؤولون في النهاية عن اختياراتهم ويتم تشجيعهم على ممارسة التقوى الشخصية والتشاور مع أهل العلم إذا كانوا في شك. يهدف MGC إلى المساعدة، وليس استبدال المسؤولية الفردية أمام الله."
 
 #: .\templates\ratings\glossary.html:13
-msgid "Understanding the terms used in the Muslim Game Classification (MGC). For the full detailed process, see our <a href=\"%(url)s\">Rating Methodology</a>."
-msgstr "فهم المصطلحات المستخدمة في تصنيف الألعاب الإسلامي (MGC). للاطلاع على العملية التفصيلية الكاملة، انظر <a href=\"%(url)s\">منهجية التقييم</a>."
+msgid "Understanding the terms used in the Muslim Game Classification (MGC). For the full detailed process, see our"
+msgstr "فهم المصطلحات المستخدمة في تصنيف الألعاب الإسلامي (MGC). للاطلاع على العملية التفصيلية الكاملة، انظر"
 
 #: .\templates\ratings\glossary.html:25
 msgid "Permissible. Games assessed to have minimal concerns. Any potentially problematic elements are minor, incidental, easily avoidable, and not positively normalized. Core themes and required actions are permissible."
