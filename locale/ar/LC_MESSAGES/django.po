@@ -322,7 +322,7 @@ msgstr "مرتفع"
 
 #: .\ratings\models.py:109 .\templates\ratings\glossary.html:69
 msgid "Prohibited"
-msgstr "محظور"
+msgstr "محرم"
 
 #: .\ratings\models.py:112
 msgid "Aqidah Severity"
@@ -1123,7 +1123,7 @@ msgid ""
 "Explicitly prohibited content, often related to Kufr/Shirk or major "
 "unavoidable Haram actions. Indicates Haram or Kufr rating."
 msgstr ""
-"محتوى محظور بشكل صريح، غالباً ما يتعلق بالكفر أو أفعال حرام كبرى لا "
+"محتوى محرم بشكل صريح، غالباً ما يتعلق بالكفر أو أفعال حرام كبرى لا "
 "يمكن تجنبها. يشير إلى تقييم حرام أو كفر."
 
 #: .\templates\ratings\glossary.html:73
@@ -2435,7 +2435,7 @@ msgstr[5] "%(num)d دقيقة"
 
 #: .\venv\Lib\site-packages\django\views\csrf.py:29
 msgid "Forbidden"
-msgstr "محظور"
+msgstr "ممنوع"
 
 #: .\venv\Lib\site-packages\django\views\csrf.py:30
 msgid "CSRF verification failed. Request aborted."
@@ -3081,15 +3081,15 @@ msgstr "جائز / مباح. ألعاب تم تقييمها بأنها ذات م
 
 #: .\templates\ratings\glossary.html:34
 msgid "Doubtful / Caution Advised. Games contain elements of moderate concern ('M' severity) that may be difficult to avoid or are somewhat normalized, OR significant scholarly differences exist regarding key elements. Player vigilance or adjustments are often required to mitigate risks (e.g., Fitnah, normalization). Falls short of the Haram threshold."
-msgstr "مشبوه / ينصح بالحذر. تحتوي الألعاب على عناصر ذات قلق متوسط (شدة 'M') قد يكون من الصعب تجنبها أو يتم تطبيعها إلى حد ما، أو توجد اختلافات علمية كبيرة بشأن العناصر الرئيسية. غالباً ما تكون يقظة اللاعب أو التعديلات مطلوبة للتخفيف من المخاطر (مثل الفتنة، التطبيع). لا تصل إلى عتبة الحرام."
+msgstr "مشبوه / ينصح بالحذر. تحتوي الألعاب على عناصر ذات قلق متوسط (شدة 'و') قد يكون من الصعب تجنبها أو يتم تطبيعها إلى حد ما، أو توجد اختلافات علمية كبيرة بشأن العناصر الرئيسية. غالباً ما تكون يقظة اللاعب أو التعديلات مطلوبة للتخفيف من المخاطر (مثل الفتنة، التطبيع). لا تصل إلى عتبة الحرام."
 
 #: .\templates\ratings\glossary.html:43
 msgid "Impermissible. Games feature clear and significant problematic content. This includes: unavoidable simulation or required engagement in major sins ('P' severity), high-level Aqidah concerns ('H' severity), multiple severe issues ('H' severity in key categories), or pervasive positive normalization/promotion of Haram making the game's environment contrary to Islamic values."
-msgstr "حرام / غير جائز. تتميز الألعاب بمحتوى إشكالي واضح وهام. وهذا يشمل: المحاكاة التي لا مفر منها أو المشاركة المطلوبة في الكبائر (شدة 'P')، مخاوف عالية المستوى تتعلق بالعقيدة (شدة 'H')، قضايا خطيرة متعددة (شدة 'H' في الفئات الرئيسية)، أو تطبيع/ترويج إيجابي منتشر للحرام مما يجعل بيئة اللعبة تتعارض مع القيم الإسلامية."
+msgstr "حرام / غير جائز. تتميز الألعاب بمحتوى إشكالي واضح وهام. وهذا يشمل: المحاكاة التي لا مفر منها أو المشاركة المطلوبة في الكبائر (شدة 'م')، مخاوف عالية المستوى تتعلق بالعقيدة (شدة 'ر')، قضايا خطيرة متعددة (شدة 'م' في الفئات الرئيسية)، أو تطبيع/ترويج إيجابي منتشر للحرام مما يجعل بيئة اللعبة تتعارض مع القيم الإسلامية."
 
 #: .\templates\ratings\glossary.html:52
 msgid "Disbelief / Polytheism. Games containing required participation in, or unavoidable positive promotion/normalization of, acts of Shirk (associating partners with Allah), Kufr (disbelief), ritualistic magic (Sihr), blasphemy, or direct attacks on core Islamic tenets ('P' severity in Aqidah)."
-msgstr "كفر / شرك. ألعاب تحتوي على مشاركة مطلوبة في، أو ترويج/تطبيع إيجابي لا مفر منه لأعمال الشرك (إشراك شركاء مع الله)، أو الكفر، أو السحر الشعائري، أو التجديف، أو هجمات مباشرة على المبادئ الإسلامية الأساسية (شدة 'P' في العقيدة)."
+msgstr "كفر / شرك. ألعاب تحتوي على مشاركة مطلوبة في، أو ترويج/تطبيع إيجابي لا مفر منه لأعمال الشرك (إشراك شركاء مع الله)، أو الكفر، أو السحر الشعائري، أو التجديف، أو هجمات مباشرة على المبادئ الإسلامية الأساسية (شدة 'م' في العقيدة)."
 
 #: .\templates\ratings\glossary.html:58
 msgid "No significant concerns identified regarding direct action or normalization."
@@ -3162,3 +3162,18 @@ msgstr "عرض منهجية التقييم الكاملة"
 #: .\templates\base.html:141
 msgid "Rating Methodology"
 msgstr "منهجية التقييم"
+
+msgid "None (N)"
+msgstr "منعدم (ع)"
+
+msgid "Low (L)"
+msgstr "منخفض (خ)"
+
+msgid "Medium (M)"
+msgstr "متوسط (و)"
+
+msgid "High (H)"
+msgstr "مرتفع (ر)"
+
+msgid "Prohibited (P)"
+msgstr "محرم (ح)"
