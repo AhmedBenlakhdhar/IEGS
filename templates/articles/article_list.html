@@ -1,51 +1,73 @@
+{# templates/articles/article_list.html - UPDATED #}
 {% extends "base.html" %}
 {% load static %}
-{% load i18n %} {# <--- ADD THIS LINE #}
+{% load i18n %}
 
-{% block title %}{% translate "MGC Blog" %}{% endblock %}
+{% block title %}{{ page_title }}{% endblock %} {# Use dynamic title from view #}
 
 {% block content %}
-  <div class="page-header d-flex justify-content-between align-items-center">
-    <h1>{% translate "Blog" %}</h1>
-    {# --- START: Search Form --- #}
-    <form method="GET" action="{% url 'articles:article_list' %}" class="d-flex search-form">
-        {# Translate placeholder and aria-label #}
-        <input class="form-control me-2" type="search" placeholder="{% translate 'Search Articles...' %}" aria-label="{% translate 'Search Articles' %}" name="q" value="{{ search_query|default:'' }}">
-        <button class="btn btn-outline-secondary" type="submit">{% translate "Search" %}</button>
-    </form>
-    {# --- END: Search Form --- #}
-  </div>
+  <div class="row">
+    {# Optional: Sidebar for Categories #}
+    <div class="col-md-3 order-md-2 mb-4">
+      <h5>{% translate "Categories" %}</h5>
+      <ul class="list-group">
+         <a href="{% url 'articles:article_list' %}" class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
+             {% translate "All Articles" %}
+         </a>
+        {% for category in all_categories %}
+         <a href="{{ category.get_absolute_url }}" class="list-group-item list-group-item-action {% if current_category == category %}active{% endif %}">
+             {{ category.name }}
+         </a>
+        {% endfor %}
+      </ul>
+    </div>
 
-  {% if search_query %}
-      {# Translate search results text #}
-      <p class="mb-3 text-secondary">{% blocktranslate %}Showing results for: <strong>"{{ search_query }}"</strong>{% endblocktranslate %}</p>
-  {% endif %}
-
-  <div class="article-list-container">
-    {% for article in articles %}
-      <div class="article-item">
-          <h4>
-             <a href="{{ article.get_absolute_url }}">{{ article.title }}</a> {# Title is from model #}
-          </h4>
-          <p class="article-meta">
-              {# Translate "Published on" #}
-              {% blocktranslate %}Published on {{ article.published_date|date:"F j, Y" }}{% endblocktranslate %}
-              {% if article.author_name %} {% blocktranslate %}by {{ article.author_name }}{% endblocktranslate %}{% endif %}
-          </p>
-          <p class="article-excerpt">
-              {{ article.content|striptags|truncatewords:45 }} {# Content is from model #}
-          </p>
-          {# Translate "Read More" #}
-          <a href="{{ article.get_absolute_url }}" class="read-more-link">{% translate "Read More →" %}</a>
+    <div class="col-md-9 order-md-1">
+      {# --- Page Header with Search --- #}
+      <div class="page-header d-flex justify-content-between align-items-center mb-3">
+        <h1>{{ page_title }}</h1> {# Dynamic title #}
+        <form method="GET" action="{% if current_category %}{{ current_category.get_absolute_url }}{% else %}{% url 'articles:article_list' %}{% endif %}" class="d-flex search-form">
+            <input class="form-control me-2" type="search" placeholder="{% translate 'Search Articles...' %}" aria-label="{% translate 'Search Articles' %}" name="q" value="{{ search_query|default:'' }}">
+            <button class="btn btn-outline-secondary" type="submit">{% translate "Search" %}</button>
+        </form>
       </div>
-    {% empty %}
-      <p class="text-center text-secondary">
-         {% if search_query %}
-           {% translate "No articles found matching your search criteria." %}
-         {% else %}
-           {% translate "No articles published yet." %}
-         {% endif %}
-      </p>
-    {% endfor %}
+
+      {# Search results message #}
+      {% if search_query %}
+          <p class="mb-3 text-secondary">{% blocktranslate %}Showing results for: <strong>"{{ search_query }}"</strong>{% endblocktranslate %}</p>
+      {% endif %}
+
+      {# Article List #}
+      <div class="article-list-container">
+        {% for article in articles %}
+          <div class="article-item">
+              <h4><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h4>
+              <p class="article-meta">
+                  {% blocktranslate %}Published on {{ article.published_date|date:"F j, Y" }}{% endblocktranslate %}
+                  {% if article.author_name %} {% blocktranslate %}by {{ article.author_name }}{% endblocktranslate %}{% endif %}
+                  {# --- Display Categories --- #}
+                  {% if article.categories.exists %}
+                      | {% translate "In:" %}
+                      {% for cat in article.categories.all %}
+                          <a href="{{ cat.get_absolute_url }}" class="text-secondary">{{ cat.name }}</a>{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                  {% endif %}
+                  {# --- End Display Categories --- #}
+              </p>
+              <p class="article-excerpt">{{ article.content|striptags|truncatewords:45 }}</p>
+              <a href="{{ article.get_absolute_url }}" class="read-more-link">{% translate "Read More →" %}</a>
+          </div>
+        {% empty %}
+          <p class="text-center text-secondary">
+             {% if search_query or current_category %}
+               {% translate "No articles found matching your criteria." %}
+             {% else %}
+               {% translate "No articles published yet." %}
+             {% endif %}
+          </p>
+        {% endfor %}
+      </div>
+      {# Add Pagination if needed later #}
+    </div>
   </div>
 {% endblock %}

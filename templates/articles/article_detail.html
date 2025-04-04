@@ -1,6 +1,7 @@
+{# templates/articles/article_detail.html - UPDATED #}
 {% extends "base.html" %}
 {% load static %}
-{% load i18n %} {# <--- ADD THIS LINE #}
+{% load i18n %}
 
 {% block title %}{{ article.title }} - {% translate "MGC Article" %}{% endblock %}
 
@@ -9,23 +10,30 @@
 
       {% if article.header_image_url %}
       <div class="article-header-image mb-4 text-center">
-          {# Translate alt text #}
           <img src="{{ article.header_image_url }}" class="img-fluid rounded shadow-sm" alt="{% blocktranslate %}{{ article.title }} Header Image{% endblocktranslate %}" style="max-height: 400px;">
       </div>
       {% endif %}
 
-      <h1 class="article-detail-title">{{ article.title }}</h1> {# Title from model #}
-      <p class="article-detail-meta">
-          {# Translate labels #}
+      <h1 class="article-detail-title">{{ article.title }}</h1>
+      <p class="article-detail-meta mb-1"> {# Reduced bottom margin #}
           {% translate "Published:" %} {{ article.published_date|date:"F j, Y" }}
           {% if article.author_name %} | {% translate "By:" %} {{ article.author_name }}{% endif %}
       </p>
+      {# --- Display Categories --- #}
+      {% if article.categories.exists %}
+          <p class="article-categories small text-secondary mb-3">
+              {% translate "Categories:" %}
+              {% for cat in article.categories.all %}
+                  <a href="{{ cat.get_absolute_url }}" class="badge bg-secondary text-decoration-none link-light me-1">{{ cat.name }}</a>
+              {% endfor %}
+          </p>
+      {% endif %}
+      {# --- End Display Categories --- #}
 
       <div class="article-content">
-          {{ article.content|linebreaks }} {# Content from model #}
+          {{ article.content|safe }}
       </div>
 
-      {# Translate back link #}
       <a href="{% url 'articles:article_list' %}" class="back-link mt-4">{% translate "← Back to Articles" %}</a>
   </article>
 {% endblock %}

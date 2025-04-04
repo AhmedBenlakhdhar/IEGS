@@ -2,7 +2,6 @@
 from django.shortcuts import render, get_object_or_404, redirect, Http404
 from django.urls import reverse
 from .models import Game, RatingTier, Flag, GameComment, MethodologyPage
-from articles.models import Article
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import SignUpForm, GameCommentForm
@@ -14,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
 from django.shortcuts import render
+from articles.models import Article
 
 # ... (homepage and game_list views remain the same as previous version) ...
 # --- Homepage View ---

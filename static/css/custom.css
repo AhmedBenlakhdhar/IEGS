@@ -101,7 +101,7 @@ h2 { font-size: 1.6rem; margin-bottom: 1.5rem; }
 h4 { font-size: 1.1rem; } /* Card titles */
 h5 { font-size: 1rem; } /* Section titles */
 
-a { color: var(--accent-primary); text-decoration: none; transition: color 0.2s ease; }
+a { color: rgba(var(--bs-link-color-rgb); text-decoration: none; transition: color 0.2s ease; }
 a:hover { color: var(--accent-hover); }
 
 /* Ensure Bootstrap links use theme colors */
@@ -1106,4 +1106,8 @@ html[dir="rtl"] .platform-badge {
 }
 .platform-icon.platform-switch img:hover {
   filter: hue-rotate(0deg) saturate(1) brightness(1);
+}
+
+.list-group {
+  padding: 0;
 }

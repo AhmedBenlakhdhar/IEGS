@@ -699,7 +699,7 @@ msgstr "MGC - تصنيف الألعاب الإلكترونية للمسلمين"
 
 #: .\templates\homepage.html:24
 msgid "Muslim Game Classification"
-msgstr "تصنيف الألعاب الإلكترونية للمسلمين"
+msgstr "تصنيف الألعاب الإلكترونية للمسلمين (MGC)"
 
 #: .\templates\homepage.html:26
 msgid ""
