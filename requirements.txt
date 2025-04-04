@@ -7,6 +7,7 @@ tzdata
 django-modeltranslation
 django-recaptcha
 django-widget-tweaks
+django-ckeditor==6.7.1
 
 # pillow # Add if needed by your project or other dependencies
 # python-dotenv # Add if using .env files

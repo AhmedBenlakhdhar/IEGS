@@ -1,12 +1,10 @@
 # ratings/admin.py
 from django.contrib import admin, messages
 from django.urls import reverse
-# --- Import TranslationAdmin ---
 from modeltranslation.admin import TranslationAdmin
-# -------------------------------
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import RatingTier, Flag, Game, CriticReview, GameComment
+from .models import RatingTier, Flag, Game, CriticReview, GameComment, MethodologyPage
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 
@@ -36,41 +34,43 @@ class CriticReviewAdmin(TranslationAdmin): # Changed from ModelAdmin
     list_filter = ('reviewer_name',)
 
 @admin.register(Game)
-class GameAdmin(TranslationAdmin): # Changed from ModelAdmin
-    # --- Use original field names ---
+class GameAdmin(TranslationAdmin):
     list_display = ('title', 'rating_tier', 'requires_adjustment', 'developer', 'publisher', 'date_updated')
     list_filter = ('rating_tier', 'requires_adjustment', 'developer', 'publisher')
-    search_fields = ('title', 'developer', 'publisher', 'summary', 'rationale') # Add searchable translated fields
-    # --------------------------------
-    prepopulated_fields = {'slug': ('title',)} # May need adjustment
-    filter_horizontal = ('flags', 'critic_reviews')
+    search_fields = ('title', 'developer', 'publisher', 'summary', 'rationale')
+    prepopulated_fields = {'slug': ('title',)}
+    filter_horizontal = ('flags', 'critic_reviews', 'adjustable_flags')
     date_hierarchy = 'date_added'
     ordering = ('-date_updated',)
     readonly_fields = ('developer_slug', 'publisher_slug', 'date_added', 'date_updated')
 
-    # --- Use original field names in fieldsets ---
     fieldsets = (
         (_('Core Information'), {'fields': ('title', 'slug', 'cover_image_url', ('developer', 'developer_slug'), ('publisher', 'publisher_slug'), 'release_date', 'summary')}),
         (_('Platform Availability'), {'fields': (('available_pc', 'available_ps5', 'available_ps4'), ('available_xbox_series', 'available_xbox_one', 'available_switch'), ('available_android', 'available_ios', 'available_quest'))}),
         (_('Store Links'), {'classes': ('collapse',), 'fields': ('steam_link', 'epic_link', 'gog_link', 'other_store_link')}),
-        (_('Overall Rating & Flags'), {'fields': ('rating_tier', 'requires_adjustment', 'flags', 'rationale', 'has_spoilers_in_details')}),
+        (_('Overall Rating & Flags'), {'fields': ('rating_tier', 'requires_adjustment', 'flags', 'adjustable_flags', 'rationale', 'has_spoilers_in_details')}),
+        # --- Consider adding suitability/positives here later ---
         (_('Additional Info'), {'classes': ('collapse',), 'fields': ('adjustment_guide', 'critic_reviews')}),
-        # Use original names for details/reason fields
+
+        # --- UPDATE FIELD NAMES HERE ---
         (_('Detailed MGC Breakdown'), {'classes': ('collapse',), 'fields': (
+            # Category 1
             ('aqidah_severity', 'aqidah_details', 'aqidah_reason'),
+            # Category 2 (NEW)
+            ('haram_depictions_severity', 'haram_depictions_details', 'haram_depictions_reason'),
+            # Category 3 (NEW)
+            ('simulation_haram_severity', 'simulation_haram_details', 'simulation_haram_reason'),
+            # Category 4 (NEW)
+            ('normalization_haram_severity', 'normalization_haram_details', 'normalization_haram_reason'),
+            # Category 5
             ('violence_severity', 'violence_details', 'violence_reason'),
-            ('immorality_severity', 'immorality_details', 'immorality_reason'),
-            ('substances_gambling_severity', 'substances_gambling_details', 'substances_gambling_reason'),
-            ('audio_music_severity', 'audio_music_details', 'audio_music_reason'),
+            # Category 6
             ('time_addiction_severity', 'time_addiction_details', 'time_addiction_reason'),
+            # Category 7
             ('online_conduct_severity', 'online_conduct_details', 'online_conduct_reason'),
         )}),
+        # --- END UPDATED FIELDS ---
     )
-    # ------------------------------------------
-
-    # Customize group fieldsets if needed (optional)
-    # group_fieldsets = True
-
 
 # --- Game Comment Admin (User content - usually NOT translated via modeltranslation) ---
 @admin.register(GameComment)
@@ -129,3 +129,14 @@ class GameCommentAdmin(admin.ModelAdmin): # Stays as ModelAdmin
         users_to_reactivate = User.objects.filter(pk__in=queryset.values_list('user__pk', flat=True))
         updated_count = users_to_reactivate.update(is_active=True)
         self.message_user(request, _(f'{updated_count} user accounts linked to selected comments were reactivated.'), messages.SUCCESS)
+
+
+@admin.register(MethodologyPage)
+class MethodologyPageAdmin(TranslationAdmin):
+    list_display = ('title', 'last_updated')
+    # Automatically uses CKEditor widget for the CKEditorUploadingField
+    fields = ('title', 'content') # Simple layout
+
+    # Optional: Prevent adding more than one instance
+    # def has_add_permission(self, request):
+    #    return not MethodologyPage.objects.exists()

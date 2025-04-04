@@ -36,21 +36,19 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    # --- Ensure modeltranslation is loaded EARLY ---
     'modeltranslation',
-    # ----------------------------------------------
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles', # Django's staticfiles app must be here
-    # --- Your apps AFTER modeltranslation and admin ---
+    'django.contrib.staticfiles',
     'ratings.apps.RatingsConfig',
     'articles.apps.ArticlesConfig',
-    # --- Other third-party apps ---
     'django_recaptcha',
     'widget_tweaks',
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 
@@ -161,6 +159,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
 # Optional: If using WhiteNoise (simpler setup sometimes)
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' # Creates media/ folder at project root
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -176,3 +176,45 @@ LOGOUT_REDIRECT_URL = '/'
 # Add these lines anywhere in settings.py
 RECAPTCHA_PUBLIC_KEY = '6LexugcrAAAAACDHcXQogzALwIC87hxMufE8WAcU'  # Paste your Site Key
 RECAPTCHA_PRIVATE_KEY = '6LexugcrAAAAAJnJge1mqszLJ9B7wATMRyi5KqcJ' # Paste your Secret Key
+
+# --- CKEDITOR CONFIGURATION ---
+CKEDITOR_UPLOAD_PATH = "uploads/" # Subdirectory within MEDIA_ROOT
+CKEDITOR_CONFIGS = {
+    'default': {
+        'skin': 'moono-lisa',
+        'toolbar': 'Custom', # Use a custom toolbar defined below
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline', 'Strike', '-', 'TextColor', 'BGColor'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'],
+            ['Link', 'Unlink', 'Anchor'],
+            ['Image', 'Table', 'HorizontalRule', 'SpecialChar'],
+            ['Format', 'FontSize'], # Keep format for Headings
+            ['Source'], # Allow viewing HTML source
+            '/', # Line break
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['RemoveFormat'],
+            ['Maximize', 'ShowBlocks'],
+            # Add PasteFromWord, PasteText if needed
+        ],
+        'height': 300,
+        'width': '100%', # Make it responsive
+        'filebrowserUploadUrl': "/ckeditor/upload/", # Make sure this matches urls.py
+        'filebrowserBrowseUrl': "/ckeditor/browse/", # Requires configuration if you want server-side browsing
+         # --- Configure language based on Django's language ---
+        # 'language': '{{ language }}', # This syntax might require template processing context not available here.
+                                     # CKEditor usually picks up the browser language or you can set it explicitly.
+                                     # For multi-language admin, CKEditor integration with modeltranslation handles it.
+         # --- Allow specific HTML content ---
+        'allowedContent': True,
+        'extraPlugins': 'justify,showblocks,autogrow',
+         'autoGrow_minHeight': 250,
+         'autoGrow_maxHeight': 600,
+         'autoGrow_onStartup': True,
+         'contentsCss': [os.path.join(STATIC_URL, 'css/custom.css')],
+    },
+    'articles_toolbar': { # Example of a different toolbar for articles if needed
+         'toolbar': 'Basic',
+         'height': 200,
+         # Inherits other settings from 'default' unless overridden
+    }
+}

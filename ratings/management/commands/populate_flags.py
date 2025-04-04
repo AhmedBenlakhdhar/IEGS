@@ -6,24 +6,32 @@ from django.db import transaction
 
 # --- CORRECTED FLAG DATA (Material Symbols icon names) ---
 FLAG_DATA = [
-    # Using Material Symbols Names for 'symbol' field
-    {"symbol": "music_note", "description": "Contains Music"},
-    {"symbol": "forum", "description": "Online Interaction / Chat"},
-    {"symbol": "paid", "description": "Microtransactions / Loot Boxes"},
-    {"symbol": "bloodtype", "description": "Significant Violence / Gore"},
-    {"symbol": "warning", "description": "Mature Themes (General)"},
-    {"symbol": "hourglass_top", "description": "High Addiction Potential / Time Sink"},
-    {"symbol": "school", "description": "Educational Content"},
-    {"symbol": "psychology", "description": "Puzzle / Strategy Focus"},
-    {"symbol": "sports_soccer", "description": "Sports"},
-    {"symbol": "history_edu", "description": "Historical Setting"},
-    {"symbol": "flare", "description": "Supernatural / Fantasy Themes (Non-Shirk)"},
-    {"symbol": "casino", "description": "Simulated Gambling Mechanics"},
-    {"symbol": "grass", "description": "Drug / Substance References"},
-    {"symbol": "favorite", "description": "Promotes Impermissible Relationships / Lifestyles"}, # Still needs better icon/term
-    {"symbol": "sentiment_dissatisfied", "description": "Excessive Foul Language"},
-    {"symbol": "auto_fix_high", "description": "Magic / Sorcery Themes (Assess Aqidah)"},
-    {"symbol": "no_adult_content", "description": "Sexual Content / Nudity ('Awrah)"},
+    # === Critical Haram/Mashbouh Warnings ===
+    # Use gpp_bad for the most severe Aqidah/Shirk/Kufr elements identified
+    {"symbol": "gpp_bad", "description": "Contains Kufr/Shirk Elements"},
+
+    # Specific flag for nudity/explicit 'Awrah issues
+    {"symbol": "visibility_off", "description": "Explicit 'Awrah / Nudity"},
+
+    # Flag for games heavily promoting lifestyles/ideologies against Islamic values
+    {"symbol": "record_voice_over", "description": "Promotes Haram Lifestyles/Ideologies"}, # Was: Anti-Islamic
+
+    # === Specific Haram/Mashbouh Mechanics ===
+    # Flag for any simulated gambling, paid or not
+    {"symbol": "casino", "description": "Contains Gambling Mechanics (Simulated/Paid)"}, # Merged casino/paid
+
+    # Flag for significant presence of Haram substances
+    {"symbol": "local_bar", "description": "Depicts/Promotes Haram Substances"}, # Replaces 'grass', more general
+
+    # Flag for significant issues with Music/Audio based on assessment
+    {"symbol": "music_off", "description": "Contains Impermissible Music/Audio"}, # Specific Audio concern
+
+    # === Interaction & Time Warnings ===
+    # Flag for risky online interactions
+    {"symbol": "forum", "description": "Risky Online Interaction"}, # Kept 'forum', description clearer
+
+    # Flag for high time sink / addiction potential
+    {"symbol": "hourglass_top", "description": "High Time/Addiction Risk"}, # Kept
 ]
 
 

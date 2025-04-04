@@ -32,8 +32,33 @@
         <p class="detail-meta mb-2 mt-3">{% if game.developer and game.developer_slug %}<a href="{% url 'ratings:games_by_developer' developer_slug=game.developer_slug %}">{{ game.developer }}</a>{% elif game.developer %}{{ game.developer }}{% endif %}{% if game.developer and game.publisher %} / {% endif %}{% if game.publisher and game.publisher_slug %}<a href="{% url 'ratings:games_by_publisher' publisher_slug=game.publisher_slug %}">{{ game.publisher }}</a>{% elif game.publisher %}{{ game.publisher }}{% endif %}{% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}</p>
         {# Rating Display #}
         <div class="mb-3 detail-overall-rating"><span class="fw-bold me-2">{% translate "Overall MGC Rating:" %}</span><span class="rating-badge rating-{{ game.rating_tier.tier_code }}" style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};"><span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>{% get_current_language as LANGUAGE_CODE_CURRENT %}{% translate "Haram" as translated_haram %}{% translate "Mashbouh" as translated_mashbouh %}{% translate "Halal" as translated_halal %}{% translate "Kufr" as translated_kufr %}<span class="rating-label">{% if game.rating_tier.display_name == "Haram" %}{{ translated_haram }}{% elif game.rating_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}{% elif game.rating_tier.display_name == "Halal" %}{{ translated_halal }}{% elif game.rating_tier.display_name == "Kufr" %}{{ translated_kufr }}{% else %}{{ game.rating_tier.display_name }}{% endif %}</span></span>{% if game.requires_adjustment %}<span class="badge adjustment-badge ms-2">{% translate "Requires Adjustment" %}</span>{% endif %}</div>
+
         {# Flags #}
-        {% if game.flags.exists %}<div class="mb-3"><span class="fw-bold me-2">{% translate "Content Flags:" %}</span>{% for flag in game.flags.all %} <span class="flag-symbol material-symbols-outlined" title="{{ flag.description }}">{{ flag.symbol }}</span> {% endfor %}</div>{% endif %}
+        <div class="mb-3">
+            <span class="fw-bold d-block mb-2">{% translate "Content Flags:" %}</span> {# Make title a block #}
+            <ul class="list-unstyled flag-list mb-0"> {# Use a list for better structure #}
+                {% for flag in game.flags.all %}
+                    {# List item for each flag #}
+                    <li class="flag-item {% if game.requires_adjustment and flag in game.adjustable_flags.all %}flag-item-adjustable{% endif %}">
+                        {# Icon remains #}
+                        <span class="flag-symbol material-symbols-outlined" aria-hidden="true">{{ flag.symbol }}</span>
+                        {# Description Text #}
+                        <span class="flag-description">
+                            {{ flag.description }}
+                            {# Add "(Adjustable)" text if applicable #}
+                            {% if game.requires_adjustment and flag in game.adjustable_flags.all %}
+                                <small class="text-adjustable ms-1">({% translate "Adjustable" %})</small>
+                            {% endif %}
+                        </span>
+                    </li>
+                {% empty %}
+                    {# Message if no flags are assigned #}
+                    <li><small class="text-secondary">{% translate "No specific content flags noted." %}</small></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
         {# Summary #}
         {% if game.summary %}<p class="game-summary text-secondary">{{ game.summary }}</p>{% endif %}
         {# Adjustment Guide #}
@@ -44,18 +69,30 @@
 {# --- Critic Reviews Section (No changes needed here) --- #}
 {% if game.critic_reviews.exists %}<div class="critic-reviews-section mt-4 mb-5"><h4 class="mb-3 guide-section-title" style="text-align: inherit; font-size: 1.3rem;">{% translate "Critic Reviews" %}</h4><div class="row row-cols-1 row-cols-md-2 g-3">{% for review in game.critic_reviews.all %}<div class="col"><div class="critic-review-card p-3 bg-element border rounded h-100"><div class="critic-review-header d-flex justify-content-between align-items-center mb-2"><span class="critic-name fw-bold">{{ review.reviewer_name }}</span>{% if review.score %}<span class="critic-score badge bg-secondary">{{ review.score }}</span>{% endif %}</div>{% if review.summary %}<blockquote class="critic-summary border-start border-3 ps-3 py-1 mb-2 fst-italic small text-secondary">"{{ review.summary|truncatewords:25 }}"</blockquote>{% endif %}<a href="{{ review.review_url }}" class="critic-link small text-primary" target="_blank" rel="noopener noreferrer">{% translate "Read Full Review" %} <span class="material-symbols-outlined external-link-icon" style="font-size: 0.9em; vertical-align: -1px;">open_in_new</span></a></div></div>{% endfor %}</div></div>{% endif %}
 
-{# --- Islamic Guidance Section (No changes needed here) --- #}
+{# --- Islamic Guidance Section (UPDATED Includes) --- #}
 <div class="mgc-guide-section mt-4">
     <h2 class="guide-section-title">{% translate "Islamic Guidance Breakdown" %}</h2>
     {% if game.has_spoilers_in_details %}<div class="alert alert-warning spoiler-alert" role="alert"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg><strong>{% translate "Spoiler Warning:" %}</strong> {% translate "Details below may contain plot spoilers." %}</div>{% endif %}
+
+    {# Category 1 #}
     {% include 'ratings/includes/guidance_category.html' with category_name='Aqidah & Ideology' slug='Aqidah' severity=game.aqidah_severity_display severity_class=game.aqidah_severity_css_class details=game.aqidah_details reason=game.aqidah_reason %}
+    {# Category 2 (NEW) #}
+    {% include 'ratings/includes/guidance_category.html' with category_name='Haram Depictions & Interactions' slug='Depictions' severity=game.haram_depictions_severity_display severity_class=game.haram_depictions_severity_css_class details=game.haram_depictions_details reason=game.haram_depictions_reason %}
+    {# Category 3 (NEW) #}
+    {% include 'ratings/includes/guidance_category.html' with category_name='Simulation of Haram Acts' slug='Simulation' severity=game.simulation_haram_severity_display severity_class=game.simulation_haram_severity_css_class details=game.simulation_haram_details reason=game.simulation_haram_reason %}
+    {# Category 4 (NEW) #}
+    {% include 'ratings/includes/guidance_category.html' with category_name='Normalization of Haram' slug='Normalization' severity=game.normalization_haram_severity_display severity_class=game.normalization_haram_severity_css_class details=game.normalization_haram_details reason=game.normalization_haram_reason %}
+    {# Category 5 #}
     {% include 'ratings/includes/guidance_category.html' with category_name='Violence & Aggression' slug='Violence' severity=game.violence_severity_display severity_class=game.violence_severity_css_class details=game.violence_details reason=game.violence_reason %}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Immorality & Indecency' slug='Immorality' severity=game.immorality_severity_display severity_class=game.immorality_severity_css_class details=game.immorality_details reason=game.immorality_reason %}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Haram Substances & Gambling' slug='Substances' severity=game.substances_gambling_severity_display severity_class=game.substances_gambling_severity_css_class details=game.substances_gambling_details reason=game.substances_gambling_reason %}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Audio & Music' slug='Audio' severity=game.audio_music_severity_display severity_class=game.audio_music_severity_css_class details=game.audio_music_details reason=game.audio_music_reason %}
+    {# Category 6 #}
     {% include 'ratings/includes/guidance_category.html' with category_name='Time Commitment & Addiction Potential' slug='Time' severity=game.time_addiction_severity_display severity_class=game.time_addiction_severity_css_class details=game.time_addiction_details reason=game.time_addiction_reason %}
+    {# Category 7 #}
     {% include 'ratings/includes/guidance_category.html' with category_name='Online Conduct & Interaction' slug='Online' severity=game.online_conduct_severity_display severity_class=game.online_conduct_severity_css_class details=game.online_conduct_details reason=game.online_conduct_reason %}
-    {% if game.aqidah_severity == 'N' and not game.aqidah_details and not game.aqidah_reason and game.violence_severity == 'N' and not game.violence_details and not game.violence_reason and game.immorality_severity == 'N' and not game.immorality_details and not game.immorality_reason and game.substances_gambling_severity == 'N' and not game.substances_gambling_details and not game.substances_gambling_reason and game.audio_music_severity == 'N' and not game.audio_music_details and not game.audio_music_reason and game.time_addiction_severity == 'N' and not game.time_addiction_details and not game.time_addiction_reason and game.online_conduct_severity == 'N' and not game.online_conduct_details and not game.online_conduct_reason %}<p class="text-center text-secondary my-4">{% translate "No significant Islamic concerns noted in the assessed categories." %}</p>{% endif %}
+
+    {# UPDATED Final check for "No concerns" message #}
+    {% if game.aqidah_severity == 'N' and not game.aqidah_details and not game.aqidah_reason and game.haram_depictions_severity == 'N' and not game.haram_depictions_details and not game.haram_depictions_reason and game.simulation_haram_severity == 'N' and not game.simulation_haram_details and not game.simulation_haram_reason and game.normalization_haram_severity == 'N' and not game.normalization_haram_details and not game.normalization_haram_reason and game.violence_severity == 'N' and not game.violence_details and not game.violence_reason and game.time_addiction_severity == 'N' and not game.time_addiction_details and not game.time_addiction_reason and game.online_conduct_severity == 'N' and not game.online_conduct_details and not game.online_conduct_reason %}
+    <p class="text-center text-secondary my-4">{% translate "No significant Islamic concerns noted in the assessed categories." %}</p>
+    {% endif %}
 </div>
 
 {# --- START: Comments Section (Updated for reCAPTCHA) --- #}

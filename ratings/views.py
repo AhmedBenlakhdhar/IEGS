@@ -1,7 +1,7 @@
 # ratings/views.py - FULL FILE (with comment actions, CAPTCHA check)
 from django.shortcuts import render, get_object_or_404, redirect, Http404
 from django.urls import reverse
-from .models import Game, RatingTier, Flag, GameComment
+from .models import Game, RatingTier, Flag, GameComment, MethodologyPage
 from articles.models import Article
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -35,7 +35,7 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     filter_description = None
 
     if developer_slug:
-        games_queryset = games_queryset.filter(developer_slug=developer_slug)
+        games_queryset = Game.objects.select_related('rating_tier').prefetch_related('flags', 'adjustable_flags').all()
         first_game = games_queryset.first()
         dev_name = first_game.developer if first_game else developer_slug
         page_title = gettext("Games by %(developer_name)s") % {'developer_name': dev_name}
@@ -115,7 +115,11 @@ def game_list(request, developer_slug=None, publisher_slug=None):
 def game_detail(request, game_slug):
     game = get_object_or_404(
         Game.objects.select_related('rating_tier').prefetch_related(
-            'flags', 'critic_reviews', 'comments__user', 'comments__flagged_by' # Prefetch users and flaggers
+            'flags',
+            'adjustable_flags',
+            'critic_reviews',
+            'comments__user',
+            'comments__flagged_by'
         ),
         slug=game_slug
     )
@@ -218,7 +222,10 @@ def flag_comment(request, comment_id):
 
 # --- NEW: Methodology View ---
 def methodology_view(request):
-    """Displays the MGC rating methodology page."""
-    # No context needed for a static page like this yet
-    context = {}
+    # ... fetch logic ...
+    methodology_page = MethodologyPage.objects.first() # Fetches the object
+    # ... messages logic ...
+    context = {
+        'methodology_page': methodology_page, # Variable name is 'methodology_page'
+    }
     return render(request, 'ratings/methodology.html', context)

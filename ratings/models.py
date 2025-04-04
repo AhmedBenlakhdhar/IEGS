@@ -1,4 +1,4 @@
-# ratings/models.py - FULL FILE (with comments auto-approved, flagging)
+# ratings/models.py
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
@@ -6,6 +6,7 @@ from django.utils import timezone # Needed if you add date/time fields later
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _ # Import for translation
 from django.contrib.auth.models import User # Import User for comments
+from ckeditor_uploader.fields import RichTextUploadingField
 
 # ... (RatingTier, Flag, CriticReview, Game models remain the same as previous version) ...
 # Represents the overall rating category (Halal, Mashbouh, etc.)
@@ -98,9 +99,31 @@ class Game(models.Model):
 
     # --- MGC Rating & Flags ---
     rating_tier = models.ForeignKey(
-        RatingTier, on_delete=models.PROTECT, related_name='games',
-        help_text=_("Overall MGC Rating based on detailed assessment."), verbose_name=_('Rating Tier')
+        RatingTier,
+        on_delete=models.PROTECT,
+        related_name='games',
+        help_text=_("Overall MGC Rating based on detailed assessment."),
+        verbose_name=_('Rating Tier')
     )
+    requires_adjustment = models.BooleanField(...)
+    flags = models.ManyToManyField( # Existing flags
+        Flag,
+        blank=True,
+        related_name='games_with_flag', # Renamed related_name to avoid clash
+        help_text=_("Quick visual indicators for potential content types."),
+        verbose_name=_('Content Flags')
+    )
+    # --- NEW Field ---
+    adjustable_flags = models.ManyToManyField(
+        Flag,
+        blank=True,
+        related_name='games_needing_adjustment', # New related_name
+        help_text=_("Select flags corresponding to content that CAN be adjusted/avoided."),
+        verbose_name=_('Adjustable Content Flags')
+    )
+    # -----------------
+    rationale = models.TextField(...)
+    adjustment_guide = models.TextField(...)
     requires_adjustment = models.BooleanField(
         default=False, help_text=_("Check if this game needs user adjustments (settings, mods) to meet its assigned Halal/Mubah rating."),
         verbose_name=_('Requires Adjustment')
@@ -149,6 +172,48 @@ class Game(models.Model):
         verbose_name=_('Has Spoilers in Details')
     )
 
+    SEVERITY_CHOICES = [
+        ('N', _('None')), ('L', _('Low')), ('M', _('Medium')), ('H', _('High')), ('P', _('Prohibited')),
+    ]
+
+    # Category 1: Aqidah & Ideology (Keep original names)
+    aqidah_severity = models.CharField(_('Aqidah Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
+    aqidah_details = models.TextField(_('Aqidah Details'), blank=True, help_text=_("Specific examples related to Aqidah concerns (magic, deities, ideologies etc)."))
+    aqidah_reason = models.TextField(_('Aqidah Reason'), blank=True, help_text=_("Reasoning or reference for the Aqidah severity rating."))
+
+    # Category 2: Haram Depictions & Interactions (NEW NAMES)
+    haram_depictions_severity = models.CharField(_('Haram Depictions Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
+    haram_depictions_details = models.TextField(_('Haram Depictions Details'), blank=True, help_text=_("Examples: Required exposure to 'Awrah, Haram music, gambling mechanics, etc."))
+    haram_depictions_reason = models.TextField(_('Haram Depictions Reason'), blank=True, help_text=_("Reasoning for the Depictions severity rating."))
+
+    # Category 3: Simulation of Haram Acts (NEW NAMES)
+    simulation_haram_severity = models.CharField(_('Simulation Haram Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
+    simulation_haram_details = models.TextField(_('Simulation Haram Details'), blank=True, help_text=_("Examples: Simulating drinking Khamr, simulated Zina, performing simulated Shirk acts."))
+    simulation_haram_reason = models.TextField(_('Simulation Haram Reason'), blank=True, help_text=_("Reasoning for the Simulation Haram severity rating."))
+
+    # Category 4: Normalization of Haram (NEW NAMES)
+    normalization_haram_severity = models.CharField(_('Normalization Haram Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
+    normalization_haram_details = models.TextField(_('Normalization Haram Details'), blank=True, help_text=_("Examples: Positive portrayal of impermissible relationships, casual depiction of sin, trivialization."))
+    normalization_haram_reason = models.TextField(_('Normalization Haram Reason'), blank=True, help_text=_("Reasoning for the Normalization Haram severity rating."))
+
+    # Category 5: Violence & Aggression (Keep original names)
+    violence_severity = models.CharField(_('Violence Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
+    violence_details = models.TextField(_('Violence Details'), blank=True, help_text=_("Specific examples of violence, gore, context, justification."))
+    violence_reason = models.TextField(_('Violence Reason'), blank=True, help_text=_("Reasoning for the Violence severity rating."))
+
+    # Category 6: Time Commitment & Addiction Potential (Keep original names, maybe shorten?)
+    time_addiction_severity = models.CharField(_('Time/Addiction Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
+    time_addiction_details = models.TextField(_('Time/Addiction Details'), blank=True, help_text=_("Notes on addictive mechanics, time investment required, potential for neglecting duties."))
+    time_addiction_reason = models.TextField(_('Time/Addiction Reason'), blank=True, help_text=_("Reasoning for the Time/Addiction severity rating."))
+
+    # Category 7: Online Conduct & Interaction (Keep original names)
+    online_conduct_severity = models.CharField(_('Online Conduct Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
+    online_conduct_details = models.TextField(_('Online Conduct Details'), blank=True, help_text=_("Risks related to online chat, community toxicity, moderation."))
+    online_conduct_reason = models.TextField(_('Online Conduct Reason'), blank=True, help_text=_("Reasoning for the Online Conduct severity rating."))
+
+    # --- Spoiler Flag ---
+    has_spoilers_in_details = models.BooleanField( default=False, help_text=_("Check this to enable the 'Show/Hide Details' toggle for categories containing potential spoilers."), verbose_name=_('Has Spoilers in Details'))
+
     # --- Store Links ---
     steam_link = models.URLField(_("Steam Store URL"), max_length=300, blank=True, null=True)
     epic_link = models.URLField(_("Epic Games Store URL"), max_length=300, blank=True, null=True)
@@ -194,29 +259,34 @@ class Game(models.Model):
     # --- Cached Properties for Severity ---
     @cached_property
     def aqidah_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.aqidah_severity, '?')
-    # ... (other severity_display properties remain the same) ...
     @cached_property
     def aqidah_severity_css_class(self): return f"severity-{self.aqidah_severity}"
+
+    @cached_property
+    def haram_depictions_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.haram_depictions_severity, '?')
+    @cached_property
+    def haram_depictions_severity_css_class(self): return f"severity-{self.haram_depictions_severity}"
+
+    @cached_property
+    def simulation_haram_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.simulation_haram_severity, '?')
+    @cached_property
+    def simulation_haram_severity_css_class(self): return f"severity-{self.simulation_haram_severity}"
+
+    @cached_property
+    def normalization_haram_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.normalization_haram_severity, '?')
+    @cached_property
+    def normalization_haram_severity_css_class(self): return f"severity-{self.normalization_haram_severity}"
+
     @cached_property
     def violence_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.violence_severity, '?')
     @cached_property
     def violence_severity_css_class(self): return f"severity-{self.violence_severity}"
-    @cached_property
-    def immorality_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.immorality_severity, '?')
-    @cached_property
-    def immorality_severity_css_class(self): return f"severity-{self.immorality_severity}"
-    @cached_property
-    def substances_gambling_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.substances_gambling_severity, '?')
-    @cached_property
-    def substances_gambling_severity_css_class(self): return f"severity-{self.substances_gambling_severity}"
-    @cached_property
-    def audio_music_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.audio_music_severity, '?')
-    @cached_property
-    def audio_music_severity_css_class(self): return f"severity-{self.audio_music_severity}"
+
     @cached_property
     def time_addiction_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.time_addiction_severity, '?')
     @cached_property
     def time_addiction_severity_css_class(self): return f"severity-{self.time_addiction_severity}"
+
     @cached_property
     def online_conduct_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.online_conduct_severity, '?')
     @cached_property
@@ -251,3 +321,16 @@ class GameComment(models.Model):
     @property
     def flag_count(self):
         return self.flagged_by.count()
+    
+# --- NEW: Methodology Page Model ---
+class MethodologyPage(models.Model):
+    title = models.CharField(max_length=200, verbose_name=_('Page Title'))
+    content = RichTextUploadingField(verbose_name=_('Page Content')) # Corrected class name
+    last_updated = models.DateTimeField(auto_now=True, verbose_name=_('Last Updated'))
+
+    class Meta:
+        verbose_name = _("Methodology Page")
+        verbose_name_plural = _("Methodology Page") # Should only be one
+
+    def __str__(self):
+        return self.title

@@ -3,14 +3,15 @@ from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _ # Import for translation
+from django.utils.translation import gettext_lazy as _
+from ckeditor_uploader.fields import RichTextUploadingField
 
 class Article(models.Model):
     # Use _() for verbose_name and help_text
     title = models.CharField(max_length=250, verbose_name=_('Title'))
     slug = models.SlugField(max_length=270, unique=True, blank=True, help_text=_("Unique URL-friendly name. Leave blank to auto-generate from title."))
     header_image_url = models.URLField(max_length=300, blank=True, null=True, help_text=_("URL for an image to display at the top of the article."), verbose_name=_('Header Image URL'))
-    content = models.TextField(verbose_name=_('Content'))
+    content = RichTextUploadingField(verbose_name=_('Content'))
     author_name = models.CharField(max_length=100, blank=True, help_text=_("Display author name (if not linked to user)"), verbose_name=_('Author Name'))
     published_date = models.DateTimeField(default=timezone.now, verbose_name=_('Published Date'))
     created_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Created Date'))

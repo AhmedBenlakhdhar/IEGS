@@ -67,8 +67,32 @@
               <span class="badge adjustment-badge ms-1">{% translate "Adjustable" %}</span>
          {% endif %}
          <br class="mt-1">
+         {# --- DEBUGGING FLAG LOOP --- #}
+         {% comment %}
+             Debug Info for game {{ game.pk }}:
+             Requires Adjustment: {{ game.requires_adjustment }}
+             All Flags PKs: {% for f in game.flags.all %}{{ f.pk }},{% endfor %}
+             Adjustable Flags PKs: {% for af in game.adjustable_flags.all %}{{ af.pk }},{% endfor %}
+         {% endcomment %}
+         
+         {# --- CLEANER FLAG LOOP --- #}
+         {% comment %} DEBUG: Game {{ game.pk }}, ReqAdj={{ game.requires_adjustment }}, AdjFlags={{ game.adjustable_flags.all }} {% endcomment %}
+         
          {% for flag in game.flags.all %}
-           <span class="flag-symbol material-symbols-outlined" title="{{ flag.description }}">{{ flag.symbol }}</span>
+             {# --- Direct Check (Prefetching is important here) --- #}
+             {% if game.requires_adjustment and flag in game.adjustable_flags.all %}
+                 {# Style for ADJUSTABLE flags #}
+                 <span class="flag-symbol material-symbols-outlined flag-adjustable"
+                       title="{{ flag.description }} ({% translate 'Can be adjusted/avoided' %})">
+                       {{ flag.symbol }}</span>
+             {% else %}
+                 {# Style for REGULAR flags #}
+                 <span class="flag-symbol material-symbols-outlined"
+                       title="{{ flag.description }}">
+                       {{ flag.symbol }}</span>
+             {% endif %}
+         {% empty %}
+             {# Optional: No flags message #}
          {% endfor %}
       </div>
     </div>
