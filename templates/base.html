@@ -8,22 +8,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{% translate "MGC Ratings" %}{% endblock %} - {% translate "MGC" %}</title>
 
-  {# --- Bootstrap CSS --- #}
+  {# --- Bootstrap CSS (Official CDN v5.3.3) --- #}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-  {# Load the standard LTR Bootstrap first #}
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-
-  {# --- Conditionally load Bootstrap RTL CSS --- #}
+  {# --- Conditionally load Bootstrap RTL CSS (Official CDN v5.3.3) --- #}
   {% if request.LANGUAGE_CODE == 'ar' %}
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" integrity="sha384-nU14brUcp6StFntEOOEBvcJm4huWjB0OcIeQ3flTLpqSrlZ9hzUkeTRvQCLe1saP" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" integrity="sha384-dpuaG1suU0eTqVARjCiAJD+aIb8ioOLE7gLKnbIssgWAHLRjoaNhGsmzJlSCzWF6" crossorigin="anonymous">
   {% endif %}
   {# ------------------------------------------- #}
 
   <!-- Google Fonts (Usually okay for RTL, but check specific font support if needed) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  {# Consider adding an Arabic-friendly font like Noto Sans Arabic or Cairo #}
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Exo+2:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  {# Consider adding an Arabic-friendly font like Noto Sans Arabic or Tajawal #}
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&family=Exo+2:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Material Symbols Font Link -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -143,9 +142,8 @@
         </div>
     </footer>
 
-
   <!-- Bootstrap Bundle JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
    {% block extra_js %}
    {% endblock %}
