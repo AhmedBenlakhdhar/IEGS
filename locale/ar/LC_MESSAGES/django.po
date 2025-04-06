@@ -800,6 +800,9 @@ msgstr "التقييم العام:"
 msgid "Content Flags:"
 msgstr "علامات المحتوى:"
 
+msgid "No specific content flags noted."
+msgstr "لم يُلاحظ أيّ محتوى محدّد."
+
 #: .\templates\ratings\game_detail.html:136
 msgid "Read Full Review"
 msgstr "اقرأ المراجعة الكاملة"

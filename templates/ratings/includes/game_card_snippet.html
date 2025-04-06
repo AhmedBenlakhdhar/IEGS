@@ -64,7 +64,7 @@
              </span>
          </span>
          {% if game.requires_adjustment %}
-              <span class="badge adjustment-badge ms-1">{% translate "Adjustable" %}</span>
+              <span class="badge adjustment-badge">{% translate "Adjustable" %}</span>
          {% endif %}
          <br class="mt-1">
          {# --- DEBUGGING FLAG LOOP --- #}
@@ -92,7 +92,8 @@
                        {{ flag.symbol }}</span>
              {% endif %}
          {% empty %}
-             {# Optional: No flags message #}
+         {# Message if no flags are assigned #}
+         <div class="no-flags-message"><small class="text-secondary">{% translate "No specific content flags noted." %}</small></div>
          {% endfor %}
       </div>
     </div>

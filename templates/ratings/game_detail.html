@@ -31,7 +31,7 @@
         {# Dev/Pub Info #}
         <p class="detail-meta mb-2 mt-3">{% if game.developer and game.developer_slug %}<a href="{% url 'ratings:games_by_developer' developer_slug=game.developer_slug %}">{{ game.developer }}</a>{% elif game.developer %}{{ game.developer }}{% endif %}{% if game.developer and game.publisher %} / {% endif %}{% if game.publisher and game.publisher_slug %}<a href="{% url 'ratings:games_by_publisher' publisher_slug=game.publisher_slug %}">{{ game.publisher }}</a>{% elif game.publisher %}{{ game.publisher }}{% endif %}{% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}</p>
         {# Rating Display #}
-        <div class="mb-3 detail-overall-rating"><span class="fw-bold me-2">{% translate "Overall MGC Rating:" %}</span><span class="rating-badge rating-{{ game.rating_tier.tier_code }}" style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};"><span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>{% get_current_language as LANGUAGE_CODE_CURRENT %}{% translate "Haram" as translated_haram %}{% translate "Mashbouh" as translated_mashbouh %}{% translate "Halal" as translated_halal %}{% translate "Kufr" as translated_kufr %}<span class="rating-label">{% if game.rating_tier.display_name == "Haram" %}{{ translated_haram }}{% elif game.rating_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}{% elif game.rating_tier.display_name == "Halal" %}{{ translated_halal }}{% elif game.rating_tier.display_name == "Kufr" %}{{ translated_kufr }}{% else %}{{ game.rating_tier.display_name }}{% endif %}</span></span>{% if game.requires_adjustment %}<span class="badge adjustment-badge ms-2">{% translate "Requires Adjustment" %}</span>{% endif %}</div>
+        <div class="mb-3 detail-overall-rating"><span class="fw-bold me-2">{% translate "Overall MGC Rating:" %}</span><span class="rating-badge rating-{{ game.rating_tier.tier_code }}" style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};"><span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>{% get_current_language as LANGUAGE_CODE_CURRENT %}{% translate "Haram" as translated_haram %}{% translate "Mashbouh" as translated_mashbouh %}{% translate "Halal" as translated_halal %}{% translate "Kufr" as translated_kufr %}<span class="rating-label">{% if game.rating_tier.display_name == "Haram" %}{{ translated_haram }}{% elif game.rating_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}{% elif game.rating_tier.display_name == "Halal" %}{{ translated_halal }}{% elif game.rating_tier.display_name == "Kufr" %}{{ translated_kufr }}{% else %}{{ game.rating_tier.display_name }}{% endif %}</span></span>{% if game.requires_adjustment %}<span class="badge adjustment-badge">{% translate "Requires Adjustment" %}</span>{% endif %}</div>
 
         {# Flags #}
         <div class="mb-3">
@@ -53,7 +53,7 @@
                     </li>
                 {% empty %}
                     {# Message if no flags are assigned #}
-                    <li><small class="text-secondary">{% translate "No specific content flags noted." %}</small></li>
+                    <div class="no-flags-message"><small class="text-secondary">{% translate "No specific content flags noted." %}</small></div>
                 {% endfor %}
             </ul>
         </div>

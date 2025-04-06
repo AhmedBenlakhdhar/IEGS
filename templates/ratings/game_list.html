@@ -39,7 +39,7 @@
             <option value="all" {% if not selected_tier or selected_tier == 'all' %}selected{% endif %}>{% translate "All Tiers" %}</option>
             {% for tier in all_tiers %}
               <option value="{{ tier.tier_code }}" {% if selected_tier == tier.tier_code %}selected{% endif %}>
-                 {{ tier.icon_name }} {{ tier.display_name }} {# display_name from model should be translated if matches msgid #}
+                {% translate tier.display_name %}
               </option>
             {% endfor %}
           </select>
