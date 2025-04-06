@@ -204,7 +204,7 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .page-header h1 { margin-bottom: 0; color: var(--text-primary); font-size: 1.8rem;}
 
 /* 5. Game Card (List View) */
-.card.game-card { background-color: var(--bg-element); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 1.5rem; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; overflow: hidden; }
+.card.game-card { background-color: var(--bg-element); border: 1px solid var(--border-color); border-radius: 6px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; overflow: hidden; }
 .card-link-wrapper { display: block; text-decoration: none; color: inherit; transition: none; }
 .card-link-wrapper:hover .card.game-card { transform: translateY(-4px); border-color: var(--border-lighter); box-shadow: 0 6px 12px var(--shadow-color); }
 .card-img-top { aspect-ratio: 3 / 4; object-fit: cover; border-bottom: 1px solid var(--border-color); }
