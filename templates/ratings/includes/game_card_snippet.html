@@ -50,51 +50,48 @@
       </div>
       {# --- END: Platform Icons --- #}
 
-      <div class="rating-flags-container mt-auto pt-2">
-         <span class="rating-badge rating-{{ game.rating_tier.tier_code }}"
-               style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};">
-             <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>
-             <span class="rating-label">
-                {% if game.rating_tier.display_name == "Haram" %}{{ translated_haram }}
-                {% elif game.rating_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}
-                {% elif game.rating_tier.display_name == "Halal" %}{{ translated_halal }}
-                {% elif game.rating_tier.display_name == "Kufr" %}{{ translated_kufr }}
-                {% else %}{{ game.rating_tier.display_name }}
-                {% endif %}
-             </span>
-         </span>
-         {% if game.requires_adjustment %}
-              <span class="badge adjustment-badge">{% translate "Adjustable" %}</span>
-         {% endif %}
-         <br class="mt-1">
-         {# --- DEBUGGING FLAG LOOP --- #}
-         {% comment %}
-             Debug Info for game {{ game.pk }}:
-             Requires Adjustment: {{ game.requires_adjustment }}
-             All Flags PKs: {% for f in game.flags.all %}{{ f.pk }},{% endfor %}
-             Adjustable Flags PKs: {% for af in game.adjustable_flags.all %}{{ af.pk }},{% endfor %}
-         {% endcomment %}
-         
-         {# --- CLEANER FLAG LOOP --- #}
-         {% comment %} DEBUG: Game {{ game.pk }}, ReqAdj={{ game.requires_adjustment }}, AdjFlags={{ game.adjustable_flags.all }} {% endcomment %}
-         
-         {% for flag in game.flags.all %}
-             {# --- Direct Check (Prefetching is important here) --- #}
-             {% if game.requires_adjustment and flag in game.adjustable_flags.all %}
-                 {# Style for ADJUSTABLE flags #}
-                 <span class="flag-symbol material-symbols-outlined flag-adjustable"
-                       title="{{ flag.description }} ({% translate 'Can be adjusted/avoided' %})">
-                       {{ flag.symbol }}</span>
-             {% else %}
-                 {# Style for REGULAR flags #}
-                 <span class="flag-symbol material-symbols-outlined"
-                       title="{{ flag.description }}">
-                       {{ flag.symbol }}</span>
-             {% endif %}
-         {% empty %}
-         {# Message if no flags are assigned #}
-         <div class="no-flags-message"><small class="text-secondary">{% translate "No specific content flags noted." %}</small></div>
-         {% endfor %}
+     <div class="rating-flags-container mt-auto pt-2">
+        {# Determine which tier to display as the MAIN badge #}
+        {% with main_tier=game.original_rating_tier|default:game.rating_tier %}
+            {# If original_rating_tier is None (e.g., not adjustable, or data missing), it defaults to the final rating_tier #}
+            <span class="rating-badge rating-{{ main_tier.tier_code }}"
+                  style="background-color: var(--rating-{{ main_tier.tier_code }});">
+                <span class="material-symbols-outlined rating-icon">{{ main_tier.icon_name }}</span>
+                <span class="rating-label">
+                  {% comment %} Translate the displayed tier name {% endcomment %}
+                  {% if main_tier.display_name == "Haram" %}{{ translated_haram }}
+                  {% elif main_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}
+                  {% elif main_tier.display_name == "Halal" %}{{ translated_halal }}
+                  {% elif main_tier.display_name == "Kufr" %}{{ translated_kufr }}
+                  {% else %}{{ main_tier.display_name }}
+                  {% endif %}
+                </span>
+            </span>
+        {% endwith %}
+        
+        {% if game.requires_adjustment and game.original_rating_tier and game.rating_tier.tier_code != game.original_rating_tier.tier_code %}
+          {% with final_code=game.rating_tier.tier_code %}
+              <span class="adjustment-badge-bordered adjustable-border-{{ final_code|lower }}"
+                    title="{% blocktranslate %}Adjustable (Achieves {{ game.rating_tier.display_name }}){% endblocktranslate %}">
+                    {% translate "Adjustable" %}
+              </span>
+          {% endwith %}
+        {% endif %}
+        
+        <br class="mt-1">
+          {% for flag in game.flags.all %}
+              {% if game.requires_adjustment and flag in game.adjustable_flags.all %}
+                  <span class="flag-symbol material-symbols-outlined flag-adjustable"
+                        title="{{ flag.description }} ({% translate 'Can be adjusted/avoided' %})">
+                        {{ flag.symbol }}</span>
+              {% else %}
+                  <span class="flag-symbol material-symbols-outlined"
+                        title="{{ flag.description }}">
+                        {{ flag.symbol }}</span>
+              {% endif %}
+          {% empty %}
+          <div class="no-flags-message"><small class="text-secondary">{% translate "No specific content flags noted." %}</small></div>
+          {% endfor %}
       </div>
     </div>
   </div>

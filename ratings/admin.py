@@ -48,28 +48,27 @@ class GameAdmin(TranslationAdmin):
         (_('Core Information'), {'fields': ('title', 'slug', 'cover_image_url', ('developer', 'developer_slug'), ('publisher', 'publisher_slug'), 'release_date', 'summary')}),
         (_('Platform Availability'), {'fields': (('available_pc', 'available_ps5', 'available_ps4'), ('available_xbox_series', 'available_xbox_one', 'available_switch'), ('available_android', 'available_ios', 'available_quest'))}),
         (_('Store Links'), {'classes': ('collapse',), 'fields': ('steam_link', 'epic_link', 'gog_link', 'other_store_link')}),
-        (_('Overall Rating & Flags'), {'fields': ('rating_tier', 'requires_adjustment', 'flags', 'adjustable_flags', 'rationale', 'has_spoilers_in_details')}),
-        # --- Consider adding suitability/positives here later ---
+        # --- UPDATED Fieldset ---
+        (_('Overall Rating & Flags'), {'fields': (
+            'rating_tier', # Final tier
+            'original_rating_tier', # <-- ADDED FIELD HERE
+            'requires_adjustment',
+            'flags',
+            'adjustable_flags',
+            'rationale',
+            'has_spoilers_in_details'
+        )}),
+        # --- END UPDATED Fieldset ---
         (_('Additional Info'), {'classes': ('collapse',), 'fields': ('adjustment_guide', 'critic_reviews')}),
-
-        # --- UPDATE FIELD NAMES HERE ---
         (_('Detailed MGC Breakdown'), {'classes': ('collapse',), 'fields': (
-            # Category 1
             ('aqidah_severity', 'aqidah_details', 'aqidah_reason'),
-            # Category 2 (NEW)
             ('haram_depictions_severity', 'haram_depictions_details', 'haram_depictions_reason'),
-            # Category 3 (NEW)
             ('simulation_haram_severity', 'simulation_haram_details', 'simulation_haram_reason'),
-            # Category 4 (NEW)
             ('normalization_haram_severity', 'normalization_haram_details', 'normalization_haram_reason'),
-            # Category 5
             ('violence_severity', 'violence_details', 'violence_reason'),
-            # Category 6
             ('time_addiction_severity', 'time_addiction_details', 'time_addiction_reason'),
-            # Category 7
             ('online_conduct_severity', 'online_conduct_details', 'online_conduct_reason'),
         )}),
-        # --- END UPDATED FIELDS ---
     )
 
 # --- Game Comment Admin (User content - usually NOT translated via modeltranslation) ---

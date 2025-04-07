@@ -35,8 +35,8 @@
   /* Shared Rating & Severity Colors */
   --rating-halal: #00e676;
   --rating-mashbouh: #ffc107;
-  --rating-haram: #ff5252;
-  --rating-kufr: #78909c;
+  --rating-haram: #ff6a6a;
+  --rating-kufr: #ada3fc;
   --rating-HAL: var(--rating-halal);
   --rating-MSH: var(--rating-mashbouh);
   --rating-HRM: var(--rating-haram);
@@ -213,7 +213,7 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .card-title { font-size: 1.1rem; margin-bottom: 0.25rem; color: var(--text-primary); font-weight: var(--font-heading-weight); text-transform: uppercase;}
 .game-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
 .rating-flags-container { margin-top: auto; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
-.rating-badge { display: inline-block; font-family: var(--font-heading); font-weight: 600; font-size: 0.75rem; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-right: 6px; margin-bottom: 6px; text-align: center; box-shadow: inset 0 -1px 1px rgba(0,0,0,0.3); }
+.rating-badge { display: inline-block; font-family: var(--font-heading); font-weight: 600; font-size: 0.75rem; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; color: #000; margin-bottom: 6px; text-align: center; box-shadow: inset 0 -1px 1px rgba(0,0,0,0.3); }
 .flag-symbol { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 1.1rem; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; color: var(--text-secondary); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; vertical-align: -2px; transition: color 0.2s, background-color 0.2s, border-color 0.2s; }
 .rating-icon { font-size: 1.7em; vertical-align: -2px; margin-right: 4px; position: relative; top: 1px; }
 .badge.adjustment-badge { background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); font-family: var(--font-primary); font-weight: 600; font-size: 0.75rem; padding: 9px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; }
@@ -442,7 +442,7 @@ html[dir="rtl"] .rating-badge .rating-icon { margin-left: 4px; margin-right: 0; 
 .flag-item-adjustable .flag-symbol { color: var(--accent-primary); }
 .flag-item-adjustable .flag-description { color: var(--text-primary); }
 .flag-item-adjustable .flag-description .text-adjustable { color: var(--accent-primary); font-weight: 600; font-size: 0.8em; }
-.no-flags-message { height: 30px;}
+.no-flags-message { height: 27px;}
 html[dir="rtl"] .flag-item .flag-symbol { margin-right: 0; margin-left: 8px; }
 html[dir="rtl"] .flag-item-adjustable { border-left: none; border-right: 3px solid var(--accent-primary); }
 html[dir="rtl"] .flag-item-adjustable .flag-description .text-adjustable.ms-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
@@ -557,3 +557,199 @@ html[dir="rtl"] .platform-badge { margin-right: 0; margin-left: 4px; }
 .platform-icon.platform-switch img:hover { filter: hue-rotate(0deg) saturate(1) brightness(1); }
 
 .list-group { padding: 0; }
+
+/* ==========================================================================
+   Sidebar / Lists (Includes Category List)
+   ========================================================================== */
+
+   .list-group {
+    /* Add border and rounding to the container */
+    border: 1px solid var(--border-color);
+    border-radius: 6px; /* Match card style */
+    overflow: hidden; /* Ensure rounded corners clip children */
+    background-color: var(--bg-element); /* Ensure container has base bg */
+}
+
+.list-group-item {
+    /* Default Dark Mode Styles */
+    background-color: var(--bg-element);
+    color: var(--text-secondary); /* Use secondary for less emphasis */
+    border-color: var(--border-color); /* Uses the dark border */
+    /* Remove Bootstrap's default borders if needed, rely on container/adjacent */
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    padding: 0.65rem 1rem; /* Slightly adjust padding */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Add border between items */
+.list-group-item + .list-group-item {
+    border-top: 1px solid var(--border-color);
+}
+
+.list-group-item-action {
+     /* Ensure link color is correct */
+     color: var(--text-secondary);
+     font-weight: 500;
+}
+
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+    /* Dark Mode Hover/Focus */
+    background-color: var(--bg-element-lighter);
+    color: var(--text-primary); /* Brighten text on hover */
+    outline: none;
+    box-shadow: none;
+}
+
+.list-group-item.active {
+    /* Dark Mode Active */
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary); /* Dark text on accent bg */
+    font-weight: 700; /* Make active item bolder */
+}
+.list-group-item.active:hover,
+.list-group-item.active:focus {
+     /* Ensure active hover doesn't change */
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary);
+}
+
+/* --- CORRECTED Light Mode Overrides for Category List --- */
+body.light-mode .list-group {
+    /* Use light mode border */
+     border-color: var(--border-color);
+     background-color: var(--bg-element); /* White */
+}
+
+body.light-mode .list-group-item {
+    /* Revert to near-default Bootstrap light styles or customize */
+    background-color: var(--bg-element); /* White */
+    color: var(--text-secondary);        /* Gray text */
+    border-color: var(--border-color);   /* Light border */
+}
+body.light-mode .list-group-item + .list-group-item {
+    border-top: 1px solid var(--border-color); /* Light border */
+}
+
+body.light-mode .list-group-item-action {
+     color: var(--text-secondary); /* Keep gray text for links */
+}
+
+body.light-mode .list-group-item-action:hover,
+body.light-mode .list-group-item-action:focus {
+    /* Standard Bootstrap light hover */
+    background-color: var(--bg-element-lighter); /* Light gray */
+    color: var(--text-primary); /* Darken text on hover */
+}
+
+body.light-mode .list-group-item.active {
+    /* Use the SITE'S light mode accent color */
+    background-color: var(--accent-primary); /* Uses the teal defined in light mode vars */
+    border-color: var(--accent-primary);
+    color: #fff; /* White text provides good contrast on the teal */
+}
+ body.light-mode .list-group-item.active:hover,
+ body.light-mode .list-group-item.active:focus {
+     /* Keep active styles on hover/focus */
+     background-color: var(--accent-primary);
+     border-color: var(--accent-primary);
+     color: #fff;
+ }
+/* --- END CORRECTED Light Mode Overrides --- */
+
+/* ==========================================================================
+   End Sidebar / Lists
+   ========================================================================== */
+
+   .comment-actions .comment-action-btn {
+    padding: 0.1rem 0.4rem;
+    font-size: 0.8rem;
+    margin-left: 5px; /* LTR spacing */
+}
+html[dir="rtl"] .comment-actions .comment-action-btn {
+    margin-left: 0;
+    margin-right: 5px; /* RTL spacing */
+}
+.comment-unapproved {
+    opacity: 0.6;
+    border-left: 3px solid var(--rating-mashbouh); /* Use Mashbouh color for pending */
+    padding-left: 10px;
+}
+html[dir="rtl"] .comment-unapproved {
+    border-left: none;
+    border-right: 3px solid var(--rating-mashbouh);
+    padding-left: 0;
+    padding-right: 10px;
+}
+/* Style for reCAPTCHA widget container if needed */
+.g-recaptcha { margin-bottom: 1rem; }
+/* Adjust comment error message styling */
+.comment-form-container .alert { font-size: 0.9rem; }
+
+/* ==========================================================================
+   Adjustable Badge (Bordered Text) Styles
+   ========================================================================== */
+
+   .adjustment-badge-bordered {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 0.65rem;
+    padding: 7px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+    line-height: 1;
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+    background-color: transparent;
+    position: relative;
+    top: -1px;
+}
+
+/* Border color variations based on FINAL achievable tier */
+.adjustment-badge-bordered.adjustable-border-hal {
+    border-color: var(--rating-halal);
+    color: var(--rating-halal); /* Match text color to border */
+}
+.adjustment-badge-bordered.adjustable-border-msh {
+    border-color: var(--rating-mashbouh);
+     color: var(--rating-mashbouh);
+}
+.adjustment-badge-bordered.adjustable-border-hrm {
+    border-color: var(--rating-haram);
+     color: var(--rating-haram);
+}
+.adjustment-badge-bordered.adjustable-border-kfr {
+    border-color: var(--rating-kufr);
+     color: var(--rating-kufr);
+}
+
+/* --- Light Mode Overrides for Adjustable Badge Border --- */
+body.light-mode .adjustment-badge-bordered {
+    border: 2px solid var(--border-color); /* Default light border */
+    color: var(--text-secondary);
+}
+body.light-mode .adjustment-badge-bordered.adjustable-border-hal {
+    border-color: var(--rating-halal);
+    color: var(--rating-halal);
+}
+body.light-mode .adjustment-badge-bordered.adjustable-border-msh {
+     border-color: var(--rating-mashbouh);
+     color: var(--rating-mashbouh);
+}
+ body.light-mode .adjustment-badge-bordered.adjustable-border-hrm {
+     border-color: var(--rating-haram);
+     color: var(--rating-haram);
+ }
+ body.light-mode .adjustment-badge-bordered.adjustable-border-kfr {
+    border-color: var(--rating-kufr);
+    color: var(--rating-kufr);
+ }
+/* ==========================================================================
+   End Adjustable Badge (Bordered Text) Styles
+   ========================================================================== */

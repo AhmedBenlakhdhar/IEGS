@@ -30,7 +30,7 @@ def homepage(request):
 
 # --- Game List View ---
 def game_list(request, developer_slug=None, publisher_slug=None):
-    games_queryset = Game.objects.select_related('rating_tier').prefetch_related('flags').all()
+    games_queryset = Game.objects.select_related('rating_tier', 'original_rating_tier').prefetch_related('flags', 'adjustable_flags').all() # Added original_rating_tier to select_related
     page_title = _("Game Ratings")
     filter_description = None
 
@@ -48,13 +48,14 @@ def game_list(request, developer_slug=None, publisher_slug=None):
         filter_description = gettext("Showing games published by <strong>%(publisher_name)s</strong>.") % {'publisher_name': pub_name}
 
     search_query = request.GET.get('q', '')
-    selected_tier = request.GET.get('tier', '')
+    selected_tier_code = request.GET.get('tier', '') # Renamed variable for clarity
     selected_flag = request.GET.get('flag', '')
     requires_adjustment_filter = request.GET.get('adj', '')
     sort_by = request.GET.get('sort', '-date_added')
     selected_platforms = request.GET.getlist('platform')
 
     if search_query:
+        # ... (search logic remains the same) ...
         games_queryset = games_queryset.filter(
             Q(title__icontains=search_query) |
             Q(developer__icontains=search_query) |
@@ -62,8 +63,11 @@ def game_list(request, developer_slug=None, publisher_slug=None):
             Q(summary__icontains=search_query)
         ).distinct()
 
-    if selected_tier and selected_tier != 'all':
-        games_queryset = games_queryset.filter(rating_tier__tier_code=selected_tier)
+    if selected_tier_code and selected_tier_code != 'all':
+        games_queryset = games_queryset.filter(
+            Q(rating_tier__tier_code=selected_tier_code) | # Matches final tier
+            (Q(requires_adjustment=True) & Q(original_rating_tier__tier_code=selected_tier_code)) # Matches original tier IF adjustable
+        ).distinct()
     if selected_flag:
         games_queryset = games_queryset.filter(flags__symbol=selected_flag).distinct()
     if requires_adjustment_filter == 'yes':
@@ -105,12 +109,12 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     context = {
         'games_page': games_page, 'page_title': page_title, 'filter_description': filter_description,
         'all_tiers': all_tiers, 'all_flags': all_flags, 'search_query': search_query,
-        'selected_tier': selected_tier, 'selected_flag': selected_flag,
+        'selected_tier': selected_tier_code, # Pass the code back to the template
+        'selected_flag': selected_flag,
         'requires_adjustment_filter': requires_adjustment_filter, 'sort_by': sort_by,
         'selected_platforms': selected_platforms, 'platform_list_for_template': platform_list_for_template,
     }
     return render(request, 'ratings/game_list.html', context)
-
 # --- Game Detail View (Updated for Comments) ---
 def game_detail(request, game_slug):
     game = get_object_or_404(

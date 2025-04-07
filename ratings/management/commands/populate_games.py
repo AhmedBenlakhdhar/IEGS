@@ -48,7 +48,8 @@ GAME_DATA = [
         "title": "Portal 2",
         "developer": "Valve", "publisher": "Valve",
         "release_date": datetime.date(2011, 4, 19),
-        "rating_tier_id": "HAL",
+        "rating_tier_id": "HAL", # Final achievable tier
+        "original_rating_tier_id": "HAL", # Original state before adjustments (still Halal)
         "requires_adjustment": True, # Due to optional music and co-op chat
         "summary": "A first-person puzzle-platform video game known for its physics-based puzzles and dark humor.",
         "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/f/f9/Portal2cover.jpg",
@@ -83,8 +84,9 @@ GAME_DATA = [
         "title": "Minecraft (Survival - Standard)",
         "developer": "Mojang Studios", "publisher": "Xbox Game Studios / Microsoft",
         "release_date": datetime.date(2011, 11, 18),
-        "rating_tier_id": "MSH", # Doubtful due to multiple moderate concerns
-        "requires_adjustment": True, # Online chat, optional magic-like systems
+        "rating_tier_id": "MSH", # Final achievable tier (if careful)
+        "original_rating_tier_id": "MSH", # Original state with optional magic/servers is Mashbouh
+        "requires_adjustment": True,
         "summary": "A sandbox game about placing blocks, crafting items, and going on adventures.",
         "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",
         "other_store_link": "https://www.minecraft.net/", # Official site
@@ -211,7 +213,8 @@ GAME_DATA = [
         "title": "Stardew Valley",
         "developer": "ConcernedApe", "publisher": "ConcernedApe",
         "release_date": datetime.date(2016, 2, 26),
-        "rating_tier_id": "MSH",
+        "rating_tier_id": "MSH", # Final achievable tier (if careful)
+        "original_rating_tier_id": "MSH", # Arguably Mashbouh due to normalization/options even before adjustment
         "requires_adjustment": True,
         "summary": "An open-ended country-life RPG focused on farming, socializing, and exploration.",
         "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/a/a8/Stardew_Valley_cover_art.jpg",
@@ -281,6 +284,7 @@ class Command(BaseCommand):
             flags_symbols = game_data.pop('flags_symbols', [])
             adjustable_flags_symbols = game_data.pop('adjustable_flags_symbols', [])
             tier_id = game_data.pop('rating_tier_id', None)
+            original_tier_id = game_data.pop('original_rating_tier_id', None) # <-- Get original tier
 
             if not tier_id:
                 self.stderr.write(self.style.WARNING(f"Missing 'rating_tier_id' for game '{title}'. Skipping."))
@@ -293,10 +297,18 @@ class Command(BaseCommand):
                 skipped_count += 1
                 continue
 
+            original_rating_tier_obj = None
+            if original_tier_id:
+                original_rating_tier_obj = tiers_cache.get(original_tier_id)
+                if not original_rating_tier_obj:
+                     self.stderr.write(self.style.WARNING(f"Original RatingTier with code '{original_tier_id}' not found for game '{title}'. Skipping original tier assignment."))
+
+
             # Prepare defaults dictionary carefully
             # Ensure all Boolean fields have a default in case not provided in GAME_DATA
             defaults = {
                 'rating_tier': rating_tier,
+                **({'original_rating_tier': original_rating_tier_obj} if original_rating_tier_obj else {}),
                 'developer_slug': slugify(game_data.get('developer', '')),
                 'publisher_slug': slugify(game_data.get('publisher', '')),
                 'available_pc': game_data.get('available_pc', False),

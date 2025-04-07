@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from ckeditor_uploader.fields import RichTextUploadingField
+from django.contrib.auth.models import User
 
 class Article(models.Model):
     # Use _() for verbose_name and help_text
@@ -108,3 +109,35 @@ class ArticleCategoryMembership(models.Model):
         # verbose_name = _("Article Category Membership")
         # verbose_name_plural = _("Article Category Memberships")
 # -------------------------------------------
+
+# --- Article Comment Model ---
+class ArticleComment(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='article_comments')
+    content = models.TextField(_('Comment'))
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Date Posted'))
+    approved = models.BooleanField(default=True, verbose_name=_('Approved')) # Auto-approve comments
+    flagged_by = models.ManyToManyField(User, related_name='flagged_article_comments', blank=True, verbose_name=_('Flagged By'))
+    moderator_attention_needed = models.BooleanField(default=False, verbose_name=_('Needs Attention'))
+
+    class Meta:
+        ordering = ['created_date'] # Order oldest first for display
+        verbose_name = _('Article Comment')
+        verbose_name_plural = _('Article Comments')
+
+    def __str__(self):
+        status = _('Approved') if self.approved else _('Unapproved')
+        if self.moderator_attention_needed:
+            status += f" ({_('Flagged')})"
+        # Use blocktranslate format specifiers for better translation context
+        return _("Comment by %(username)s on Article '%(article_title)s' (%(status)s)") % {
+            'username': self.user.username,
+            'article_title': self.article.title,
+            'status': status
+        }
+
+    @property
+    def flag_count(self):
+        """Returns the number of users who flagged this comment."""
+        return self.flagged_by.count()
+# --- END: Article Comment Model ---
