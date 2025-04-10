@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   {# Consider adding an Arabic-friendly font like Noto Sans Arabic or Tajawal #}
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&family=Exo+2:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Material Symbols Font Link -->
@@ -33,35 +33,39 @@
   <!-- Custom CSS (LOAD LAST) -->
   <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
-  {# Favicon Link #}
   <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 
 </head>
 {# Add d-flex classes for sticky footer #}
 <body class="d-flex flex-column min-vh-100">
-
-  {# --- Get language information --- #}
-  {% get_current_language as LANGUAGE_CODE %}
-
-  <header class="site-header sticky-top">
-    <nav class="navbar navbar-expand-lg">
-      <div class="container">
-         <a class="navbar-brand site-brand" href="{% url 'home' %}"> {% translate "MGC" %} </a>
-         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-         </button>
-         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
-                {# --- Main Nav Links --- #}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.app_name == 'ratings' and request.resolver_match.url_name != 'glossary' %}active{% endif %}" href="{% url 'ratings:game_list' %}">{% translate "Games" %}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.app_name == 'articles' %}active{% endif %}" href="{% url 'articles:article_list' %}">{% translate "Blog" %}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'glossary' %}active{% endif %}" href="{% url 'ratings:glossary' %}">{% translate "Glossary" %}</a>
-                </li>
+    {% get_current_language as LANGUAGE_CODE %}
+    <header class="site-header sticky-top">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+           <a class="navbar-brand site-brand" href="{% url 'home' %}"> {% translate "MGC" %} </a>
+           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+           </button>
+           <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-auto align-items-center">
+                  <li class="nav-item">
+                      <a class="nav-link {% if request.resolver_match.app_name == 'ratings' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'ratings:game_list' %}">{% translate "Games" %}</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link {% if request.resolver_match.app_name == 'articles' %}active{% endif %}" href="{% url 'articles:article_list' %}">{% translate "Blog" %}</a>
+                  </li>
+                  {# --- START: Informational Links Group --- #}
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'why_mgc' or request.resolver_match.url_name == 'methodology' or request.resolver_match.url_name == 'glossary' %}active{% endif %}" href="#" id="infoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      {% translate "About MGC" %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="infoDropdown">
+                      <li><a class="dropdown-item {% if request.resolver_match.url_name == 'why_mgc' %}active{% endif %}" href="{% url 'ratings:why_mgc' %}">{% translate "Why MGC?" %}</a></li>
+                      <li><a class="dropdown-item {% if request.resolver_match.url_name == 'methodology' %}active{% endif %}" href="{% url 'ratings:methodology' %}">{% translate "Rating Methodology" %}</a></li>
+                      <li><a class="dropdown-item {% if request.resolver_match.url_name == 'glossary' %}active{% endif %}" href="{% url 'ratings:glossary' %}">{% translate "Glossary" %}</a></li>
+                    </ul>
+                  </li>
+                  {# --- END: Informational Links Group --- #}
 
                 {# --- Account Dropdown --- #}
                 <li class="nav-item dropdown">

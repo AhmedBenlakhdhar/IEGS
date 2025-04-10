@@ -13,6 +13,7 @@ urlpatterns = [
     # Glossary & Methodology
     path('glossary/', views.glossary_view, name='glossary'),
     path('methodology/', views.methodology_view, name='methodology'),
+    path('why-mgc/', views.why_mgc_view, name='why_mgc'),
 
     # Comment actions
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),

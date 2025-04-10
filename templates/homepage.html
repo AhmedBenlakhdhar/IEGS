@@ -1,69 +1,107 @@
-{# templates/homepage.html - UPDATED #}
+{# templates/homepage.html - Revamped #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% translate "MGC - Muslim Game Classification" %}{% endblock %}
+{% block title %}{% translate "MGC - Islamic Guidance for Video Games" %}{% endblock %}
 
 {% block content %}
 
-  {# Pre-translate Rating Tiers for the Cards #}
-  {% get_current_language as LANGUAGE_CODE_CURRENT %}
-  {% translate "Haram" as translated_haram %}
-  {% translate "Mashbouh" as translated_mashbouh %}
-  {% translate "Halal" as translated_halal %}
-  {% translate "Kufr" as translated_kufr %}
-
   {# --- 1. Hero Section --- #}
-  <div class="homepage-hero text-center py-5 mb-5">
-      <h1 class="display-4 fw-bold">{% translate "Muslim Game Classification" %}</h1>
-      <p class="lead col-lg-8 mx-auto text-secondary">
-          {% translate "Navigating video games according to the Quran & Sunnah as understood by As-Salaf. Find ratings and guidance." %}
+  <section class="homepage-hero text-center py-5 mb-5">
+      <h1 class="display-4 fw-bold mb-3">{% translate "Informed Gaming Choices for Muslims" %}</h1>
+      <p class="lead col-lg-8 mx-auto text-secondary mb-4">
+          {% translate "MGC provides clear, Shariah-based ratings and detailed analysis to help you navigate the world of video games according to Islamic values." %}
       </p>
-      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-          <a href="{% url 'ratings:game_list' %}" class="btn btn-primary btn-lg px-4 gap-3">{% translate "Browse Game Ratings" %}</a>
-          <a href="{% url 'articles:article_list' %}" class="btn btn-outline-secondary btn-lg px-4">{% translate "Read Articles" %}</a>
+      {# --- Search Bar --- #}
+      <div class="row justify-content-center mb-4">
+          <div class="col-md-8 col-lg-6">
+              <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form">
+                  <input class="form-control form-control-lg me-2" type="search" placeholder="{% translate 'Search for a game...' %}" aria-label="{% translate 'Search Games' %}" name="q">
+                  <button class="btn btn-primary btn-lg" type="submit">{% translate "Search" %}</button>
+              </form>
+          </div>
       </div>
-  </div>
-
-  {# --- 2. What is MGC Section --- #}
-  <section id="what-is-mgc" class="py-5 text-center bg-element rounded mb-5">
-    <div class="container">
-        <h2 class="section-title mb-4">{% translate "What is MGC?" %}</h2>
-        {# UPDATED DESCRIPTION #}
-        <p class="lead text-secondary col-lg-8 mx-auto">
-            {% blocktranslate %}The Muslim Game Classification (MGC) provides guidance for video games based on the Quran, Sunnah, and understanding of the Salaf-us-Salih. We analyze game content across detailed categories (like Aqidah, Immorality, Violence), assess severity levels considering direct actions and normalization, assign an overall ruling (Halal, Mashbouh, Haram, Kufr), and offer suitability notes to help Muslims make informed choices.{% endblocktranslate %}
-        </p>
-        {# ADDED Link to Methodology #}
-        <a href="{% url 'ratings:methodology' %}" class="btn btn-sm btn-outline-info mt-3">{% translate "View Full Rating Methodology" %}</a>
-    </div>
+      {# --- End Search Bar --- #}
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+          <a href="{% url 'ratings:game_list' %}" class="btn btn-outline-secondary px-4">{% translate "Browse All Ratings" %}</a>
+          <a href="{% url 'ratings:why_mgc' %}" class="btn btn-outline-secondary px-4">{% translate "Learn More (Why MGC?)" %}</a>
+      </div>
   </section>
 
-  {# --- 3. Featured Halal Games Section --- #}
-  <section id="featured-halal" class="py-5">
+  {# --- 2. Understanding Our Ratings Section --- #}
+  <section id="rating-explanation" class="py-5 mb-5">
+      <div class="container">
+          <h2 class="section-title text-center mb-5">{% translate "Understanding Our Ratings" %}</h2>
+          <div class="row text-center g-4">
+              {# Fetch tiers for dynamic display #}
+              {% for tier in all_tiers %}
+              <div class="col-md-3 col-6">
+                  <div class="rating-explainer-item p-3 rounded">
+                       <span class="material-symbols-outlined rating-icon mb-2 d-block" style="font-size: 2.5rem; color: {{ tier.color_hex }};">{{ tier.icon_name }}</span>
+                       <h5 class="mb-1 fs-6" style="color: {{ tier.color_hex }};">{{ tier.display_name }}</h5>
+                       <p class="small text-secondary mb-0">{{ tier.description }}</p>
+                  </div>
+              </div>
+              {% endfor %}
+          </div>
+           <div class="text-center mt-4">
+                <a href="{% url 'ratings:glossary' %}" class="btn btn-sm btn-outline-info">{% translate "View Full Glossary" %}</a>
+            </div>
+      </div>
+  </section>
+
+  {# --- 3. How MGC Works Section --- #}
+  <section id="how-it-works" class="py-5 bg-element rounded mb-5">
+       <div class="container">
+           <h2 class="section-title text-center mb-4">{% translate "How MGC Works" %}</h2>
+           <div class="row g-4 text-center">
+               <div class="col-md-4">
+                    <span class="material-symbols-outlined mb-2 d-block" style="font-size: 3rem; color: var(--accent-primary);">checklist</span>
+                   <h5>{% translate "1. Detailed Analysis" %}</h5>
+                   <p class="text-secondary">{% blocktranslate %}We evaluate games across 19 specific Islamic concerns, assessing content severity and avoidability.{% endblocktranslate %}</p>
+               </div>
+               <div class="col-md-4">
+                   <span class="material-symbols-outlined mb-2 d-block" style="font-size: 3rem; color: var(--accent-primary);">rule</span>
+                   <h5>{% translate "2. Clear Rating" %}</h5>
+                   <p class="text-secondary">{% blocktranslate %}Based on the analysis, an overall tier (Acceptable, Doubtful, Haram, Kufr/Shirk) is assigned using defined rules.{% endblocktranslate %}</p>
+               </div>
+               <div class="col-md-4">
+                   <span class="material-symbols-outlined mb-2 d-block" style="font-size: 3rem; color: var(--accent-primary);">info</span>
+                   <h5>{% translate "3. Informed Choice" %}</h5>
+                   <p class="text-secondary">{% blocktranslate %}Our detailed breakdowns and ratings empower you to make choices aligned with your values.{% endblocktranslate %}</p>
+               </div>
+           </div>
+            <div class="text-center mt-4">
+                <a href="{% url 'ratings:methodology' %}" class="btn btn-sm btn-outline-info">{% translate "View Full Methodology" %}</a>
+            </div>
+       </div>
+   </section>
+
+  {# --- 4. Recently Rated Games --- #}
+  <section id="recent-games" class="py-5">
     <div class="container">
-        <h2 class="section-title text-center mb-4">{% translate "Featured Halal Games" %}</h2>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
-            {% if top_halal_games %}
-                {% for game in top_halal_games %}
+        <h2 class="section-title text-center mb-4">{% translate "Recently Rated Games" %}</h2>
+         {# Pre-translate for cards #}
+         {% translate "Haram" as translated_haram %} {% translate "Doubtful" as translated_mashbouh %} {% translate "Acceptable" as translated_halal %} {% translate "Kufr/Shirk" as translated_kufr %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center"> {# Changed to 4 columns for recents #}
+            {% if recent_games %}
+                {% for game in recent_games %}
                    <div class="col">
-                       {# Pass translated tiers to snippet #}
                        {% include 'ratings/includes/game_card_snippet.html' with game=game translated_haram=translated_haram translated_mashbouh=translated_mashbouh translated_halal=translated_halal translated_kufr=translated_kufr %}
                    </div>
                 {% endfor %}
             {% else %}
-               <p class="col-12 text-center text-secondary">{% translate "No Halal games featured yet." %}</p>
+               <p class="col-12 text-center text-secondary">{% translate "No games rated yet." %}</p>
             {% endif %}
        </div>
-       {% if top_halal_games %}
        <div class="text-center mt-4">
-            <a href="{% url 'ratings:game_list' %}?tier=HAL" class="btn btn-sm btn-outline-secondary">{% translate "View All Halal Rated Games" %}</a>
+            <a href="{% url 'ratings:game_list' %}" class="btn btn-sm btn-outline-secondary">{% translate "View All Game Ratings" %}</a>
         </div>
-        {% endif %}
     </div>
   </section>
 
-  {# --- 4. Recent Articles / Insights Section --- #}
+  {# --- 5. Recent Articles / Insights Section --- #}
   <section id="recent-articles" class="py-5 bg-element rounded mt-5 mb-5">
     <div class="container">
         <h2 class="section-title text-center mb-4">{% translate "Recent Articles & Insights" %}</h2>

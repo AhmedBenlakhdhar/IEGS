@@ -1,4 +1,4 @@
-{# templates/ratings/glossary.html - FIXED #}
+{# templates/ratings/glossary.html - UPDATED to show severity words #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -11,69 +11,48 @@
 </div>
 
 <div class="glossary-content">
-    {# --- FIX: Generate URL outside blocktranslate --- #}
     {% url 'ratings:methodology' as methodology_url %}
     <p class="lead text-secondary">
         {% blocktranslate %}Understanding the terms used in the Muslim Game Classification (MGC). For the full detailed process, see our{% endblocktranslate %} <a href="{{ methodology_url }}">{% blocktranslate %}Rating Methodology{% endblocktranslate %}</a>.
     </p>
-    {# --- END FIX --- #}
 
     <h3 class="mt-4">{% translate "Rating Tiers" %}</h3>
     <dl class="row">
-        {# --- Halal --- #}
-        <dt class="col-sm-3">
-			<span class="rating-badge" style="background-color: var(--rating-halal); color: #000;">
-				<span class="material-symbols-outlined rating-icon"> check_circle </span>
-                <span class="rating-label">{% translate "Halal" %}</span>
-			</span>
-		</dt>
-        <dd class="col-sm-9">{% blocktranslate %}Permissible. Games assessed to have minimal concerns. Any potentially problematic elements are minor, incidental, easily avoidable, and not positively normalized. Core themes and required actions are permissible.{% endblocktranslate %}</dd>
-
-        {# --- Mashbouh --- #}
-        <dt class="col-sm-3">
-			<span class="rating-badge" style="background-color: var(--rating-mashbouh); color: #000">
-				<span class="material-symbols-outlined rating-icon"> warning </span>
-				<span class="rating-label">{% translate "Mashbouh" %}</span>
-			</span>
-		</dt>
-        <dd class="col-sm-9">{% blocktranslate %}Doubtful / Caution Advised. Games contain elements of moderate concern ('M' severity) that may be difficult to avoid or are somewhat normalized, OR significant scholarly differences exist regarding key elements. Player vigilance or adjustments are often required to mitigate risks (e.g., Fitnah, normalization). Falls short of the Haram threshold.{% endblocktranslate %}</dd>
-
-        {# --- Haram --- #}
-        <dt class="col-sm-3">
-			<span class="rating-badge" style="background-color: var(--rating-haram); color: #000">
-				<span class="material-symbols-outlined rating-icon"> cancel </span>
-				<span class="rating-label">{% translate "Haram" %}</span>
-			</span>
-		</dt>
-        <dd class="col-sm-9">{% blocktranslate %}Impermissible. Games feature clear and significant problematic content. This includes: unavoidable simulation or required engagement in major sins ('P' severity), high-level Aqidah concerns ('H' severity), multiple severe issues ('H' severity in key categories), or pervasive positive normalization/promotion of Haram making the game's environment contrary to Islamic values.{% endblocktranslate %}</dd>
-
-        {# --- Kufr / Shirk --- #}
-        <dt class="col-sm-3">
-			<span class="rating-badge" style="background-color: var(--rating-kufr); color: #fff">
-				<span class="material-symbols-outlined rating-icon"> gpp_bad </span>
-				<span class="rating-label">{% translate "Kufr" %}</span>
-			</span>
-		</dt>
-        <dd class="col-sm-9">{% blocktranslate %}Disbelief / Polytheism. Games containing required participation in, or unavoidable positive promotion/normalization of, acts of Shirk (associating partners with Allah), Kufr (disbelief), ritualistic magic (Sihr), blasphemy, or direct attacks on core Islamic tenets ('P' severity in Aqidah).{% endblocktranslate %}</dd>
+        {# Iterate through tiers passed from view #}
+        {% for tier in all_tiers %}
+            <dt class="col-sm-3">
+                <span class="rating-badge rating-{{ tier.tier_code }}" style="background-color: {{ tier.color_hex }};">
+                    <span class="material-symbols-outlined rating-icon">{{ tier.icon_name }}</span>
+                    {# Display the translated name directly #}
+                    <span class="rating-label">{{ tier.display_name }}</span>
+                </span>
+            </dt>
+            {# Display the translated description directly #}
+            <dd class="col-sm-9">{{ tier.description }}</dd>
+        {% endfor %}
     </dl>
 
      <h3 class="mt-4">{% translate "Severity Levels (for Breakdown Categories)" %}</h3>
     <dl class="row">
-        <dt class="col-sm-3"><span class="severity-circle severity-n"></span> {% translate "None (N)" %}</dt>
+        {# Manually list severity levels using their display names from choices #}
+        {# Assuming Game.SEVERITY_CHOICES is ('N', _('None')), ('L', _('Mild')), etc. #}
+        {# We access the display value directly using get_SEVERITY_CHOICES_display() which isn't ideal here #}
+        {# A better way is to define them explicitly or pass the dict from the view #}
+
+        <dt class="col-sm-3"><span class="severity-circle severity-n"></span> {% translate "None" %}</dt>
         <dd class="col-sm-9">{% blocktranslate %}No significant concerns identified regarding direct action or normalization.{% endblocktranslate %}</dd>
 
-        <dt class="col-sm-3"><span class="severity-circle severity-l"></span> {% translate "Low (L)" %}</dt>
+        <dt class="col-sm-3"><span class="severity-circle severity-l"></span> {% translate "Mild" %}</dt>
         <dd class="col-sm-9">{% blocktranslate %}Minor issues present, potentially avoidable, infrequent, or contextually less impactful. Not presented positively or normalized. Minimal risk.{% endblocktranslate %}</dd>
 
-        <dt class="col-sm-3"><span class="severity-circle severity-m"></span> {% translate "Medium (M)" %}</dt>
+        <dt class="col-sm-3"><span class="severity-circle severity-m"></span> {% translate "Moderate" %}</dt>
         <dd class="col-sm-9">{% blocktranslate %}Moderate concerns. Problematic elements (not major sins/Kufr) may be present and optional OR somewhat normalized neutrally/slightly positively. Requires player vigilance.{% endblocktranslate %}</dd>
 
-         <dt class="col-sm-3"><span class="severity-circle severity-h"></span> {% translate "High (H)" %}</dt>
-        <dd class="col-sm-9">{% blocktranslate %}Severe concerns. Problematic actions (short of major sins/Kufr) strongly encouraged/rewarded OR Haram elements difficult to avoid OR impermissible lifestyles/beliefs (short of Kufr/Shirk) actively promoted/normalized. High risk of negative influence/Tashabbuh.{% endblocktranslate %}</dd>
+         <dt class="col-sm-3"><span class="severity-circle severity-s"></span> {% translate "Severe" %}</dt>
+        <dd class="col-sm-9">{% blocktranslate %}Severe concerns. Problematic actions (short of major sins/Kufr) strongly encouraged/rewarded OR Haram elements difficult/impossible to avoid OR impermissible lifestyles/beliefs (short of Kufr/Shirk) actively promoted/normalized, OR explicitly involves required/unavoidable simulation/engagement in major sins or acts of Kufr/Shirk.{% endblocktranslate %}</dd>
 
-        <dt class="col-sm-3"><span class="severity-circle severity-p"></span> {% translate "Prohibited (P)" %}</dt>
-        <dd class="col-sm-9">{% blocktranslate %}Explicitly involves required/unavoidable simulation/engagement in major sins or acts of Kufr/Shirk, OR central, inescapable, positive promotion/normalization of such.{% endblocktranslate %}</dd>
     </dl>
+
     <p><a href="{% url 'home' %}" class="back-link mt-3">{% translate "← Back to Home" %}</a></p>
 </div>
 

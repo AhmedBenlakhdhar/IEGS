@@ -1,61 +1,49 @@
 {% extends "base.html" %}
 {% load static %}
-{% load i18n %} {# Ensure i18n is loaded #}
+{% load i18n %}
 
-{% block title %}{{ page_title }}{% endblock %} {# page_title is translated in the view #}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
   <div class="page-header d-block d-md-flex justify-content-between align-items-center">
-    <h1>{{ page_title }}</h1> {# page_title is translated in the view #}
-     {# --- START: Search Form --- #}
+    <h1>{{ page_title }}</h1>
      <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form mt-3 mt-md-0 ms-md-auto">
-        {# Use translate tag for placeholder #}
         <input class="form-control me-2" type="search" placeholder="{% translate 'Search Title/Dev...' %}" aria-label="{% translate 'Search' %}" name="q" value="{{ search_query|default:'' }}">
         <button class="btn btn-outline-secondary" type="submit">{% translate "Search" %}</button>
      </form>
-    {# --- END: Search Form --- #}
   </div>
 
    {% if filter_description %}
         <div class="alert alert-info small" role="alert">
-            {{ filter_description|safe }} {# filter_description is translated in the view #}
+            {{ filter_description|safe }}
             <a href="{% url 'ratings:game_list' %}" class="alert-link">{% translate "Clear Filter" %}</a>
         </div>
    {% endif %}
 
-  {# --- START: Filter/Sort Controls --- #}
+  {# --- Filter/Sort Controls --- #}
   <form method="GET" action="{% if developer_slug %}{% url 'ratings:games_by_developer' developer_slug=developer_slug %}{% elif publisher_slug %}{% url 'ratings:games_by_publisher' publisher_slug=publisher_slug %}{% else %}{% url 'ratings:game_list' %}{% endif %}" class="filter-sort-form card bg-element mb-4">
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        {# --- Hidden Search Field --- #}
-        {% if search_query %}
-            <input type="hidden" name="q" value="{{ search_query }}">
-        {% endif %}
-
-        {# --- Tier Filter --- #}
+        {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
         <div class="col-md-3 col-sm-6">
           <label for="tierFilter" class="form-label form-label-sm">{% translate "Rating Tier" %}</label>
           <select class="form-select form-select-sm" id="tierFilter" name="tier">
-            <option value="all" {% if not selected_tier or selected_tier == 'all' %}selected{% endif %}>{% translate "All Tiers" %}</option>
+            <option value="" {% if not selected_tier %}selected{% endif %}>{% translate "All Tiers" %}</option>
             {% for tier in all_tiers %}
-              <option value="{{ tier.tier_code }}" {% if selected_tier == tier.tier_code %}selected{% endif %}>
-                {% translate tier.display_name %}
-              </option>
+              {# Use the translated display_name from the Tier object #}
+              <option value="{{ tier.tier_code }}" {% if selected_tier == tier.tier_code %}selected{% endif %}>{{ tier.display_name }}</option>
             {% endfor %}
           </select>
         </div>
-
-        {# --- Adjustment Filter --- #}
         <div class="col-md-3 col-sm-6">
-           <label for="adjFilter" class="form-label form-label-sm">{% translate "Adjustment" %}</label>
-           <select class="form-select form-select-sm" id="adjFilter" name="adj">
-               <option value="" {% if not requires_adjustment_filter %}selected{% endif %}>{% translate "Any" %}</option>
-               <option value="yes" {% if requires_adjustment_filter == 'yes' %}selected{% endif %}>{% translate "Required" %}</option>
-               <option value="no" {% if requires_adjustment_filter == 'no' %}selected{% endif %}>{% translate "Not Required" %}</option>
-           </select>
+            <label for="flagFilter" class="form-label form-label-sm">{% translate "Content Flags" %}</label>
+            <select class="form-select form-select-sm" id="flagFilter" name="flag">
+                <option value="" {% if not selected_flag %}selected{% endif %}>{% translate "Any Flags" %}</option>
+                {% for flag in all_flags %}
+                    <option value="{{ flag.symbol }}" {% if selected_flag == flag.symbol %}selected{% endif %}>{{ flag.description }}</option>
+                {% endfor %}
+            </select>
         </div>
-
-        {# --- Sort By --- #}
         <div class="col-md-3 col-sm-6">
           <label for="sortFilter" class="form-label form-label-sm">{% translate "Sort By" %}</label>
           <select class="form-select form-select-sm" id="sortFilter" name="sort">
@@ -67,60 +55,41 @@
             <option value="release_date" {% if sort_by == 'release_date' %}selected{% endif %}>{% translate "Release Date (Oldest)" %}</option>
           </select>
         </div>
-
-        {# --- Placeholder for Alignment --- #}
-        <div class="col-md-3 col-sm-6 d-none d-md-block">
-            <label class="form-label form-label-sm"> </label> {# Keep space for sort #}
-        </div>
-
-        {# --- Platform Filters (Full Width on next row essentially) --- #}
-        <div class="col-12 mt-3 mt-md-2"> {# Reduced top margin on medium+ screens #}
+        <div class="col-12 mt-3 mt-md-2">
           <label class="form-label form-label-sm">{% translate "Platforms" %}</label>
           <div class="d-flex flex-wrap gap-2">
-            {# Iterate over the list passed from the view context #}
             {% for platform_item in platform_list_for_template %}
-              <div class="form-check form-check-inline mb-1"> {# Added mb-1 for better wrapping #}
-                <input class="form-check-input" type="checkbox" name="platform" value="{{ platform_item.code }}" id="platform_{{ platform_item.code }}"
-                       {% if platform_item.code in selected_platforms %}checked{% endif %}>
-                <label class="form-check-label small" for="platform_{{ platform_item.code }}">
-                  {{ platform_item.name }}
-                </label>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="checkbox" name="platform" value="{{ platform_item.code }}" id="platform_{{ platform_item.code }}" {% if platform_item.code in selected_platforms %}checked{% endif %}>
+                <label class="form-check-label small" for="platform_{{ platform_item.code }}">{{ platform_item.name }}</label>
               </div>
             {% endfor %}
           </div>
         </div>
-
-        {# --- Submit Button --- #}
-        <div class="col-12 mt-3 text-end"> {# Full width, text-end for button #}
+        <div class="col-12 mt-3 text-end">
           <button type="submit" class="btn btn-sm btn-primary filter-apply-btn">{% translate "Apply Filters" %}</button>
         </div>
-
       </div>
     </div>
   </form>
   {# --- END: Filter/Sort Controls --- #}
 
-  {# --- START: Pre-translate known rating strings (Workaround) --- #}
+  {# --- Pre-translate for cards (already correct) --- #}
   {% get_current_language as LANGUAGE_CODE_CURRENT %}
-
-  {% translate "Haram" as translated_haram %}
-  {% translate "Mashbouh" as translated_mashbouh %}
-  {% translate "Halal" as translated_halal %}
-  {% translate "Kufr" as translated_kufr %}
-  {# --- END: Pre-translate --- #}
+  {% translate "Impermissible / Haram" as translated_haram %}
+  {% translate "Caution Required" as translated_mashbouh %}
+  {% translate "Acceptable" as translated_halal %}
+  {% translate "Contains Kufr/Shirk" as translated_kufr %}
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {% for game in games_page %}
     <div class="col">
-         {# --- Pass the pre-translated strings into the snippet context --- #}
          {% include 'ratings/includes/game_card_snippet.html' with game=game translated_haram=translated_haram translated_mashbouh=translated_mashbouh translated_halal=translated_halal translated_kufr=translated_kufr %}
     </div>
     {% empty %}
       <p class="col-12 text-center text-secondary">
-        {% if search_query or selected_tier != 'all' or requires_adjustment_filter or selected_flag or selected_platforms %} {# Added selected_platforms to condition #}
-            {# Generate the URL into a variable first #}
+        {% if search_query or selected_tier or selected_flag or selected_platforms %}
             {% url 'ratings:game_list' as all_games_url %}
-            {# Now use the variable inside the blocktranslate tag #}
             {% blocktranslate %}No games found matching your criteria. <a href="{{ all_games_url }}" class="link-secondary">View all games?</a>{% endblocktranslate %}
         {% else %}
             {% translate "No games rated yet." %}
@@ -129,33 +98,20 @@
     {% endfor %}
   </div>
 
-  {# --- START: Pagination --- #}
+  {# --- Pagination (Keep as is) --- #}
     <nav aria-label="{% translate 'Game list navigation' %}" class="mt-5">
       <ul class="pagination justify-content-center">
         {% if games_page.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{% translate "« First" %}</a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" href="?page={{ games_page.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{% translate "Previous" %}</a>
-          </li>
+          <li class="page-item"><a class="page-link" href="?page=1{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endfor %}">{% translate "« First" %}</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ games_page.previous_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endfor %}">{% translate "Previous" %}</a></li>
         {% else %}
           <li class="page-item disabled"><span class="page-link">{% translate "« First" %}</span></li>
           <li class="page-item disabled"><span class="page-link">{% translate "Previous" %}</span></li>
         {% endif %}
-
-        <li class="page-item disabled">
-            {# Use blocktranslate for dynamic content #}
-            <span class="page-link">{% blocktranslate %}Page {{ games_page.number }} of {{ games_page.paginator.num_pages }}{% endblocktranslate %}</span>
-        </li>
-
+        <li class="page-item disabled"><span class="page-link">{% blocktranslate %}Page {{ games_page.number }} of {{ games_page.paginator.num_pages }}{% endblocktranslate %}</span></li>
         {% if games_page.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ games_page.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{% translate "Next" %}</a>
-          </li>
-           <li class="page-item">
-            <a class="page-link" href="?page={{ games_page.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{% translate "Last »" %}</a>
-          </li>
+          <li class="page-item"><a class="page-link" href="?page={{ games_page.next_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endfor %}">{% translate "Next" %}</a></li>
+           <li class="page-item"><a class="page-link" href="?page={{ games_page.paginator.num_pages }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endfor %}">{% translate "Last »" %}</a></li>
         {% else %}
            <li class="page-item disabled"><span class="page-link">{% translate "Next" %}</span></li>
            <li class="page-item disabled"><span class="page-link">{% translate "Last »" %}</span></li>
@@ -163,5 +119,4 @@
       </ul>
     </nav>
   {# --- END: Pagination --- #}
-
 {% endblock %}

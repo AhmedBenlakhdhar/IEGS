@@ -3,398 +3,307 @@
 import datetime
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.text import slugify
-from ratings.models import Game, RatingTier, Flag # Assuming User/date fields aren't populated by script
+from ratings.models import Game, RatingTier, Flag # Keep Flag import if Game model needs it
 from django.db import transaction, IntegrityError
-from django.utils.translation import gettext_lazy as _ # Import needed if using _() here
+from django.utils.translation import gettext_lazy as _
 
-# --- GAME DATA LIST (v1.2 Methodology Applied - English Only - FIXED NOT NULL) ---
-# Added default empty strings "" for all new _details and _reason fields
-# Assumes model field names are:
-# - haram_depictions_severity, haram_depictions_details, haram_depictions_reason
-# - simulation_haram_severity, simulation_haram_details, simulation_haram_reason
-# - normalization_haram_severity, normalization_haram_details, normalization_haram_reason
+# --- GAME DATA LIST (v2.2 Methodology Applied - Refined Logic & Final URLs) ---
+# Severity Codes: N=None, L=Mild, M=Moderate, S=Severe
+# rating_tier_id reflects the FINAL calculated tier based on the refined rules in models.py
 GAME_DATA = [
-    # === 1. Halal (Recommended) Example ===
+    # === 1. Mini Motorways (HAL) ===
     {
         "title": "Mini Motorways",
         "developer": "Dinosaur Polo Club", "publisher": "Dinosaur Polo Club",
-        "release_date": datetime.date(2021, 7, 20), # PC release
-        "rating_tier_id": "HAL",
-        "requires_adjustment": False,
-        "summary": "A minimalist strategy simulation game about drawing roads to build a bustling city.",
-        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/1/1b/Mini_Motorways_cover_art.jpg",
+        "release_date": datetime.date(2021, 7, 20),
+        "rating_tier_id": "HAL", # Music(L), Time(L). Total L=2 -> HAL
+        "summary": "A minimalist strategy simulation game about drawing roads.",
+        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/1/1b/Mini_Motorways_cover_art.jpg", # User provided URL
         "steam_link": "https://store.steampowered.com/app/1127500/Mini_Motorways/",
-        "available_pc": True, "available_switch": True, "available_ios": True, "available_android": False, # Example platforms
-        # --- MGC Rating & Supporting ---
-        "flags_symbols": [],
-        "adjustable_flags_symbols": [], # Not adjustable
-        "rationale": "Excellent puzzle game focused on logic and planning. No concerning themes identified.",
-        "adjustment_guide": "",
-        # "suitability_notes": "", # Removed based on user request
-        # "positive_aspects": "", # Removed based on user request
-        # "is_recommended": True, # Removed based on user request
+        "available_pc": True, "available_switch": True, "available_ios": True,
+        "rationale": "Excellent puzzle game focused on logic. Minimal concerns: mutable background music (Mild) and potential time sink (Mild). Meets 'Acceptable' criteria.",
         "has_spoilers_in_details": False,
-        # --- Detailed Breakdown (Mostly 'N', added defaults for new fields) ---
-        "aqidah_severity": "N", "aqidah_details": "", "aqidah_reason": "",
-        "haram_depictions_severity": "N", "haram_depictions_details": "", "haram_depictions_reason": "", # ADDED ""
-        "simulation_haram_severity": "N", "simulation_haram_details": "", "simulation_haram_reason": "", # ADDED ""
-        "normalization_haram_severity": "N", "normalization_haram_details": "", "normalization_haram_reason": "", # ADDED ""
-        "violence_severity": "N", "violence_details": "", "violence_reason": "",
-        "time_addiction_severity": "L", "time_addiction_details": "Gameplay loop can be engaging, but sessions are relatively short. Less prone to addiction than many games.", "time_addiction_reason": "",
-        "online_conduct_severity": "N", "online_conduct_details": "Primarily single-player. Leaderboards exist but no direct chat.", "online_conduct_reason": "",
+        # --- Detailed Breakdown ---
+        "forced_shirk_severity": "N", "promote_shirk_severity": "N", "insult_islam_severity": "N", "depict_unseen_severity": "N", "magic_sorcery_severity": "N",
+        "contradictory_ideologies_severity": "N", "nudity_lewdness_severity": "N", "music_instruments_severity": "L", "gambling_severity": "N", "lying_severity": "N",
+        "simulate_killing_severity": "N", "simulate_theft_crime_severity": "N", "normalize_haram_rels_severity": "N", "normalize_substances_severity": "N", "profanity_obscenity_severity": "N",
+        "time_wasting_severity": "L", "financial_extravagance_severity": "N", "online_communication_severity": "N", "ugc_risks_severity": "N",
+        "music_instruments_details": "Minimalist ambient electronic music.", "music_instruments_reason": "Can be muted.",
+        "time_wasting_details": "Engaging puzzle loop, but generally played in shorter sessions.",
+        # Add empty details/reason for 'N' fields if desired
+        "forced_shirk_details": "", "forced_shirk_reason": "", "promote_shirk_details": "", "promote_shirk_reason": "", "insult_islam_details": "", "insult_islam_reason": "",
+        "depict_unseen_details": "", "depict_unseen_reason": "", "magic_sorcery_details": "", "magic_sorcery_reason": "", "contradictory_ideologies_details": "", "contradictory_ideologies_reason": "",
+        "nudity_lewdness_details": "", "nudity_lewdness_reason": "", "gambling_details": "", "gambling_reason": "", "lying_details": "", "lying_reason": "",
+        "simulate_killing_details": "", "simulate_killing_reason": "", "simulate_theft_crime_details": "", "simulate_theft_crime_reason": "", "normalize_haram_rels_details": "", "normalize_haram_rels_reason": "",
+        "normalize_substances_details": "", "normalize_substances_reason": "", "profanity_obscenity_details": "", "profanity_obscenity_reason": "", "time_wasting_reason": "",
+        "financial_extravagance_details": "", "financial_extravagance_reason": "", "online_communication_details": "Leaderboards only.", "online_communication_reason": "", "ugc_risks_details": "", "ugc_risks_reason": "",
     },
-    # === 2. Halal (Standard - Requires Adjustment for Audio) Example ===
+    # === 2. Portal 2 (MSH) ===
     {
         "title": "Portal 2",
         "developer": "Valve", "publisher": "Valve",
         "release_date": datetime.date(2011, 4, 19),
-        "rating_tier_id": "HAL", # Final achievable tier
-        "original_rating_tier_id": "HAL", # Original state before adjustments (still Halal)
-        "requires_adjustment": True, # Due to optional music and co-op chat
-        "summary": "A first-person puzzle-platform video game known for its physics-based puzzles and dark humor.",
-        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/f/f9/Portal2cover.jpg",
+        "rating_tier_id": "MSH", # Online Comm (M) -> MSH
+        "summary": "A first-person puzzle-platform video game known for physics-based puzzles and dark humor.",
+        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/f/f9/Portal2cover.jpg", # User provided URL
         "steam_link": "https://store.steampowered.com/app/620/Portal_2/",
-        "available_pc": True, "available_ps4": True, "available_xbox_one": True, # Via compatibility/collections
-        # --- MGC Rating & Supporting ---
-        "flags_symbols": ["forum", "music_off"], # Added music_off flag
-        "adjustable_flags_symbols": ["forum", "music_off"], # Chat and music are adjustable
-        "rationale": "Core gameplay is focused on permissible puzzle-solving. Requires adjustment for optional co-op chat (potential Laghw/Fitnah) and background music (disputed permissibility).",
-        "adjustment_guide": "1. Mute background music via in-game settings if concerned about its permissibility. \n2. Disable voice/text chat or play co-op only with known/trusted individuals to avoid Laghw or negative interactions.",
-        # "suitability_notes": "", # Removed based on user request
-        # "positive_aspects": "", # Removed based on user request
-        # "is_recommended": False, # Removed based on user request
-        "has_spoilers_in_details": True, # Story elements might be spoiled
-        # --- Detailed Breakdown (Added defaults for new fields) ---
-        "aqidah_severity": "N", "aqidah_details": "Themes of AI consciousness are fictional/sci-fi.", "aqidah_reason": "",
-        "haram_depictions_severity": "L", # Changed from N to L due to music being present
-        "haram_depictions_details": "Contains background ambient/electronic music. Some dark humor/sarcasm.", # Moved sarcasm here
-        "haram_depictions_reason": "Music is considered Mashbouh/Haram by some scholars, but it's optional/mutable. Sarcasm is contextual.",
-        "simulation_haram_severity": "N", "simulation_haram_details": "", "simulation_haram_reason": "", # ADDED ""
-        "normalization_haram_severity": "L", # Lowered from M as sarcasm isn't strong normalization
-        "normalization_haram_details": "", # Moved sarcasm to depictions
-        "normalization_haram_reason": "", # ADDED ""
-        "violence_severity": "N", "violence_details": "No direct combat. Environmental hazards (turrets, lasers) exist but are part of puzzles, not depicted graphically.", "violence_reason": "",
-        "time_addiction_severity": "L", "time_addiction_details": "Finite puzzle game, though community maps extend playtime.", "time_addiction_reason": "",
-        "online_conduct_severity": "M", # Moderate risk due to chat
-        "online_conduct_details": "Optional Co-op mode requires coordination. Voice/text chat with strangers carries risk of Laghw, insults, or Fitnah.",
-        "online_conduct_reason": "Potential for negative interaction if not adjusted.",
+        "available_pc": True, "available_ps4": True, "available_xbox_one": True,
+        "rationale": "Core gameplay is permissible puzzle-solving. Rated 'Caution Required' due to Moderate risk in Online Communication (optional co-op chat). Mild concerns for mutable music, minor ideology (dark humor), time, and UGC.",
+        "has_spoilers_in_details": True,
+        # --- Detailed Breakdown ---
+        "forced_shirk_severity": "N", "promote_shirk_severity": "N", "insult_islam_severity": "N", "depict_unseen_severity": "N", "magic_sorcery_severity": "N",
+        "contradictory_ideologies_severity": "L", "nudity_lewdness_severity": "N", "music_instruments_severity": "L", "gambling_severity": "N", "lying_severity": "N",
+        "simulate_killing_severity": "N", "simulate_theft_crime_severity": "N", "normalize_haram_rels_severity": "N", "normalize_substances_severity": "N", "profanity_obscenity_severity": "N",
+        "time_wasting_severity": "L", "financial_extravagance_severity": "N", "online_communication_severity": "M", "ugc_risks_severity": "L",
+        "promote_shirk_details": "Themes of AI consciousness are fictional/sci-fi.",
+        "contradictory_ideologies_details": "Some dark humor/sarcasm.",
+        "music_instruments_details": "Contains background ambient/electronic music.", "music_instruments_reason": "Optional/mutable.",
+        "simulate_killing_details": "No direct combat. Environmental hazards.",
+        "time_wasting_details": "Finite puzzle game, community maps extend.",
+        "online_communication_details": "Optional Co-op mode with voice/text chat risk.", "online_communication_reason": "Requires management.", # Moderate -> MSH
+        "ugc_risks_details": "Community maps generally safe.",
+        # Add empty details/reason for 'N' fields
+        "forced_shirk_details": "", "forced_shirk_reason": "", "insult_islam_details": "", "insult_islam_reason": "", "depict_unseen_details": "", "depict_unseen_reason": "",
+        "magic_sorcery_details": "", "magic_sorcery_reason": "", "contradictory_ideologies_reason": "", "nudity_lewdness_details": "", "nudity_lewdness_reason": "", "gambling_details": "", "gambling_reason": "",
+        "lying_details": "", "lying_reason": "", "simulate_killing_reason": "", "simulate_theft_crime_details": "", "simulate_theft_crime_reason": "", "normalize_haram_rels_details": "", "normalize_haram_rels_reason": "",
+        "normalize_substances_details": "", "normalize_substances_reason": "", "profanity_obscenity_details": "", "profanity_obscenity_reason": "", "time_wasting_reason": "",
+        "financial_extravagance_details": "", "financial_extravagance_reason": "", "ugc_risks_reason": "",
     },
-    # === 3. Mashbouh Example (Minecraft - Normalization/Optional elements) ===
-     {
-        "title": "Minecraft (Survival - Standard)",
-        "developer": "Mojang Studios", "publisher": "Xbox Game Studios / Microsoft",
-        "release_date": datetime.date(2011, 11, 18),
-        "rating_tier_id": "MSH", # Final achievable tier (if careful)
-        "original_rating_tier_id": "MSH", # Original state with optional magic/servers is Mashbouh
-        "requires_adjustment": True,
-        "summary": "A sandbox game about placing blocks, crafting items, and going on adventures.",
-        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",
-        "other_store_link": "https://www.minecraft.net/", # Official site
-        "available_pc": True, "available_ps5": True, "available_ps4": True, "available_xbox_series": True, "available_xbox_one": True, "available_switch": True, "available_android": True, "available_ios": True,
-        # --- MGC Rating & Supporting ---
-        "flags_symbols": ["forum", "hourglass_top"],
-        "adjustable_flags_symbols": ["forum"],
-        "rationale": "Mashbouh primarily due to optional gameplay systems (enchanting, potions) resembling magic, potential normalization concerns, and significant risks in unmoderated online play. Core building/exploration can be Halal if questionable elements are avoided and online play is managed.",
-        "adjustment_guide": "1. Play offline, on LAN, or only on trusted, well-moderated private servers ('Realms' or similar).\n2. Disable multiplayer chat features or restrict communication to known individuals.\n3. Avoid deep engagement with enchanting/potion systems if concerned about resemblance to Sihr (Sadd al-Dhara'i). Focus on building, farming, exploration.",
-        # "suitability_notes": "", # Removed
-        # "positive_aspects": "", # Removed
-        # "is_recommended": False, # Removed
-        "has_spoilers_in_details": False,
-        # --- Detailed Breakdown (Added defaults for new fields) ---
-        "aqidah_severity": "L",
-        "aqidah_details": "Enchanting items and brewing potions use specific mechanics and materials. While fictional, the process can resemble ritualistic aspects of magic, raising concerns of Tashabbuh (imitation) or trivializing Sihr.",
-        "aqidah_reason": "Concern based on Sadd al-Dhara'i (blocking the means) regarding normalization or imitation of magic-like actions, even if fictional.",
-        "haram_depictions_severity": "L",
-        "haram_depictions_details": "Contains mutable background music. Some fictional monsters (zombies, skeletons) might be considered mildly disturbing by some. Custom skins could potentially show 'Awrah.", # Added skin note here
-        "haram_depictions_reason": "Music permissibility is disputed. Monster depictions are stylized. Player skins are user-generated risk.",
-        "simulation_haram_severity": "L",
-        "simulation_haram_details": "Player can simulate killing passive animals (cows, sheep, chickens) for resources. Also involves combat against fictional hostile monsters.",
-        "simulation_haram_reason": "Simulating killing, even animals/monsters, requires context assessment. Stylized nature keeps it Low.",
-        "normalization_haram_severity": "L",
-        "normalization_haram_details": "Enchanting/potions presented as neutral game mechanics.", # Removed skin note
-        "normalization_haram_reason": "Neutral presentation of magic-like systems.", # ADDED ""
-        "violence_severity": "L",
-        "violence_details": "Stylized combat against fictional monsters (zombies, spiders, etc.) and animals. No blood or gore.",
-        "violence_reason": "", # ADDED ""
-        "time_addiction_severity": "M",
-        "time_addiction_details": "Open-ended ('sandbox') nature allows for potentially endless gameplay and large projects. Can easily consume significant time.",
-        "time_addiction_reason": "High risk of Israf (wastefulness) of time and neglecting duties if not self-controlled.",
-        "online_conduct_severity": "H",
-        "online_conduct_details": "Public multiplayer servers often lack moderation. High risk of exposure to Fahisha (foul language), insults, Fitnah (arguments, inappropriate discussions/behavior), and encountering problematic user-created content/skins.",
-        "online_conduct_reason": "Significant risk in unmanaged online environments requires adjustment (avoiding public servers/chat).",
+    # === 3. Skyrim (KFR) ===
+    {
+        "title": "The Elder Scrolls V: Skyrim",
+        "developer": "Bethesda Game Studios", "publisher": "Bethesda Softworks",
+        "release_date": datetime.date(2011, 11, 11),
+        "rating_tier_id": "KFR", # Magic(S) -> KFR
+        "summary": "An open-world action role-playing game.",
+        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/1/15/The_Elder_Scrolls_V_Skyrim_cover.png", # User provided URL
+        "steam_link": "https://store.steampowered.com/app/489830/The_Elder_Scrolls_V_Skyrim_Special_Edition/",
+        "available_pc": True, "available_ps5": True, "available_ps4": True, "available_xbox_series": True, "available_xbox_one": True, "available_switch": True,
+        "rationale": "Impermissible (Contains Kufr/Shirk). Core gameplay involves polytheistic deities (Divines/Daedra) and detailed simulation/glorification of magic (Sihr). Severe risks from mods and time wastage.",
+        "has_spoilers_in_details": True,
+        # --- Detailed Breakdown ---
+        "forced_shirk_severity": "N", "promote_shirk_severity": "M", "insult_islam_severity": "N", "depict_unseen_severity": "M", "magic_sorcery_severity": "S",
+        "contradictory_ideologies_severity": "L", "nudity_lewdness_severity": "L", "music_instruments_severity": "M", "gambling_severity": "N", "lying_severity": "M",
+        "simulate_killing_severity": "M", "simulate_theft_crime_severity": "M", "normalize_haram_rels_severity": "L", "normalize_substances_severity": "M", "profanity_obscenity_severity": "L",
+        "time_wasting_severity": "S", "financial_extravagance_severity": "L", "online_communication_severity": "N", "ugc_risks_severity": "S",
+        "promote_shirk_details": "Interaction with polytheistic framework (Divines, Daedra).", "depict_unseen_details": "Depictions of souls, ghosts, Daedric realms.", "magic_sorcery_details": "Extensive magic system (spells, summoning, enchanting) core to gameplay.", "magic_sorcery_reason": "Detailed simulation/glorification of Sihr.",
+        "contradictory_ideologies_details": "Themes of rebellion, racial tensions.", "nudity_lewdness_details": "Base game minimal; severe risk via mods.", "music_instruments_details": "Orchestral score, bards. Mutable.", "lying_details": "Optional deception.", "simulate_killing_details": "Violence central, optional civilian killing.",
+        "simulate_theft_crime_details": "Theft/Assassination optional paths.", "normalize_haram_rels_details": "Marriage options can include impermissible via mods.", "normalize_substances_details": "Consumable alcohol/fictional drugs.", "profanity_obscenity_details": "Occasional mild profanity.",
+        "time_wasting_details": "Vast world, endless quests.", "time_wasting_reason": "High potential for Israf.", "financial_extravagance_details": "Base game/DLC purchase. Creation Club paid mods (minor).",
+        "ugc_risks_details": "Mods can introduce ANY Haram content.", "ugc_risks_reason": "Extreme risk from UGC.",
     },
-    # === 4. Haram Example (GTA V - Multiple P/H severities) ===
-     {
+    # === 4. GTA V (HRM) ===
+    {
         "title": "Grand Theft Auto V",
         "developer": "Rockstar North", "publisher": "Rockstar Games",
         "release_date": datetime.date(2013, 9, 17),
-        "rating_tier_id": "HRM",
-        "requires_adjustment": False,
-        "summary": "An open-world action-adventure game centered around criminal activities, satire, and violence.",
-        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/a/a5/Grand_Theft_Auto_V.png",
+        "rating_tier_id": "HRM", # Multiple 'S' -> HRM
+        "summary": "Open-world action game centered on crime, satire, and violence.",
+        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/a/a5/Grand_Theft_Auto_V.png", # User provided URL
         "steam_link": "https://store.steampowered.com/app/271590/Grand_Theft_Auto_V/",
         "available_pc": True, "available_ps5": True, "available_ps4": True, "available_xbox_series": True, "available_xbox_one": True,
-        # --- MGC Rating & Supporting ---
-        "flags_symbols": ["visibility_off", "record_voice_over", "casino", "local_bar", "music_off", "forum", "hourglass_top"],
-        "adjustable_flags_symbols": [],
-        "rationale": "Impermissible (Haram). Core gameplay requires engaging in and simulating major sins (theft, murder, interaction with indecency). Contains unavoidable explicit 'Awrah, pervasive foul language, promotion of Haram lifestyles (crime, drugs, Zina), and normalization of violence and vice. Online mode is highly problematic.",
-        "adjustment_guide": "",
-        # "suitability_notes": "", # Removed
-        # "positive_aspects": "", # Removed
-        # "is_recommended": False, # Removed
+        "rationale": "Impermissible (Haram). Core gameplay simulates major sins. Unavoidable explicit content ('Awrah, Fahisha), promotes Haram lifestyles, normalizes vice. Highly problematic online.",
         "has_spoilers_in_details": False,
-        # --- Detailed Breakdown (Added defaults for new fields) ---
-        "aqidah_severity": "M",
-        "aqidah_details": "Contains cynical satire that may touch upon or mock religious/moral values. Promotes a nihilistic and materialistic worldview.",
-        "aqidah_reason": "Potential mockery/trivialization of values, promotion of anti-Islamic worldview.",
-        "haram_depictions_severity": "P",
-        "haram_depictions_details": "Required interaction with environments containing explicit nudity ('Awrah exposure in strip clubs). Pervasive use of extreme foul language (Fahisha) in mandatory dialogue. Licensed radio stations feature music with impermissible themes/lyrics (Ghina' Muharram), hard to avoid completely.",
-        "haram_depictions_reason": "Direct, often unavoidable exposure to Haram sights and sounds is integral to the game's atmosphere and required missions.",
-        "simulation_haram_severity": "P",
-        "simulation_haram_details": "Core gameplay mechanics *require* the player to simulate major sins: Grand Theft (theft/robbery), murder (including unjustified killing of civilians/police), torture (in one specific mission), engaging in simulated interactions related to Zina.",
-        "simulation_haram_reason": "Mandatory simulation of actions categorized as major sins in Islam.",
-        "normalization_haram_severity": "P",
-        "normalization_haram_details": "Crime, violence, drug use/dealing, alcohol consumption (Khamr), and impermissible relationships/lifestyles are presented as normal, cool, or integral parts of the game world and narrative. Criminal protagonists are often glorified.",
-        "normalization_haram_reason": "Extreme and pervasive normalization and often positive portrayal of major sins and Haram lifestyles.",
-        "violence_severity": "P",
-        "violence_details": "Gameplay centers on high levels of violence, including shootings, explosions, vehicular violence. Can involve killing innocent civilians and law enforcement. Contains graphic depictions of injury and death. Torture sequence in one mission.",
-        "violence_reason": "Excessive, graphic, often unjustified violence is a core gameplay element and requirement.",
-        "time_addiction_severity": "M",
-        "time_addiction_details": "Vast open world with numerous activities and a compelling online mode (GTA Online) designed for long-term engagement and potential microtransactions.",
-        "time_addiction_reason": "High potential for Israf (wastefulness) of time due to engaging design and online features.",
-        "online_conduct_severity": "H",
-        "online_conduct_details": "GTA Online is notorious for extremely toxic player interactions, including pervasive foul language, insults, harassment, cheating, and exposure to Fitnah. Moderation is often ineffective.",
-        "online_conduct_reason": "Very high probability of exposure to severely negative and harmful online conduct.",
+        # --- Detailed Breakdown ---
+        "forced_shirk_severity": "N", "promote_shirk_severity": "N", "insult_islam_severity": "N", "depict_unseen_severity": "N", "magic_sorcery_severity": "N",
+        "contradictory_ideologies_severity": "S", "nudity_lewdness_severity": "S", "music_instruments_severity": "S", "gambling_severity": "S", "lying_severity": "M",
+        "simulate_killing_severity": "S", "simulate_theft_crime_severity": "S", "normalize_haram_rels_severity": "S", "normalize_substances_severity": "S", "profanity_obscenity_severity": "S",
+        "time_wasting_severity": "S", "financial_extravagance_severity": "S", "online_communication_severity": "S", "ugc_risks_severity": "M",
+        "contradictory_ideologies_details": "Promotes extreme materialism, nihilism, mocks values.", "nudity_lewdness_details": "Required strip club scenes, explicit 'Awrah.", "music_instruments_details": "Pervasive Haram themes/lyrics in soundtrack.", "gambling_details": "Online casino linked to real money.",
+        "lying_details": "Deception required in missions.", "simulate_killing_details": "Glorified violence against civilians/police required.", "simulate_theft_crime_details": "Core gameplay is theft, robbery, etc.", "normalize_haram_rels_details": "Normalizes prostitution, adultery.", "normalize_substances_details": "Player use/dealing normalized.", "profanity_obscenity_details": "Constant extreme foul language.",
+        "time_wasting_details": "Endless open world and online.", "financial_extravagance_details": "Heavy push for microtransactions.", "online_communication_details": "Extremely toxic online environment.", "ugc_risks_details": "Custom jobs/races risk.",
     },
-    # === 5. Kufr Example (God of War - Shirk Themes) ===
+    # === 5. God of War (KFR) ===
      {
         "title": "God of War (2018)",
         "developer": "Santa Monica Studio", "publisher": "Sony Interactive Entertainment",
         "release_date": datetime.date(2018, 4, 20),
-        "rating_tier_id": "KFR",
-        "requires_adjustment": False,
-        "summary": "Action-adventure game following Kratos, a demigod, and his son Atreus in the world of Norse mythology.",
-        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/a/a3/God_of_War_4_cover.jpg",
+        "rating_tier_id": "KFR", # ForcedShirk(S) -> KFR
+        "summary": "Action game following a demigod in Norse mythology.",
+        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/a/a3/God_of_War_4_cover.jpg", # User provided URL
         "steam_link": "https://store.steampowered.com/app/1593500/God_of_War/",
         "available_pc": True, "available_ps4": True, "available_ps5": True,
-        # --- MGC Rating & Supporting ---
-        "flags_symbols": ["gpp_bad"],
-        "adjustable_flags_symbols": [],
-        "rationale": "Impermissible (Kufr). The game's entire narrative and world are based on Norse pagan mythology (Shirk). The player embodies a demigod, interacts extensively with, seeks help from, and fights false deities. This directly contradicts the core principle of Tawhid.",
-        "adjustment_guide": "",
-        # "suitability_notes": "", # Removed
-        # "positive_aspects": "", # Removed
-        # "is_recommended": False, # Removed
+        "rationale": "Impermissible (Contains Kufr/Shirk). Game based on pagan mythology (Shirk). Player embodies/interacts with/fights false deities, contradicting Tawhid.",
         "has_spoilers_in_details": True,
-        # --- Detailed Breakdown (Added defaults for new fields) ---
-        "aqidah_severity": "P",
-        "aqidah_details": "Game is entirely centered around Norse pagan mythology. Player character (Kratos) is portrayed as a god/demigod. Gameplay involves interacting with, fighting against, and sometimes receiving aid/power from figures explicitly depicted as Norse gods (Odin, Thor, Freya etc.). Involves travelling through mythological realms (Asgard, Helheim).",
-        "aqidah_reason": "Direct and unavoidable immersion in and engagement with narratives and characters representing Shirk (polytheism), fundamentally contradicting Tawhid.",
-        "haram_depictions_severity": "L",
-        "haram_depictions_details": "Contains occasional strong language (Fahisha).",
-        "haram_depictions_reason": "Language is present but not pervasive compared to the Aqidah issues.",
-        "simulation_haram_severity": "L",
-        "simulation_haram_details": "Player simulates killing mythological creatures and beings portrayed as gods/demigods.",
-        "simulation_haram_reason": "While killing itself needs context, the primary issue here is the *target* being false deities within a Shirk framework.",
-        "normalization_haram_severity": "P",
-        "normalization_haram_details": "The entire premise normalizes the existence and power of false deities. Pagan mythology is presented as the game's reality.",
-        "normalization_haram_reason": "Inescapable normalization of Shirk through world-building and narrative.",
-        "violence_severity": "H",
-        "violence_details": "Intense, graphic, and often brutal combat. Includes dismemberment, finishing moves, and significant blood effects against mythological creatures and humanoid deities.",
-        "violence_reason": "High level of graphic brutality, though context is fantasy/mythological combat.",
-        "time_addiction_severity": "M",
-        "time_addiction_details": "Story-driven but contains significant side content, exploration, and collectibles that can extend playtime considerably.",
-        "time_addiction_reason": "Potential for significant time investment.",
-        "online_conduct_severity": "N",
-        "online_conduct_details": "", "online_conduct_reason": "", # ADDED ""
+        # --- Detailed Breakdown ---
+        "forced_shirk_severity": "S", "promote_shirk_severity": "S", "insult_islam_severity": "N", "depict_unseen_severity": "S", "magic_sorcery_severity": "S",
+        "contradictory_ideologies_severity": "L", "nudity_lewdness_severity": "L", "music_instruments_severity": "M", "gambling_severity": "N", "lying_severity": "L",
+        "simulate_killing_severity": "S", "simulate_theft_crime_severity": "N", "normalize_haram_rels_severity": "N", "normalize_substances_severity": "N", "profanity_obscenity_severity": "M",
+        "time_wasting_severity": "M", "financial_extravagance_severity": "N", "online_communication_severity": "N", "ugc_risks_severity": "N",
+        "forced_shirk_details": "Player IS a demigod, core gameplay involves false deities.", "promote_shirk_details": "Norse mythology presented as game's reality.", "depict_unseen_details": "Detailed depictions of mythological realms.", "magic_sorcery_details": "Runic magic, mythical weapons linked to Shirk framework.",
+        "nudity_lewdness_details": "Some gore.", "music_instruments_details": "Orchestral score. Mutable.", "lying_details": "Narrative deception.",
+        "simulate_killing_details": "Intense, graphic, brutal combat.", "profanity_obscenity_details": "Strong language present.", "time_wasting_details": "Long game with side content.",
     },
-    # === 6. Mashbouh (Stardew Valley - Normalization/Optional Haram) ===
+    # === 6. Stardew Valley (MSH) ===
     {
         "title": "Stardew Valley",
         "developer": "ConcernedApe", "publisher": "ConcernedApe",
         "release_date": datetime.date(2016, 2, 26),
-        "rating_tier_id": "MSH", # Final achievable tier (if careful)
-        "original_rating_tier_id": "MSH", # Arguably Mashbouh due to normalization/options even before adjustment
-        "requires_adjustment": True,
-        "summary": "An open-ended country-life RPG focused on farming, socializing, and exploration.",
-        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/a/a8/Stardew_Valley_cover_art.jpg",
+        "rating_tier_id": "MSH", # NormHaramRels(M), NormSubs(M), Time(M) -> MSH
+        "summary": "An open-ended country-life RPG focused on farming and socializing.",
+        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/a/a8/Stardew_Valley_cover_art.jpg", # User provided URL
         "steam_link": "https://store.steampowered.com/app/413150/Stardew_Valley/",
         "available_pc": True, "available_ps4": True, "available_xbox_one": True, "available_switch": True, "available_android": True, "available_ios": True,
-        # --- MGC Rating & Supporting ---
-        "flags_symbols": ["record_voice_over", "casino", "local_bar", "hourglass_top", "forum"],
-        "adjustable_flags_symbols": ["local_bar", "casino", "record_voice_over", "forum"],
-        "rationale": "Mashbouh due to normalization of alcohol (saloon is a central social hub), optional gambling mechanics, promotion of impermissible relationships (same-sex marriage option), and minor non-Islamic spiritual elements. Core farming/crafting gameplay is permissible, but avoiding problematic social aspects requires player vigilance.",
-        "adjustment_guide": "1. Avoid purchasing/consuming alcohol items and minimize time spent in the Saloon.\n2. Do not engage with the Casino area/mechanics.\n3. Choose only permissible marriage candidates according to Islamic guidelines.\n4. Treat fictional spiritual elements (Junimos, Wizard) purely as game mechanics, avoiding belief in them.\n5. Manage online co-op interactions carefully if playing multiplayer.",
-        # "suitability_notes": "", # Removed
-        # "positive_aspects": "", # Removed
-        # "is_recommended": False, # Removed
+        "rationale": "Caution Required (Mashbouh). Normalization of alcohol (central saloon), optional gambling, option for impermissible relationships. Time sink potential is moderate. Core farming is permissible if problematic aspects are avoided.",
         "has_spoilers_in_details": False,
-        # --- Detailed Breakdown (Added defaults for new fields) ---
-        "aqidah_severity": "L",
-        "aqidah_details": "Minor fantasy elements (Junimos, Wizard) presented fictionally. Some festivals might have subtle pagan undertones. Marriage system normalization (see Normalization) touches upon worldview.",
-        "aqidah_reason": "Fictional context keeps severity Low, but presence requires awareness.",
-        "haram_depictions_severity": "L",
-        "haram_depictions_details": "Contains mutable background music. Depicts alcoholic beverages available for purchase/gifting.",
-        "haram_depictions_reason": "Music disputed. Alcohol depiction is Haram but avoidable.",
-        "simulation_haram_severity": "N", # Changed from L, gifting alcohol is too indirect
-        "simulation_haram_details": "", # Player doesn't simulate drinking/eating haram directly
-        "simulation_haram_reason": "", # ADDED ""
-        "normalization_haram_severity": "M",
-        "normalization_haram_details": "Saloon (bar) is a central social hub where many villagers gather, normalizing alcohol presence/consumption. Optional casino area normalizes gambling. Marriage system presents same-sex marriage as a standard, equal option, normalizing impermissible relationships.",
-        "normalization_haram_reason": "Neutral-to-positive presentation of Haram elements (alcohol, gambling, relationship types) as normal parts of social life.",
-        "violence_severity": "L",
-        "violence_details": "Simple, stylized combat against monsters (slimes, bats, etc.) in the mines.",
-        "violence_reason": "Minimal, contextual fantasy violence.",
-        "time_addiction_severity": "H",
-        "time_addiction_details": "Very engaging daily loop, collection mechanics, and progression systems create high potential for addiction and excessive playtime.",
-        "time_addiction_reason": "Significant risk of Israf (wastefulness) of time.",
-        "online_conduct_severity": "L",
-        "online_conduct_details": "Optional co-op mode exists. Usually played with known friends, limiting risks compared to public servers.",
-        "online_conduct_reason": "Low risk assuming play with trusted individuals.",
+        # --- Detailed Breakdown ---
+        "forced_shirk_severity": "N", "promote_shirk_severity": "L", "insult_islam_severity": "N", "depict_unseen_severity": "N", "magic_sorcery_severity": "N",
+        "contradictory_ideologies_severity": "L", "nudity_lewdness_severity": "N", "music_instruments_severity": "L", "gambling_severity": "L", "lying_severity": "N",
+        "simulate_killing_severity": "L", "simulate_theft_crime_severity": "N", "normalize_haram_rels_severity": "M", "normalize_substances_severity": "M", "profanity_obscenity_severity": "N",
+        "time_wasting_severity": "M", "financial_extravagance_severity": "N", "online_communication_severity": "L", "ugc_risks_severity": "L",
+        "promote_shirk_details": "Minor fantasy elements (Junimos, Wizard).", "music_instruments_details": "Mutable background music.", "gambling_details": "Optional casino area.",
+        "simulate_killing_details": "Stylized combat vs monsters.", "normalize_haram_rels_details": "Same-sex marriage presented as standard option.", "normalize_substances_details": "Saloon is central social hub, normalizing alcohol.",
+        "time_wasting_details": "Engaging loop, high potential for excessive play.", "online_communication_details": "Optional co-op usually with friends.", "ugc_risks_details": "Mods exist but less prevalent.",
+    },
+    # === 7. Elden Ring (KFR) ===
+    {
+        "title": "Elden Ring",
+        "developer": "FromSoftware", "publisher": "Bandai Namco Entertainment",
+        "release_date": datetime.date(2022, 2, 25),
+        "rating_tier_id": "KFR", # Promote Shirk(S), Magic(S) -> KFR
+        "summary": "An action RPG set in the Lands Between, featuring exploration and challenging combat.",
+        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/b/b9/Elden_Ring_Box_art.jpg", # User provided URL
+        "steam_link": "https://store.steampowered.com/app/1245620/ELDEN_RING/",
+        "available_pc": True, "available_ps5": True, "available_ps4": True, "available_xbox_series": True, "available_xbox_one": True,
+        "rationale": "Impermissible (Contains Kufr/Shirk). Deeply embedded polytheistic lore. Extensive use of magic linked to these entities. Contains severe graphic violence.",
+        "has_spoilers_in_details": True,
+        # --- Detailed Breakdown ---
+        "forced_shirk_severity": "N", "promote_shirk_severity": "S", "insult_islam_severity": "N", "depict_unseen_severity": "M", "magic_sorcery_severity": "S",
+        "contradictory_ideologies_severity": "M", "nudity_lewdness_severity": "L", "music_instruments_severity": "M", "gambling_severity": "N", "lying_severity": "L",
+        "simulate_killing_severity": "S", "simulate_theft_crime_severity": "N", "normalize_haram_rels_severity": "N", "normalize_substances_severity": "N", "profanity_obscenity_severity": "L",
+        "time_wasting_severity": "S", "financial_extravagance_severity": "N", "online_communication_severity": "M", "ugc_risks_severity": "L",
+        "promote_shirk_details": "Complex lore involving multiple god-like beings. Player interacts with items/powers derived from them.", "promote_shirk_reason": "Pervasive polytheistic framework.",
+        "depict_unseen_details": "Depiction of spirits, spectral beings.", "magic_sorcery_details": "Sorceries/Incantations core systems, tied to lore figures/gods.", "magic_sorcery_reason": "Central role, link to Shirk.",
+        "contradictory_ideologies_details": "Themes of ambition, despair.", "nudity_lewdness_details": "Some suggestive enemy designs.", "music_instruments_details": "Orchestral score. Mutable.",
+        "lying_details": "Ambiguous NPC interactions.", "simulate_killing_details": "Challenging, graphic combat.", "simulate_killing_reason": "High graphic violence.",
+        "profanity_obscenity_details": "Occasional mild profanity.", "time_wasting_details": "Vast world, difficult bosses.", "time_wasting_reason": "High Israf potential.",
+        "online_communication_details": "Asynchronous messages, summons.", "ugc_risks_details": "Primarily texture/model swaps.",
+    },
+    # === 8. Genshin Impact (KFR) ===
+    {
+        "title": "Genshin Impact",
+        "developer": "miHoYo", "publisher": "Cognosphere PTE. LTD.",
+        "release_date": datetime.date(2020, 9, 28),
+        "rating_tier_id": "KFR", # Promote Shirk(S) -> KFR
+        "summary": "An open-world action RPG featuring gacha mechanics.",
+        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/a/a6/Genshin_Impact_cover_art.png", # User provided URL
+        "other_store_link": "https://genshin.hoyoverse.com/",
+        "available_pc": True, "available_ps5": True, "available_ps4": True, "available_android": True, "available_ios": True,
+        "rationale": "Impermissible (Contains Kufr/Shirk). Contains significant polytheistic themes ('Archons' worshipped as gods). Also includes severe gambling (Gacha/Maysir) and financial extravagance risks.",
+        "has_spoilers_in_details": True,
+        # --- Detailed Breakdown ---
+        "forced_shirk_severity": "N", "promote_shirk_severity": "S", "insult_islam_severity": "N", "depict_unseen_severity": "M", "magic_sorcery_severity": "M",
+        "contradictory_ideologies_severity": "L", "nudity_lewdness_severity": "M", "music_instruments_severity": "M", "gambling_severity": "S", "lying_severity": "L",
+        "simulate_killing_severity": "L", "simulate_theft_crime_severity": "N", "normalize_haram_rels_severity": "L", "normalize_substances_severity": "L",
+        "profanity_obscenity_severity": "N", "time_wasting_severity": "S", "financial_extravagance_severity": "S", "online_communication_severity": "L", "ugc_risks_severity": "N",
+        "promote_shirk_details": "World features 'Archons' worshipped as gods, central to lore/gameplay.", "promote_shirk_reason": "Normalization/central role of polytheism.", # Severe -> KFR
+        "depict_unseen_details": "Elemental spirits, otherworldly beings.", "magic_sorcery_details": "Elemental 'Visions' grant magical powers.", "nudity_lewdness_details": "Stylized characters, some revealing outfits.",
+        "music_instruments_details": "Extensive orchestral score. Assume mutable.", "gambling_details": "Core 'Wish' system (Gacha) uses premium currency linked to real money.", "gambling_reason": "Clear gambling mechanic.", # Severe
+        "lying_details": "Some dialogue choices.", "simulate_killing_details": "Stylized combat.", "normalize_haram_rels_details": "Ambiguous character interactions.", "normalize_substances_details": "Possible alcohol references.",
+        "time_wasting_details": "Gacha loop, daily tasks, events.", "time_wasting_reason": "Designed for addiction.", # Severe
+        "financial_extravagance_details": "Gacha system strongly incentivizes spending.", "financial_extravagance_reason": "Predatory monetization.", # Severe
+        "online_communication_details": "Optional co-op with limited chat.",
+    },
+    # === 9. EA SPORTS FC 24 (FIFA) (HRM) ===
+    {
+        "title": "EA SPORTS FC 24",
+        "developer": "EA Vancouver & EA Romania", "publisher": "Electronic Arts",
+        "release_date": datetime.date(2023, 9, 29),
+        "rating_tier_id": "HRM", # Gambling (S), Music(S), Finance(S) -> HRM
+        "summary": "A football simulation game featuring Ultimate Team.",
+        "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/e/e9/FC_24_Cover_Art.jpg", # User provided URL
+        "steam_link": "https://store.steampowered.com/app/2195250/EA_SPORTS_FC_24/",
+        "available_pc": True, "available_ps5": True, "available_ps4": True, "available_xbox_series": True, "available_xbox_one": True, "available_switch": True,
+        "rationale": "Impermissible (Haram) primarily due to Ultimate Team mode's 'packs' (loot boxes) constituting gambling (Maysir) linked to real money. Also contains pervasive music and encourages financial extravagance.",
+        "has_spoilers_in_details": False,
+        # --- Detailed Breakdown ---
+        "forced_shirk_severity": "N", "promote_shirk_severity": "N", "insult_islam_severity": "N", "depict_unseen_severity": "N", "magic_sorcery_severity": "N",
+        "contradictory_ideologies_severity": "L", "nudity_lewdness_severity": "N", "music_instruments_severity": "S", "gambling_severity": "S", # HRM Trigger
+        "lying_severity": "N", "simulate_killing_severity": "N", "simulate_theft_crime_severity": "N", "normalize_haram_rels_severity": "N", "normalize_substances_severity": "N",
+        "profanity_obscenity_severity": "L", "time_wasting_severity": "M", "financial_extravagance_severity": "S", "online_communication_severity": "M", "ugc_risks_severity": "N",
+        "contradictory_ideologies_details": "Potential promotion of excessive competitiveness.", "music_instruments_details": "Extensive licensed soundtrack with questionable lyrics/themes.", "music_instruments_reason": "Pervasive, hard to avoid.", # Severe
+        "gambling_details": "Ultimate Team packs (loot boxes) core to mode, linked to real money.", "gambling_reason": "Clear gambling mechanic.", # Severe
+        "profanity_obscenity_details": "Online chat/player names risk.", "time_wasting_details": "Ultimate Team requires significant time/money.",
+        "financial_extravagance_details": "Ultimate Team strongly incentivizes buying packs.", "financial_extravagance_reason": "Pay-to-win / Gambling loop.", # Severe
+        "online_communication_details": "Online matches risk toxic behavior.",
     },
 ]
 
-
+# --- Command Class (Keep as is) ---
 class Command(BaseCommand):
-    help = 'Populates the database with initial game rating data (v1.2 Methodology - Fixed Defaults).' # Updated help text
+    help = 'Populates the database with initial game rating data (v2.2 Methodology - Final URLs & Ratings).'
 
     @transaction.atomic
     def handle(self, *args, **options):
-        self.stdout.write(self.style.NOTICE("Populating games (v1.2 Methodology - Fixed Defaults)...")) # Updated notice
+        self.stdout.write(self.style.NOTICE("Populating games (v2.2 Methodology)..."))
 
-        # Pre-fetch flags and tiers for efficiency
-        flags_cache = {flag.symbol: flag for flag in Flag.objects.all()}
         tiers_cache = {tier.tier_code: tier for tier in RatingTier.objects.all()}
 
-        created_count = 0
-        updated_count = 0
-        skipped_count = 0
-        errors = 0
+        created_count = 0; updated_count = 0; skipped_count = 0; errors = 0
 
         for game_data_item in GAME_DATA:
             game_data = game_data_item.copy()
-
             title = game_data.get('title')
-            if not title:
-                self.stderr.write(self.style.ERROR("Skipping entry with missing title."))
-                errors += 1
-                continue
+            if not title: self.stderr.write(self.style.ERROR("Skipping entry with missing title.")); errors += 1; continue
 
-            # Separate flag lists before creating defaults
-            flags_symbols = game_data.pop('flags_symbols', [])
-            adjustable_flags_symbols = game_data.pop('adjustable_flags_symbols', [])
             tier_id = game_data.pop('rating_tier_id', None)
-            original_tier_id = game_data.pop('original_rating_tier_id', None) # <-- Get original tier
-
-            if not tier_id:
-                self.stderr.write(self.style.WARNING(f"Missing 'rating_tier_id' for game '{title}'. Skipping."))
-                skipped_count += 1
-                continue
+            if not tier_id: self.stderr.write(self.style.WARNING(f"Missing 'rating_tier_id' for game '{title}'. Skipping.")); skipped_count += 1; continue
 
             rating_tier = tiers_cache.get(tier_id)
-            if not rating_tier:
-                self.stderr.write(self.style.WARNING(f"RatingTier with code '{tier_id}' not found for game '{title}'. Skipping."))
-                skipped_count += 1
-                continue
+            if not rating_tier: self.stderr.write(self.style.WARNING(f"RatingTier with code '{tier_id}' not found for game '{title}'. Skipping.")); skipped_count += 1; continue
 
-            original_rating_tier_obj = None
-            if original_tier_id:
-                original_rating_tier_obj = tiers_cache.get(original_tier_id)
-                if not original_rating_tier_obj:
-                     self.stderr.write(self.style.WARNING(f"Original RatingTier with code '{original_tier_id}' not found for game '{title}'. Skipping original tier assignment."))
-
-
-            # Prepare defaults dictionary carefully
-            # Ensure all Boolean fields have a default in case not provided in GAME_DATA
             defaults = {
                 'rating_tier': rating_tier,
-                **({'original_rating_tier': original_rating_tier_obj} if original_rating_tier_obj else {}),
                 'developer_slug': slugify(game_data.get('developer', '')),
                 'publisher_slug': slugify(game_data.get('publisher', '')),
-                'available_pc': game_data.get('available_pc', False),
-                'available_ps5': game_data.get('available_ps5', False),
-                'available_ps4': game_data.get('available_ps4', False),
-                'available_xbox_series': game_data.get('available_xbox_series', False),
-                'available_xbox_one': game_data.get('available_xbox_one', False),
-                'available_switch': game_data.get('available_switch', False),
-                'available_android': game_data.get('available_android', False),
-                'available_ios': game_data.get('available_ios', False),
-                'available_quest': game_data.get('available_quest', False),
+                'available_pc': game_data.get('available_pc', False), 'available_ps5': game_data.get('available_ps5', False), 'available_ps4': game_data.get('available_ps4', False),
+                'available_xbox_series': game_data.get('available_xbox_series', False), 'available_xbox_one': game_data.get('available_xbox_one', False), 'available_switch': game_data.get('available_switch', False),
+                'available_android': game_data.get('available_android', False), 'available_ios': game_data.get('available_ios', False), 'available_quest': game_data.get('available_quest', False),
                 'has_spoilers_in_details': game_data.get('has_spoilers_in_details', False),
-                'requires_adjustment': game_data.get('requires_adjustment', False),
-                # Add defaults for TextFields that might be missing (ensure they are blank=True in model)
-                'summary': game_data.get('summary', ''),
-                'rationale': game_data.get('rationale', ''),
-                'adjustment_guide': game_data.get('adjustment_guide', ''),
-                'aqidah_details': game_data.get('aqidah_details', ''),
-                'aqidah_reason': game_data.get('aqidah_reason', ''),
-                'haram_depictions_details': game_data.get('haram_depictions_details', ''),
-                'haram_depictions_reason': game_data.get('haram_depictions_reason', ''),
-                'simulation_haram_details': game_data.get('simulation_haram_details', ''),
-                'simulation_haram_reason': game_data.get('simulation_haram_reason', ''),
-                'normalization_haram_details': game_data.get('normalization_haram_details', ''),
-                'normalization_haram_reason': game_data.get('normalization_haram_reason', ''),
-                'violence_details': game_data.get('violence_details', ''),
-                'violence_reason': game_data.get('violence_reason', ''),
-                'time_addiction_details': game_data.get('time_addiction_details', ''),
-                'time_addiction_reason': game_data.get('time_addiction_reason', ''),
-                'online_conduct_details': game_data.get('online_conduct_details', ''),
-                'online_conduct_reason': game_data.get('online_conduct_reason', ''),
+                # Add ALL severity/details/reason fields with defaults
+                'forced_shirk_severity': game_data.get('forced_shirk_severity', 'N'), 'forced_shirk_details': game_data.get('forced_shirk_details', ''), 'forced_shirk_reason': game_data.get('forced_shirk_reason', ''),
+                'promote_shirk_severity': game_data.get('promote_shirk_severity', 'N'), 'promote_shirk_details': game_data.get('promote_shirk_details', ''), 'promote_shirk_reason': game_data.get('promote_shirk_reason', ''),
+                'insult_islam_severity': game_data.get('insult_islam_severity', 'N'), 'insult_islam_details': game_data.get('insult_islam_details', ''), 'insult_islam_reason': game_data.get('insult_islam_reason', ''),
+                'depict_unseen_severity': game_data.get('depict_unseen_severity', 'N'), 'depict_unseen_details': game_data.get('depict_unseen_details', ''), 'depict_unseen_reason': game_data.get('depict_unseen_reason', ''),
+                'magic_sorcery_severity': game_data.get('magic_sorcery_severity', 'N'), 'magic_sorcery_details': game_data.get('magic_sorcery_details', ''), 'magic_sorcery_reason': game_data.get('magic_sorcery_reason', ''),
+                'contradictory_ideologies_severity': game_data.get('contradictory_ideologies_severity', 'N'), 'contradictory_ideologies_details': game_data.get('contradictory_ideologies_details', ''), 'contradictory_ideologies_reason': game_data.get('contradictory_ideologies_reason', ''),
+                'nudity_lewdness_severity': game_data.get('nudity_lewdness_severity', 'N'), 'nudity_lewdness_details': game_data.get('nudity_lewdness_details', ''), 'nudity_lewdness_reason': game_data.get('nudity_lewdness_reason', ''),
+                'music_instruments_severity': game_data.get('music_instruments_severity', 'N'), 'music_instruments_details': game_data.get('music_instruments_details', ''), 'music_instruments_reason': game_data.get('music_instruments_reason', ''),
+                'gambling_severity': game_data.get('gambling_severity', 'N'), 'gambling_details': game_data.get('gambling_details', ''), 'gambling_reason': game_data.get('gambling_reason', ''),
+                'lying_severity': game_data.get('lying_severity', 'N'), 'lying_details': game_data.get('lying_details', ''), 'lying_reason': game_data.get('lying_reason', ''),
+                'simulate_killing_severity': game_data.get('simulate_killing_severity', 'N'), 'simulate_killing_details': game_data.get('simulate_killing_details', ''), 'simulate_killing_reason': game_data.get('simulate_killing_reason', ''),
+                'simulate_theft_crime_severity': game_data.get('simulate_theft_crime_severity', 'N'), 'simulate_theft_crime_details': game_data.get('simulate_theft_crime_details', ''), 'simulate_theft_crime_reason': game_data.get('simulate_theft_crime_reason', ''),
+                'normalize_haram_rels_severity': game_data.get('normalize_haram_rels_severity', 'N'), 'normalize_haram_rels_details': game_data.get('normalize_haram_rels_details', ''), 'normalize_haram_rels_reason': game_data.get('normalize_haram_rels_reason', ''),
+                'normalize_substances_severity': game_data.get('normalize_substances_severity', 'N'), 'normalize_substances_details': game_data.get('normalize_substances_details', ''), 'normalize_substances_reason': game_data.get('normalize_substances_reason', ''),
+                'profanity_obscenity_severity': game_data.get('profanity_obscenity_severity', 'N'), 'profanity_obscenity_details': game_data.get('profanity_obscenity_details', ''), 'profanity_obscenity_reason': game_data.get('profanity_obscenity_reason', ''),
+                'time_wasting_severity': game_data.get('time_wasting_severity', 'N'), 'time_wasting_details': game_data.get('time_wasting_details', ''), 'time_wasting_reason': game_data.get('time_wasting_reason', ''),
+                'financial_extravagance_severity': game_data.get('financial_extravagance_severity', 'N'), 'financial_extravagance_details': game_data.get('financial_extravagance_details', ''), 'financial_extravagance_reason': game_data.get('financial_extravagance_reason', ''),
+                'online_communication_severity': game_data.get('online_communication_severity', 'N'), 'online_communication_details': game_data.get('online_communication_details', ''), 'online_communication_reason': game_data.get('online_communication_reason', ''),
+                'ugc_risks_severity': game_data.get('ugc_risks_severity', 'N'), 'ugc_risks_details': game_data.get('ugc_risks_details', ''), 'ugc_risks_reason': game_data.get('ugc_risks_reason', ''),
             }
 
-            # Add remaining keys from game_data, prioritizing explicit values over defaults if present
+            excluded_keys = {'title', 'rating_tier_id'}
             for key, value in game_data.items():
-                 if key != 'title': # Title is used for lookup
-                     defaults[key] = value # Overwrite default if key exists in game_data
+                 if key not in excluded_keys: defaults[key] = value
 
             try:
-                game, created = Game.objects.update_or_create(
-                    title=title,
-                    defaults=defaults
-                )
-
-                # --- Add Flags ---
-                current_flags_qs = []
-                for symbol_name in flags_symbols:
-                    flag_obj = flags_cache.get(symbol_name)
-                    if flag_obj:
-                        current_flags_qs.append(flag_obj)
-                    else:
-                         self.stderr.write(self.style.WARNING(f"Flag symbol '{symbol_name}' for 'flags' not found in cache for game '{game.title}'. Skipping."))
-                if current_flags_qs or game.flags.exists():
-                    game.flags.set(current_flags_qs)
-
-                # --- Add Adjustable Flags ---
-                current_adj_flags_qs = []
-                for symbol_name in adjustable_flags_symbols:
-                     flag_obj = flags_cache.get(symbol_name)
-                     if flag_obj:
-                         current_adj_flags_qs.append(flag_obj)
-                     else:
-                          self.stderr.write(self.style.WARNING(f"Flag symbol '{symbol_name}' for 'adjustable_flags' not found in cache for game '{game.title}'. Skipping."))
-                if current_adj_flags_qs or game.adjustable_flags.exists():
-                     game.adjustable_flags.set(current_adj_flags_qs)
-
+                game, created = Game.objects.update_or_create( title=title, defaults=defaults )
+                game.save() # Trigger calculation and flag update
+                game.refresh_from_db() # Get the final state
 
                 if created:
-                    self.stdout.write(self.style.SUCCESS(f"  CREATED: {game.title}"))
+                    self.stdout.write(self.style.SUCCESS(f"  CREATED: {game.title} -> Final Rating: {game.rating_tier.tier_code}"))
                     created_count += 1
                 else:
-                    self.stdout.write(f"  Checked/Updated: {game.title}")
-                    updated_count +=1
+                    self.stdout.write(f"  Checked/Updated: {game.title} -> Final Rating: {game.rating_tier.tier_code}")
+                    updated_count += 1
 
-            except IntegrityError as e:
-                 self.stderr.write(self.style.ERROR(f"Integrity error processing '{title}': {e}. Check constraints."))
-                 errors += 1
-            except Exception as e:
-                 self.stderr.write(self.style.ERROR(f"General error processing '{title}': {e}"))
-                 errors += 1
+            except IntegrityError as e: self.stderr.write(self.style.ERROR(f"Integrity error processing '{title}': {e}.")); errors += 1
+            except Exception as e: self.stderr.write(self.style.ERROR(f"General error processing '{title}': {e}")); errors += 1
 
-
-        total_processed = created_count + updated_count + errors
+        total_processed = created_count + updated_count + errors + skipped_count
         if errors > 0 or skipped_count > 0:
              self.stdout.write(self.style.WARNING(f"Finished game population with {errors} errors and {skipped_count} skipped entries."))
         else:
             self.stdout.write(self.style.SUCCESS("Finished game population successfully."))
-
         self.stdout.write(f"Summary: Created={created_count}, Updated/Existing={updated_count}, Skipped={skipped_count}, Errors={errors}, Total Attempted={len(GAME_DATA)}")

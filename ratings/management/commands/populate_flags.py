@@ -3,44 +3,45 @@
 from django.core.management.base import BaseCommand, CommandError
 from ratings.models import Flag
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 
-# --- CORRECTED FLAG DATA (Material Symbols icon names) ---
+# --- NEW FLAG DATA (v2.0 - Using Material Symbols Icons) ---
+# Symbols are Material Symbols names. Descriptions are the translatable concern names.
 FLAG_DATA = [
-    # === Critical Haram/Mashbouh Warnings ===
-    # Use gpp_bad for the most severe Aqidah/Shirk/Kufr elements identified
-    {"symbol": "gpp_bad", "description": "Contains Kufr/Shirk Elements"},
+    # 1. Aqidah & Ideology
+    {"symbol": "gpp_bad", "description": _('Forced Shirk/Kufr Action')},
+    {"symbol": "hub", "description": _('Presence/Promotion of Shirk/Kufr')}, # 'hub' for interconnected false beliefs/pantheons
+    {"symbol": "report_problem", "description": _('Insulting Islam')},
+    {"symbol": "cloud_off", "description": _('Tampering/Depicting Unseen')}, # 'cloud_off' distinct from nudity
+    {"symbol": "auto_fix_high", "description": _('Magic & Sorcery')}, # Sparkles icon
+    {"symbol": "record_voice_over", "description": _('Contradictory Ideologies')}, # Promoting conflicting narratives/worldviews
 
-    # Specific flag for nudity/explicit 'Awrah issues
-    {"symbol": "visibility_off", "description": "Explicit 'Awrah / Nudity"},
+    # 2. Haram Actions & Scenes
+    {"symbol": "visibility_off", "description": _('Nudity & Lewd Scenes')}, # Hidden/Covered 'Awrah
+    {"symbol": "music_off", "description": _('Forbidden Music/Instruments')},
+    {"symbol": "casino", "description": _('Engaging in Gambling/Maysir')},
+    {"symbol": "front_hand", "description": _('Intentional Lying (by Player)')}, # Hiding the truth
 
-    # Flag for games heavily promoting lifestyles/ideologies against Islamic values
-    {"symbol": "record_voice_over", "description": "Promotes Haram Lifestyles/Ideologies"}, # Was: Anti-Islamic
+    # 3. Simulation & Normalization
+    {"symbol": "swords", "description": _('Simulating Unjustified Aggression')}, # Represents combat/violence
+    {"symbol": "local_police", "description": _('Simulating Theft & Crime')}, # Represents law-breaking
+    {"symbol": "heart_broken", "description": _('Normalizing Forbidden Relationships')},
+    {"symbol": "local_bar", "description": _('Normalizing Alcohol/Drugs')}, # Covers alcohol, general substances
+    {"symbol": "speaker_notes_off", "description": _('Profanity/Obscenity')}, # Censored/forbidden speech
 
-    # === Specific Haram/Mashbouh Mechanics ===
-    # Flag for any simulated gambling, paid or not
-    {"symbol": "casino", "description": "Contains Gambling Mechanics (Simulated/Paid)"}, # Merged casino/paid
-
-    # Flag for significant presence of Haram substances
-    {"symbol": "local_bar", "description": "Depicts/Promotes Haram Substances"}, # Replaces 'grass', more general
-
-    # Flag for significant issues with Music/Audio based on assessment
-    {"symbol": "music_off", "description": "Contains Impermissible Music/Audio"}, # Specific Audio concern
-
-    # === Interaction & Time Warnings ===
-    # Flag for risky online interactions
-    {"symbol": "forum", "description": "Risky Online Interaction"}, # Kept 'forum', description clearer
-
-    # Flag for high time sink / addiction potential
-    {"symbol": "hourglass_top", "description": "High Time/Addiction Risk"}, # Kept
+    # 4. Effects & Risks
+    {"symbol": "hourglass_top", "description": _('Excessive Time Wasting')},
+    {"symbol": "monetization_on", "description": _('Financial Extravagance (Microtransactions)')}, # Spending money
+    {"symbol": "forum", "description": _('Online Communication Risks')}, # Online interaction
+    {"symbol": "extension", "description": _('User-Generated Content Risks')}, # Add-ons/Mods
 ]
 
-
 class Command(BaseCommand):
-    help = 'Populates the database with initial Flag data (Material Symbols names and descriptions).'
+    help = 'Populates the database with initial Flag data (v2.0 - Material Symbols names).'
 
     @transaction.atomic
     def handle(self, *args, **options):
-        self.stdout.write(self.style.NOTICE("Starting flag population with Material Symbols names...")) # Updated notice
+        self.stdout.write(self.style.NOTICE("Starting flag population (v2.0 - Material Symbols)..."))
 
         created_count = 0
         updated_count = 0
@@ -48,7 +49,7 @@ class Command(BaseCommand):
 
         for flag_item in FLAG_DATA:
             symbol_name = flag_item.get('symbol') # This is the icon NAME
-            description = flag_item.get('description')
+            description = flag_item.get('description') # This is the translatable concern text
 
             if not symbol_name or not description:
                 self.stderr.write(self.style.ERROR(f"Skipping invalid flag data item: {flag_item}"))
@@ -56,25 +57,23 @@ class Command(BaseCommand):
                 continue
 
             try:
-                # Use update_or_create based on the icon name (which is stored in the 'symbol' field)
+                # Use update_or_create based on the icon name (symbol)
                 flag, created = Flag.objects.update_or_create(
-                    symbol=symbol_name, # Store the NAME in the 'symbol' field
-                    defaults={'description': description}
+                    symbol=symbol_name, # The icon name is stored in the 'symbol' field
+                    defaults={'description': description} # Store the translatable description
                 )
 
                 if created:
+                    # Use .description for display (will show translated if available)
                     self.stdout.write(self.style.SUCCESS(f"  CREATED Flag: {flag.symbol} - {flag.description}"))
                     created_count += 1
                 else:
                     # Check if description actually changed before claiming update
-                    # Fetch again to compare, or just count as checked
-                     flag_check = Flag.objects.get(symbol=symbol_name)
-                     if flag_check.description != description:
-                         self.stdout.write(f"  UPDATED Flag Description for: {flag.symbol}")
-                         # No need to call save(), update_or_create already did
-                     # else:
-                         # self.stdout.write(f"  Checked/Existing Flag: {flag.symbol}") # Optional: be more verbose
-                     updated_count += 1
+                    flag_check = Flag.objects.get(symbol=symbol_name)
+                    # Comparing lazy translation objects should work correctly
+                    if flag_check.description != description:
+                        self.stdout.write(f"  UPDATED Flag Description for: {flag.symbol}")
+                    updated_count += 1
 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"Error processing flag '{symbol_name}': {e}"))

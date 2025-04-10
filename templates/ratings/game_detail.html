@@ -1,28 +1,32 @@
-{# templates/ratings/game_detail.html - FINAL VERSION with Comments/Flagging/Delete/reCAPTCHA #}
+{# templates/ratings/game_detail.html - FINAL Combined Flags/Categories #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
-{% load widget_tweaks %} {# Load widget_tweaks for form rendering #}
+{% load widget_tweaks %}
 
 {% block title %}{{ game.title }} - {% translate "MGC Rating Details" %}{% endblock %}
 
 {% block content %}
-{# --- Game Header Info (No changes needed here) --- #}
+{# --- Game Header Info --- #}
 <div class="row mb-4">
     <div class="col-lg-3 col-md-4">
         {# Image #}
-        <div class="detail-image-wrapper mb-3 mb-md-0">{% if game.cover_image_url %}<img src="{{ game.cover_image_url }}" class="img-fluid" alt="{% blocktranslate %}{{ game.title }} Cover{% endblocktranslate %}">{% else %}<div class="img-fluid rounded shadow"><span>{% translate "No Image" %}</span></div>{% endif %}</div>
+        <div class="detail-image-wrapper mb-3 mb-md-0">{% if game.cover_image_url %}<img src="{{ game.cover_image_url }}" class="img-fluid" alt="{% blocktranslate %}{{ game.title }} Cover{% endblocktranslate %}">{% else %}<div class="img-fluid rounded shadow d-flex align-items-center justify-content-center" style="min-height: 200px;"><span>{% translate "No Image" %}</span></div>{% endif %}</div>
         {# Platforms #}
-        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios %}<div class="detail-platform-section mt-3"><h6 class="detail-platform-title">{% translate "Available On:" %}</h6><div class="platform-icons-container">
-            {% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}
-            {% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}
-            {% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}
-            {% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>{% endif %}
-            {% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}
-            {% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}
-            {% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}
+        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios or game.available_quest %}
+        <div class="detail-platform-section mt-3">
+            <h6 class="detail-platform-title">{% translate "Available On:" %}</h6>
+            <div class="platform-icons-container">
+                {% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}
+                {% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}
+                {% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}
+                {% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>{% endif %}
+                {% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}
+                {% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}
+                {% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}
+            </div>
         </div>
-    </div>{% endif %}
+        {% endif %}
         {# Store Links #}
         {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}{% if game.rating_tier.tier_code != 'KFR' and game.rating_tier.tier_code != 'HRM' %}<div class="store-links-section mt-3">{% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}{% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}{% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}{% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}</div>{% endif %}{% endif %}
     </div>
@@ -30,72 +34,82 @@
         <h1 class="detail-title mb-1">{{ game.title }}</h1>
         {# Dev/Pub Info #}
         <p class="detail-meta mb-2 mt-3">{% if game.developer and game.developer_slug %}<a href="{% url 'ratings:games_by_developer' developer_slug=game.developer_slug %}">{{ game.developer }}</a>{% elif game.developer %}{{ game.developer }}{% endif %}{% if game.developer and game.publisher %} / {% endif %}{% if game.publisher and game.publisher_slug %}<a href="{% url 'ratings:games_by_publisher' publisher_slug=game.publisher_slug %}">{{ game.publisher }}</a>{% elif game.publisher %}{{ game.publisher }}{% endif %}{% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}</p>
-        {# Rating Display #}
-        <div class="mb-3 detail-overall-rating"><span class="fw-bold me-2">{% translate "Overall MGC Rating:" %}</span><span class="rating-badge rating-{{ game.rating_tier.tier_code }}" style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};"><span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>{% get_current_language as LANGUAGE_CODE_CURRENT %}{% translate "Haram" as translated_haram %}{% translate "Mashbouh" as translated_mashbouh %}{% translate "Halal" as translated_halal %}{% translate "Kufr" as translated_kufr %}<span class="rating-label">{% if game.rating_tier.display_name == "Haram" %}{{ translated_haram }}{% elif game.rating_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}{% elif game.rating_tier.display_name == "Halal" %}{{ translated_halal }}{% elif game.rating_tier.display_name == "Kufr" %}{{ translated_kufr }}{% else %}{{ game.rating_tier.display_name }}{% endif %}</span></span>{% if game.requires_adjustment %}<span class="badge adjustment-badge">{% translate "Requires Adjustment" %}</span>{% endif %}</div>
 
-        {# Flags #}
-        <div class="mb-3">
-            <span class="fw-bold d-block mb-2">{% translate "Content Flags:" %}</span> {# Make title a block #}
-            <ul class="list-unstyled flag-list mb-0"> {# Use a list for better structure #}
-                {% for flag in game.flags.all %}
-                    {# List item for each flag #}
-                    <li class="flag-item {% if game.requires_adjustment and flag in game.adjustable_flags.all %}flag-item-adjustable{% endif %}">
-                        {# Icon remains #}
-                        <span class="flag-symbol material-symbols-outlined" aria-hidden="true">{{ flag.symbol }}</span>
-                        {# Description Text #}
-                        <span class="flag-description">
-                            {{ flag.description }}
-                            {# Add "(Adjustable)" text if applicable #}
-                            {% if game.requires_adjustment and flag in game.adjustable_flags.all %}
-                                <small class="text-adjustable ms-1">({% translate "Adjustable" %})</small>
-                            {% endif %}
-                        </span>
-                    </li>
-                {% empty %}
-                    {# Message if no flags are assigned #}
-                    <div class="no-flags-message"><small class="text-secondary">{% translate "No specific content flags noted." %}</small></div>
-                {% endfor %}
-            </ul>
+        {# Rating Display #}
+        <div class="mb-3 detail-overall-rating">
+            <span class="fw-bold me-2">{% translate "Overall MGC Rating:" %}</span>
+            <span class="rating-badge rating-{{ game.rating_tier.tier_code }}" style="background-color: var(--rating-{{ game.rating_tier.tier_code }});">
+                <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>
+                <span class="rating-label">{{ game.rating_tier.display_name }}</span>
+            </span>
         </div>
 
+        {# --- REMOVED SEPARATE FLAGS SECTION --- #}
 
-        {# Summary #}
+        {# Summary & Rationale #}
         {% if game.summary %}<p class="game-summary text-secondary">{{ game.summary }}</p>{% endif %}
-        {# Adjustment Guide #}
-        {% if game.requires_adjustment and game.adjustment_guide %}<div class="adjustment-guide-section mt-4"><h5>{% translate "Adjustment Guide" %}</h5><div class="adjustment-guide-content">{{ game.adjustment_guide|linebreaks }}</div></div>{% endif %}
+        {% if game.rationale %}<p class="mt-3"><strong>{% translate "Rationale:" %}</strong> {{ game.rationale|linebreaksbr }}</p>{% endif %}
     </div>
 </div>
 
-{# --- Critic Reviews Section (No changes needed here) --- #}
+{# --- Critic Reviews Section (Keep as is) --- #}
 {% if game.critic_reviews.exists %}<div class="critic-reviews-section mt-4 mb-5"><h4 class="mb-3 guide-section-title" style="text-align: inherit; font-size: 1.3rem;">{% translate "Critic Reviews" %}</h4><div class="row row-cols-1 row-cols-md-2 g-3">{% for review in game.critic_reviews.all %}<div class="col"><div class="critic-review-card p-3 bg-element border rounded h-100"><div class="critic-review-header d-flex justify-content-between align-items-center mb-2"><span class="critic-name fw-bold">{{ review.reviewer_name }}</span>{% if review.score %}<span class="critic-score badge bg-secondary">{{ review.score }}</span>{% endif %}</div>{% if review.summary %}<blockquote class="critic-summary border-start border-3 ps-3 py-1 mb-2 fst-italic small text-secondary">"{{ review.summary|truncatewords:25 }}"</blockquote>{% endif %}<a href="{{ review.review_url }}" class="critic-link small text-primary" target="_blank" rel="noopener noreferrer">{% translate "Read Full Review" %} <span class="material-symbols-outlined external-link-icon" style="font-size: 0.9em; vertical-align: -1px;">open_in_new</span></a></div></div>{% endfor %}</div></div>{% endif %}
 
-{# --- Islamic Guidance Section (UPDATED Includes) --- #}
+{# --- UPDATED Islamic Guidance Breakdown (Conditional Includes with Icons) --- #}
 <div class="mgc-guide-section mt-4">
     <h2 class="guide-section-title">{% translate "Islamic Guidance Breakdown" %}</h2>
-    {% if game.has_spoilers_in_details %}<div class="alert alert-warning spoiler-alert" role="alert"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg><strong>{% translate "Spoiler Warning:" %}</strong> {% translate "Details below may contain plot spoilers." %}</div>{% endif %}
-
-    {# Category 1 #}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Aqidah & Ideology' slug='Aqidah' severity=game.aqidah_severity_display severity_class=game.aqidah_severity_css_class details=game.aqidah_details reason=game.aqidah_reason %}
-    {# Category 2 (NEW) #}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Haram Depictions & Interactions' slug='Depictions' severity=game.haram_depictions_severity_display severity_class=game.haram_depictions_severity_css_class details=game.haram_depictions_details reason=game.haram_depictions_reason %}
-    {# Category 3 (NEW) #}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Simulation of Haram Acts' slug='Simulation' severity=game.simulation_haram_severity_display severity_class=game.simulation_haram_severity_css_class details=game.simulation_haram_details reason=game.simulation_haram_reason %}
-    {# Category 4 (NEW) #}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Normalization of Haram' slug='Normalization' severity=game.normalization_haram_severity_display severity_class=game.normalization_haram_severity_css_class details=game.normalization_haram_details reason=game.normalization_haram_reason %}
-    {# Category 5 #}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Violence & Aggression' slug='Violence' severity=game.violence_severity_display severity_class=game.violence_severity_css_class details=game.violence_details reason=game.violence_reason %}
-    {# Category 6 #}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Time Commitment & Addiction Potential' slug='Time' severity=game.time_addiction_severity_display severity_class=game.time_addiction_severity_css_class details=game.time_addiction_details reason=game.time_addiction_reason %}
-    {# Category 7 #}
-    {% include 'ratings/includes/guidance_category.html' with category_name='Online Conduct & Interaction' slug='Online' severity=game.online_conduct_severity_display severity_class=game.online_conduct_severity_css_class details=game.online_conduct_details reason=game.online_conduct_reason %}
-
-    {# UPDATED Final check for "No concerns" message #}
-    {% if game.aqidah_severity == 'N' and not game.aqidah_details and not game.aqidah_reason and game.haram_depictions_severity == 'N' and not game.haram_depictions_details and not game.haram_depictions_reason and game.simulation_haram_severity == 'N' and not game.simulation_haram_details and not game.simulation_haram_reason and game.normalization_haram_severity == 'N' and not game.normalization_haram_details and not game.normalization_haram_reason and game.violence_severity == 'N' and not game.violence_details and not game.violence_reason and game.time_addiction_severity == 'N' and not game.time_addiction_details and not game.time_addiction_reason and game.online_conduct_severity == 'N' and not game.online_conduct_details and not game.online_conduct_reason %}
-    <p class="text-center text-secondary my-4">{% translate "No significant Islamic concerns noted in the assessed categories." %}</p>
+    {% if game.has_spoilers_in_details %}
+        <div class="alert alert-warning spoiler-alert" role="alert"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg><strong>{% translate "Spoiler Warning:" %}</strong> {% translate "Details below may contain plot spoilers." %}</div>
     {% endif %}
-</div>
 
-{# --- START: Comments Section (Updated for reCAPTCHA) --- #}
+    {# --- Subsection 1: Aqidah & Ideology --- #}
+    {% if game.forced_shirk_severity != 'N' or game.promote_shirk_severity != 'N' or game.insult_islam_severity != 'N' or game.depict_unseen_severity != 'N' or game.magic_sorcery_severity != 'N' or game.contradictory_ideologies_severity != 'N' %}
+        <h5 class="guide-subsection-title">{% translate "1. Aqidah & Ideology Violations" %}</h5>
+        {% if game.forced_shirk_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Forced Shirk/Kufr Action') slug='ForcedShirk' icon_symbol='gpp_bad' icon_title=_('Forced Shirk/Kufr Action') severity_display=game.forced_shirk_severity_display severity_class=game.forced_shirk_severity_css_class details=game.forced_shirk_details reason=game.forced_shirk_reason %}{% endif %}
+        {% if game.promote_shirk_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Presence/Promotion of Shirk/Kufr') slug='PromoteShirk' icon_symbol='hub' icon_title=_('Presence/Promotion of Shirk/Kufr') severity_display=game.promote_shirk_severity_display severity_class=game.promote_shirk_severity_css_class details=game.promote_shirk_details reason=game.promote_shirk_reason %}{% endif %}
+        {% if game.insult_islam_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Insulting Islam') slug='InsultIslam' icon_symbol='report_problem' icon_title=_('Insulting Islam') severity_display=game.insult_islam_severity_display severity_class=game.insult_islam_severity_css_class details=game.insult_islam_details reason=game.insult_islam_reason %}{% endif %}
+        {% if game.depict_unseen_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Tampering/Depicting Unseen') slug='DepictUnseen' icon_symbol='cloud_off' icon_title=_('Tampering/Depicting Unseen') severity_display=game.depict_unseen_severity_display severity_class=game.depict_unseen_severity_css_class details=game.depict_unseen_details reason=game.depict_unseen_reason %}{% endif %}
+        {% if game.magic_sorcery_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Magic & Sorcery') slug='MagicSorcery' icon_symbol='auto_fix_high' icon_title=_('Magic & Sorcery') severity_display=game.magic_sorcery_severity_display severity_class=game.magic_sorcery_severity_css_class details=game.magic_sorcery_details reason=game.magic_sorcery_reason %}{% endif %}
+        {% if game.contradictory_ideologies_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Contradictory Ideologies') slug='Ideologies' icon_symbol='record_voice_over' icon_title=_('Contradictory Ideologies') severity_display=game.contradictory_ideologies_severity_display severity_class=game.contradictory_ideologies_severity_css_class details=game.contradictory_ideologies_details reason=game.contradictory_ideologies_reason %}{% endif %}
+    {% endif %}
+
+    {# --- Subsection 2: Haram Actions & Scenes --- #}
+    {% if game.nudity_lewdness_severity != 'N' or game.music_instruments_severity != 'N' or game.gambling_severity != 'N' or game.lying_severity != 'N' %}
+        <h5 class="guide-subsection-title mt-4">{% translate "2. Haram Actions & Scenes" %}</h5>
+        {% if game.nudity_lewdness_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Nudity & Lewd Scenes') slug='Nudity' icon_symbol='visibility_off' icon_title=_('Nudity & Lewd Scenes') severity_display=game.nudity_lewdness_severity_display severity_class=game.nudity_lewdness_severity_css_class details=game.nudity_lewdness_details reason=game.nudity_lewdness_reason %}{% endif %}
+        {% if game.music_instruments_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Forbidden Music/Instruments') slug='Music' icon_symbol='music_off' icon_title=_('Forbidden Music/Instruments') severity_display=game.music_instruments_severity_display severity_class=game.music_instruments_severity_css_class details=game.music_instruments_details reason=game.music_instruments_reason %}{% endif %}
+        {% if game.gambling_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Engaging in Gambling/Maysir') slug='Gambling' icon_symbol='casino' icon_title=_('Engaging in Gambling/Maysir') severity_display=game.gambling_severity_display severity_class=game.gambling_severity_css_class details=game.gambling_details reason=game.gambling_reason %}{% endif %}
+        {% if game.lying_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Intentional Lying (by Player)') slug='Lying' icon_symbol='front_hand' icon_title=_('Intentional Lying (by Player)') severity_display=game.lying_severity_display severity_class=game.lying_severity_css_class details=game.lying_details reason=game.lying_reason %}{% endif %}
+    {% endif %}
+
+    {# --- Subsection 3: Simulation & Normalization --- #}
+    {% if game.simulate_killing_severity != 'N' or game.simulate_theft_crime_severity != 'N' or game.normalize_haram_rels_severity != 'N' or game.normalize_substances_severity != 'N' or game.profanity_obscenity_severity != 'N' %}
+        <h5 class="guide-subsection-title mt-4">{% translate "3. Simulation & Normalization of Prohibitions" %}</h5>
+        {% if game.simulate_killing_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Simulating Unjustified Aggression') slug='SimKill' icon_symbol='swords' icon_title=_('Simulating Unjustified Aggression') severity_display=game.simulate_killing_severity_display severity_class=game.simulate_killing_severity_css_class details=game.simulate_killing_details reason=game.simulate_killing_reason %}{% endif %}
+        {% if game.simulate_theft_crime_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Simulating Theft & Crime') slug='SimTheft' icon_symbol='local_police' icon_title=_('Simulating Theft & Crime') severity_display=game.simulate_theft_crime_severity_display severity_class=game.simulate_theft_crime_severity_css_class details=game.simulate_theft_crime_details reason=game.simulate_theft_crime_reason %}{% endif %}
+        {% if game.normalize_haram_rels_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Normalizing Forbidden Relationships') slug='NormHaramRels' icon_symbol='heart_broken' icon_title=_('Normalizing Forbidden Relationships') severity_display=game.normalize_haram_rels_severity_display severity_class=game.normalize_haram_rels_severity_css_class details=game.normalize_haram_rels_details reason=game.normalize_haram_rels_reason %}{% endif %}
+        {% if game.normalize_substances_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Normalizing Alcohol/Drugs') slug='NormSubstances' icon_symbol='local_bar' icon_title=_('Normalizing Alcohol/Drugs') severity_display=game.normalize_substances_severity_display severity_class=game.normalize_substances_severity_css_class details=game.normalize_substances_details reason=game.normalize_substances_reason %}{% endif %}
+        {% if game.profanity_obscenity_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Profanity/Obscenity') slug='Profanity' icon_symbol='speaker_notes_off' icon_title=_('Profanity/Obscenity') severity_display=game.profanity_obscenity_severity_display severity_class=game.profanity_obscenity_severity_css_class details=game.profanity_obscenity_details reason=game.profanity_obscenity_reason %}{% endif %}
+    {% endif %}
+
+    {# --- Subsection 4: Effects & Risks --- #}
+    {% if game.time_wasting_severity != 'N' or game.financial_extravagance_severity != 'N' or game.online_communication_severity != 'N' or game.ugc_risks_severity != 'N' %}
+        <h5 class="guide-subsection-title mt-4">{% translate "4. Game-Related Effects, Environment & Risks" %}</h5>
+        {% if game.time_wasting_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Excessive Time Wasting') slug='TimeWasting' icon_symbol='hourglass_top' icon_title=_('Excessive Time Wasting') severity_display=game.time_wasting_severity_display severity_class=game.time_wasting_severity_css_class details=game.time_wasting_details reason=game.time_wasting_reason %}{% endif %}
+        {% if game.financial_extravagance_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Financial Extravagance (Microtransactions)') slug='Finance' icon_symbol='monetization_on' icon_title=_('Financial Extravagance (Microtransactions)') severity_display=game.financial_extravagance_severity_display severity_class=game.financial_extravagance_severity_css_class details=game.financial_extravagance_details reason=game.financial_extravagance_reason %}{% endif %}
+        {% if game.online_communication_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('Online Communication Risks') slug='OnlineComm' icon_symbol='forum' icon_title=_('Online Communication Risks') severity_display=game.online_communication_severity_display severity_class=game.online_communication_severity_css_class details=game.online_communication_details reason=game.online_communication_reason %}{% endif %}
+        {% if game.ugc_risks_severity != 'N' %}{% include 'ratings/includes/guidance_category.html' with category_name=_('User-Generated Content Risks') slug='UGC' icon_symbol='extension' icon_title=_('User-Generated Content Risks') severity_display=game.ugc_risks_severity_display severity_class=game.ugc_risks_severity_css_class details=game.ugc_risks_details reason=game.ugc_risks_reason %}{% endif %}
+    {% endif %}
+
+    {# --- Message if ALL categories are None --- #}
+    {% if game.forced_shirk_severity == 'N' and game.promote_shirk_severity == 'N' and game.insult_islam_severity == 'N' and game.depict_unseen_severity == 'N' and game.magic_sorcery_severity == 'N' and game.contradictory_ideologies_severity == 'N' and game.nudity_lewdness_severity == 'N' and game.music_instruments_severity == 'N' and game.gambling_severity == 'N' and game.lying_severity == 'N' and game.simulate_killing_severity == 'N' and game.simulate_theft_crime_severity == 'N' and game.normalize_haram_rels_severity == 'N' and game.normalize_substances_severity == 'N' and game.profanity_obscenity_severity == 'N' and game.time_wasting_severity == 'N' and game.financial_extravagance_severity == 'N' and game.online_communication_severity == 'N' and game.ugc_risks_severity == 'N' %}
+         <p class="text-center text-secondary my-4 fst-italic">{% translate "No significant concerns noted in the detailed breakdown categories." %}</p>
+    {% endif %}
+
+</div>
+{# --- END Islamic Guidance Breakdown --- #}
+
+{# --- Comments Section (Keep as is) --- #}
 <div class="comments-section mt-5 pt-4 border-top" id="comments-section">
      <h3 class="mb-4 guide-section-title" style="text-align: inherit; font-size: 1.3rem;">
          {# Count only approved comments for the title #}
@@ -126,13 +140,13 @@
         <p class="text-secondary">{% translate "No comments yet. Be the first to comment!" %}</p>
     {% endfor %}
 
-    {# --- Comment Form --- #}
+    {# Comment Form (Keep as is) #}
     {% if user.is_authenticated %}
-        <div class="comment-form-container mt-4 pt-4 border-top" id="comment-form"> {# Added anchor ID #}
+        <div class="comment-form-container mt-4 pt-4 border-top" id="comment-form">
             <h4 class="mb-3">{% translate "Add Your Comment" %}</h4>
             {% if messages %}
               {% for message in messages %}
-                  {% if 'comment_error' in message.tags or message.level == 40 %} {# Check for specific tag or error level #}
+                  {% if 'comment_error' in message.tags or message.level == 40 %}
                       <div class="alert alert-danger" role="alert">{{ message }}</div>
                   {% elif 'comment_success' in message.tags %}
                        <div class="alert alert-success" role="alert">{{ message }}</div>
@@ -141,16 +155,14 @@
                    {% endif %}
               {% endfor %}
             {% endif %}
-            <form method="post" action="{{ request.path }}#comment-form"> {# Post to the current page with anchor #}
+            <form method="post" action="{{ request.path }}#comment-form">
                 {% csrf_token %}
                 <div class="mb-3">
-                    {# Use widget_tweaks to render content field #}
                      {% render_field comment_form.content class+="form-control" rows="3" placeholder=comment_form.content.field.widget.attrs.placeholder %}
                      {% if comment_form.content.errors %}
                          <div class="form-text text-danger">{{ comment_form.content.errors|striptags }}</div>
                      {% endif %}
                 </div>
-                {# Render reCAPTCHA field using widget_tweaks #}
                 <div class="mb-3">
                     {% render_field comment_form.captcha %}
                     {% if comment_form.captcha.errors %}
@@ -159,7 +171,6 @@
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm">{% translate "Submit Comment" %}</button>
             </form>
-            {# Removed awaiting approval message #}
         </div>
     {% else %}
         <p class="mt-4 pt-4 border-top">
@@ -175,22 +186,19 @@
 {% endblock %}
 
 {% block extra_css %}
-{# Add some basic styling for comment actions #}
+{# Add some basic styling for comment actions and sub-section titles #}
 <style>
 .comment-actions .comment-action-btn {
-    padding: 0.1rem 0.4rem;
-    font-size: 0.8rem;
-    margin-left: 5px; /* LTR spacing */
+    padding: 0.1rem 0.4rem; font-size: 0.8rem; margin-left: 5px; /* LTR */
 }
-html[dir="rtl"] .comment-actions .comment-action-btn {
-    margin-left: 0;
-    margin-right: 5px; /* RTL spacing */
-}
-.comment-unapproved { opacity: 0.7; border-left: 3px solid var(--rating-mashbouh); padding-left: 10px; }
-html[dir="rtl"] .comment-unapproved { border-left: none; border-right: 3px solid var(--rating-mashbouh); padding-left: 0; padding-right: 10px; }
-/* Style for reCAPTCHA widget container if needed */
+html[dir="rtl"] .comment-actions .comment-action-btn { margin-left: 0; margin-right: 5px; /* RTL */ }
+.comment-unapproved { opacity: 0.7; border-left: 3px solid var(--rating-mashbouh); padding-left: 10px; /* LTR */ }
+html[dir="rtl"] .comment-unapproved { border-left: none; border-right: 3px solid var(--rating-mashbouh); padding-left: 0; padding-right: 10px; /* RTL */ }
 .g-recaptcha { margin-bottom: 1rem; }
-/* Adjust comment error message styling */
 .comment-form-container .alert { font-size: 0.9rem; }
+.guide-subsection-title {
+    font-size: 1.1rem; color: var(--text-secondary); text-transform: uppercase;
+    margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border-lighter);
+}
 </style>
 {% endblock %}

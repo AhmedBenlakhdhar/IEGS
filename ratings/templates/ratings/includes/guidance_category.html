@@ -1,39 +1,62 @@
-{# ratings/templates/ratings/includes/guidance_category.html #}
+{# templates/ratings/includes/guidance_category.html - FINAL Combined #}
 {% load i18n %}
 
-{% if severity != 'None' or details or reason %}
+{# Expects: category_name, slug, severity_display, severity_class, details, reason, icon_symbol, icon_title #}
+
+{# Only render if severity is NOT 'None' #}
+{% if severity_display|slice:":4"|lower != "none" %}
 <div class="guide-category-block">
-    <div class="guide-category-header"
-         data-bs-toggle="collapse"
-         data-bs-target="#details{{ slug }}" {# Use the slug passed from the parent #}
-         aria-expanded="false"
-         aria-controls="details{{ slug }}"
-         title="{% translate 'Show/Hide Details & Reason' %}">
-        <span class="category-title-text">{% translate category_name %}</span> {# Translate the category name passed from parent #}
+    {# --- Header: Always visible for non-'None' categories --- #}
+    <div class="guide-category-header {% if details or reason %}collapsible-header{% endif %}"
+         {% if details or reason %}
+             data-bs-toggle="collapse"
+             data-bs-target="#details-{{ slug }}"
+             aria-expanded="false"
+             aria-controls="details-{{ slug }}"
+             title="{% translate 'Show/Hide Details & Reason' %}"
+             role="button"
+         {% else %}
+             title="{{ severity_display }}" {# Show severity on hover if not expandable #}
+         {% endif %}
+         >
+        <div class="d-flex align-items-center"> {# Group icon and title #}
+            {# --- Display Icon next to Title --- #}
+            {% if icon_symbol %}
+                <span class="material-symbols-outlined category-icon me-2" title="{{ icon_title }}" aria-hidden="true">{{ icon_symbol }}</span>
+            {% endif %}
+            <span class="category-title-text">{% translate category_name %}</span>
+        </div>
         <div class="severity-display d-flex align-items-center">
              <span class="d-flex align-items-center">
-                 <span class="severity-text ms-2">{{ severity }}</span> {# Use severity passed from parent #}
-                 <span class="severity-circle {{ severity_class|lower }}" title="{% translate 'Severity Rating' %}"></span> {# Use severity_class passed from parent #}
+                 <span class="severity-text ms-2">{{ severity_display }}</span>
+                 <span class="severity-circle {{ severity_class }}" title="{% translate 'Severity Rating' %}"></span>
              </span>
-             <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
+             {# --- Only show toggle arrow if details/reason exist --- #}
+             {% if details or reason %}
+                 <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
+             {% endif %}
         </div>
     </div>
-    <div class="collapse" id="details{{ slug }}">
+
+    {# --- Details/Reason: Only rendered if details/reason exist --- #}
+    {% if details or reason %}
+    <div class="collapse" id="details-{{ slug }}">
         <div class="guide-category-details">
             {% if details %}
-                {{ details|linebreaksbr }} {# Use details passed from parent #}
+                {{ details|linebreaksbr }}
             {% endif %}
             {% if reason %}
                 <div class="category-reason-inline">
                     {% if details %}<hr class="reason-separator">{% endif %}
                     <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
-                    <p class="reason-text">{{ reason|linebreaksbr }}</p> {# Use reason passed from parent #}
+                    <p class="reason-text">{{ reason|linebreaksbr }}</p>
                 </div>
             {% endif %}
             {% if not details and not reason %}
-                <p class="text-secondary fst-italic m-0">{% translate "No specific details provided." %}</p>
+                 <p class="text-secondary fst-italic m-0">{% translate "No specific details provided for this level." %}</p>
             {% endif %}
         </div>
     </div>
+    {% endif %}
 </div>
-{% endif %}
+{% endif %} {# End outer if severity != 'None' #}

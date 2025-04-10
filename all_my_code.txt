@@ -628,11 +628,14 @@ class Command(BaseCommand):
 === FILE: C:\Job\MGC\articles\admin.py ===
 
 # articles/admin.py
-from django.contrib import admin
+from django.contrib import admin, messages
 # --- Import TranslationAdmin ---
 from modeltranslation.admin import TranslationAdmin
-from .models import Article, ArticleCategory, ArticleCategoryMembership
+from .models import Article, ArticleCategory, ArticleCategoryMembership, ArticleComment
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse # Import reverse
+from django.utils.html import format_html # Import format_html
+from django.contrib.auth.models import User # Import User
 
 @admin.register(ArticleCategory)
 class ArticleCategoryAdmin(TranslationAdmin):
@@ -673,6 +676,84 @@ class ArticleAdmin(TranslationAdmin):
     # categories_display.short_description = _('Categories')
     # -----------------------------------------------
 
+@admin.register(ArticleComment)
+class ArticleCommentAdmin(admin.ModelAdmin): # Not inheriting from TranslationAdmin
+    list_display = ('article_link', 'user_link', 'created_date', 'approved', 'moderator_attention_needed', 'flag_count_display', 'content_preview')
+    list_filter = ('approved', 'moderator_attention_needed', 'created_date', 'article')
+    search_fields = ('content', 'user__username', 'article__title')
+    actions = ['approve_comments', 'unapprove_comments', 'mark_reviewed', 'deactivate_commenter', 'reactivate_commenter']
+    readonly_fields = ('user', 'article', 'created_date', 'flagged_by') # Make flagged_by readonly
+    list_display_links = ('content_preview',) # Link from preview
+
+    fieldsets = (
+        (None, {'fields': ('article', 'user', 'created_date')}),
+        (_('Content & Status'), {'fields': ('content', 'approved', 'moderator_attention_needed', 'flagged_by')}),
+    )
+
+    def article_link(self, obj):
+        # Link to the article in the admin
+        article_admin_url = reverse("admin:articles_article_change", args=[obj.article.pk])
+        return format_html('<a href="{}">{}</a>', article_admin_url, obj.article.title)
+    article_link.short_description = _('Article')
+    article_link.admin_order_field = 'article'
+
+    def user_link(self, obj):
+        # Link to the user in the admin
+        user_admin_url = reverse("admin:auth_user_change", args=[obj.user.pk])
+        return format_html('<a href="{}">{}</a>', user_admin_url, obj.user.username)
+    user_link.short_description = _('User')
+    user_link.admin_order_field = 'user'
+
+    def content_preview(self, obj):
+        return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
+    content_preview.short_description = _('Comment Preview')
+
+    def flag_count_display(self, obj):
+        return obj.flag_count # Use the property
+    flag_count_display.short_description = _('Flags')
+    # flag_count_display.admin_order_field = 'flag_count' # Requires annotation
+
+    # --- Admin Actions (Similar to GameCommentAdmin) ---
+    @admin.action(description=_('Approve selected comments'))
+    def approve_comments(self, request, queryset):
+        updated = queryset.update(approved=True)
+        # Use blocktranslate for plurals
+        self.message_user(request,
+                          _('%(updated)d comments were successfully approved.') % {'updated': updated},
+                          messages.SUCCESS)
+
+    @admin.action(description=_('Unapprove selected comments'))
+    def unapprove_comments(self, request, queryset):
+        updated = queryset.update(approved=False)
+        self.message_user(request,
+                           _('%(updated)d comments were successfully unapproved.') % {'updated': updated},
+                           messages.SUCCESS)
+
+    @admin.action(description=_('Mark selected comments as reviewed (remove attention flag)'))
+    def mark_reviewed(self, request, queryset):
+        updated = queryset.update(moderator_attention_needed=False)
+        self.message_user(request,
+                           _('%(updated)d comments marked as reviewed.') % {'updated': updated},
+                           messages.SUCCESS)
+
+    @admin.action(description=_('Deactivate (Ban) commenter accounts'))
+    def deactivate_commenter(self, request, queryset):
+        users_to_deactivate = User.objects.filter(pk__in=queryset.values_list('user__pk', flat=True))
+        updated_count = users_to_deactivate.update(is_active=False)
+        self.message_user(request,
+                           _('%(updated_count)d user accounts linked to selected comments were deactivated.') % {'updated_count': updated_count},
+                           messages.SUCCESS)
+
+    @admin.action(description=_('Reactivate commenter accounts'))
+    def reactivate_commenter(self, request, queryset):
+        users_to_reactivate = User.objects.filter(pk__in=queryset.values_list('user__pk', flat=True))
+        updated_count = users_to_reactivate.update(is_active=True)
+        self.message_user(request,
+                           _('%(updated_count)d user accounts linked to selected comments were reactivated.') % {'updated_count': updated_count},
+                           messages.SUCCESS)
+# --- END: Article Comment Admin ---
+
+
 === FILE: C:\Job\MGC\articles\apps.py ===
 
 from django.apps import AppConfig
@@ -681,6 +762,31 @@ class ArticlesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'articles'
 
+
+=== FILE: C:\Job\MGC\articles\forms.py ===
+
+# articles/forms.py
+from django import forms
+from django.utils.translation import gettext_lazy as _
+from .models import ArticleComment
+from django_recaptcha.fields import ReCaptchaField
+
+class ArticleCommentForm(forms.ModelForm):
+    captcha = ReCaptchaField()
+
+    class Meta:
+        model = ArticleComment
+        fields = ['content'] # Only content needed from user in the form
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': _('Add your comment...'),
+                'class': 'form-control' # Ensure Bootstrap class is added
+                }),
+        }
+        labels = {
+            'content': '', # Hide the default label, placeholder is enough
+        }
 
 === FILE: C:\Job\MGC\articles\models.py ===
 
@@ -691,6 +797,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from ckeditor_uploader.fields import RichTextUploadingField
+from django.contrib.auth.models import User
 
 class Article(models.Model):
     # Use _() for verbose_name and help_text
@@ -795,6 +902,38 @@ class ArticleCategoryMembership(models.Model):
         # verbose_name_plural = _("Article Category Memberships")
 # -------------------------------------------
 
+# --- Article Comment Model ---
+class ArticleComment(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='article_comments')
+    content = models.TextField(_('Comment'))
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Date Posted'))
+    approved = models.BooleanField(default=True, verbose_name=_('Approved')) # Auto-approve comments
+    flagged_by = models.ManyToManyField(User, related_name='flagged_article_comments', blank=True, verbose_name=_('Flagged By'))
+    moderator_attention_needed = models.BooleanField(default=False, verbose_name=_('Needs Attention'))
+
+    class Meta:
+        ordering = ['created_date'] # Order oldest first for display
+        verbose_name = _('Article Comment')
+        verbose_name_plural = _('Article Comments')
+
+    def __str__(self):
+        status = _('Approved') if self.approved else _('Unapproved')
+        if self.moderator_attention_needed:
+            status += f" ({_('Flagged')})"
+        # Use blocktranslate format specifiers for better translation context
+        return _("Comment by %(username)s on Article '%(article_title)s' (%(status)s)") % {
+            'username': self.user.username,
+            'article_title': self.article.title,
+            'status': status
+        }
+
+    @property
+    def flag_count(self):
+        """Returns the number of users who flagged this comment."""
+        return self.flagged_by.count()
+# --- END: Article Comment Model ---
+
 
 === FILE: C:\Job\MGC\articles\tests.py ===
 
@@ -828,23 +967,32 @@ from . import views
 app_name = 'articles' # Define the namespace for this app
 
 urlpatterns = [
-    # e.g., /articles/
     path('', views.article_list, name='article_list'),
-    # --- NEW: Filter by category ---
     path('category/<slug:category_slug>/', views.article_list, name='article_list_by_category'),
-    # -------------------------------
-    # e.g., /articles/why-mgc-is-important/
+
+    # --- NEW: Comment Action URLs ---
+    path('comment/<int:comment_id>/delete/', views.delete_article_comment, name='delete_article_comment'),
+    path('comment/<int:comment_id>/flag/', views.flag_article_comment, name='flag_article_comment'),
+    # ---------------------------------
+
+    # Article detail (Keep last as it uses a general slug)
     path('<slug:article_slug>/', views.article_detail, name='article_detail'),
 ]
 
 === FILE: C:\Job\MGC\articles\views.py ===
 
 # articles/views.py
-from django.shortcuts import render, get_object_or_404
-from .models import Article, ArticleCategory # <-- Import ArticleCategory
+from django.shortcuts import render, get_object_or_404, redirect # Add redirect
+from django.urls import reverse # Add reverse
+from .models import Article, ArticleCategory, ArticleComment # <-- Import ArticleComment
+from .forms import ArticleCommentForm # <-- Import ArticleCommentForm
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import gettext # <-- Import gettext for dynamic titles
+from django.utils.translation import gettext
+from django.contrib.auth.decorators import login_required # <-- Import login_required
+from django.views.decorators.http import require_POST # <-- Import require_POST
+from django.contrib import messages # <-- Import messages
+from django.http import HttpResponseForbidden # <-- Import HttpResponseForbidden
 
 # --- UPDATED article_list view ---
 def article_list(request, category_slug=None): # <-- Add category_slug parameter
@@ -898,6 +1046,95 @@ def article_detail(request, article_slug):
         # 'page_title': article.title, # Title already handled in base template logic
     }
     return render(request, 'articles/article_detail.html', context)
+
+# --- UPDATED article_detail view ---
+def article_detail(request, article_slug):
+    """Displays a single article and handles comment submission."""
+    article = get_object_or_404(
+        Article.objects.prefetch_related('categories', 'comments__user', 'comments__flagged_by'), # Prefetch comments too
+        slug=article_slug,
+        published_date__isnull=False
+    )
+    all_comments = article.comments.all() # Get all comments for logic, filter in template
+    comment_form = ArticleCommentForm() # Initialize form for GET
+
+    if request.method == 'POST':
+        # --- Comment Submission Handling ---
+        if not request.user.is_authenticated:
+            messages.error(request, _("You must be logged in to post a comment."))
+            # Redirect to login, adding the current article path as the 'next' parameter
+            login_url = reverse('login')
+            return redirect(f'{login_url}?next={request.path}')
+
+        # Check if user is active
+        if not request.user.is_active:
+            messages.error(request, _("Your account is currently inactive and cannot post comments."), extra_tags='comment_error') # Add tag
+            # Re-render the page with the form and error
+            context = {'article': article, 'all_comments': all_comments, 'comment_form': comment_form}
+            return render(request, 'articles/article_detail.html', context)
+
+        comment_form = ArticleCommentForm(data=request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.article = article
+            new_comment.user = request.user
+            new_comment.approved = True # Auto-approve
+            new_comment.save()
+            messages.success(request, _('Your comment has been posted.'), extra_tags='comment_success') # Add tag
+            # Redirect back to the same article detail page, focusing on the comments section
+            return redirect(article.get_absolute_url() + '#comments-section')
+        else:
+            # Add a generic error message if the form is invalid (specific errors are shown by the fields)
+            messages.error(request, _('There was an error submitting your comment. Please check the form and CAPTCHA.'), extra_tags='comment_error') # Add tag
+            # Fall through to render the page with the invalid form below
+
+    context = {
+        'article': article,
+        'all_comments': all_comments, # Pass all comments to the template
+        'comment_form': comment_form, # Pass the form (potentially invalid)
+    }
+    return render(request, 'articles/article_detail.html', context)
+
+# --- NEW: Delete Article Comment View ---
+@login_required
+@require_POST # Ensure this can only be accessed via POST
+def delete_article_comment(request, comment_id):
+    comment = get_object_or_404(ArticleComment.objects.select_related('article'), pk=comment_id)
+    article_url = comment.article.get_absolute_url() + '#comments-section'
+
+    # Only allow staff to delete comments
+    if not request.user.is_staff:
+        messages.error(request, _("You do not have permission to delete this comment."))
+        return redirect(article_url)
+
+    comment_content = comment.content[:30] # For message
+    comment.delete()
+    messages.success(request, _("Comment '%(comment_snippet)s...' deleted successfully.") % {'comment_snippet': comment_content})
+    return redirect(article_url)
+
+# --- NEW: Flag Article Comment View ---
+@login_required
+@require_POST # Ensure this can only be accessed via POST
+def flag_article_comment(request, comment_id):
+    comment = get_object_or_404(ArticleComment.objects.select_related('article', 'user'), pk=comment_id)
+    article_url = comment.article.get_absolute_url() + '#comments-section'
+
+    # Prevent users from flagging their own comments or if already flagged
+    if comment.user == request.user:
+        messages.warning(request, _("You cannot flag your own comment."))
+        return redirect(article_url)
+    if comment.flagged_by.filter(pk=request.user.pk).exists():
+        messages.info(request, _("You have already flagged this comment."))
+        return redirect(article_url)
+
+    # Add user to flaggers and mark for attention
+    comment.flagged_by.add(request.user)
+    comment.moderator_attention_needed = True
+    comment.save()
+
+    messages.success(request, _("Comment flagged for moderator review. Thank you."))
+    return redirect(article_url)
+
 
 === FILE: C:\Job\MGC\articles\__init__.py ===
 
@@ -3674,7 +3911,7 @@ msgstr "1. المقدمة والغرض"
 
 #: .\templates\ratings\methodology.html:16
 msgid "The Muslim Game Classification (MGC) system provides structured guidance for Muslims seeking to evaluate video games according to Islamic principles. Its primary purpose is to enable users to make informed decisions about game engagement, aligning their choices with the teachings of the Quran, the authentic Sunnah (Prophetic tradition), and the understanding of the As-Salaf As-Salih (Pious Predecessors)."
-msgstr "يقدم نظام تصنيف الألعاب الإسلامي (MGC) إرشادات منظمة للمسلمين الذين يسعون لتقييم ألعاب الفيديو وفقاً للمبادئ الإسلامية. هدفه الأساسي هو تمكين المستخدمين من اتخاذ قرارات مستنيرة بشأن مشاركتهم في الألعاب، ومواءمة اختياراتهم مع تعاليم القرآن والسنة النبوية الصحيحة وفهم السلف الصالح."
+msgstr "يقدم نظام تصنيف الألعاب للمسلمين (MGC) إرشادات منظمة للمسلمين الذين يسعون لتقييم ألعاب الفيديو وفقاً للمبادئ الإسلامية. هدفه الأساسي هو تمكين المستخدمين من اتخاذ قرارات مستنيرة بشأن مشاركتهم في الألعاب، ومواءمة اختياراتهم مع تعاليم القرآن والسنة النبوية الصحيحة وفهم السلف الصالح."
 
 #: .\templates\ratings\methodology.html:17
 msgid "This document outlines the methodology used by MGC assessors to analyze games and assign ratings, ensuring consistency, transparency, and adherence to core Islamic values."
@@ -3982,7 +4219,7 @@ msgstr "يتم تقديم تقييمات MGC كإرشادات بناءً على 
 
 #: .\templates\ratings\glossary.html:13
 msgid "Understanding the terms used in the Muslim Game Classification (MGC). For the full detailed process, see our"
-msgstr "فهم المصطلحات المستخدمة في تصنيف الألعاب الإسلامي (MGC). للاطلاع على العملية التفصيلية الكاملة، انظر"
+msgstr "فهم المصطلحات المستخدمة في تصنيف الألعاب للمسلمين (MGC). للاطلاع على العملية التفصيلية الكاملة، انظر"
 
 #: .\templates\ratings\glossary.html:25
 msgid "Permissible. Games assessed to have minimal concerns. Any potentially problematic elements are minor, incidental, easily avoidable, and not positively normalized. Core themes and required actions are permissible."
@@ -7087,7 +7324,8 @@ GAME_DATA = [
         "title": "Portal 2",
         "developer": "Valve", "publisher": "Valve",
         "release_date": datetime.date(2011, 4, 19),
-        "rating_tier_id": "HAL",
+        "rating_tier_id": "HAL", # Final achievable tier
+        "original_rating_tier_id": "HAL", # Original state before adjustments (still Halal)
         "requires_adjustment": True, # Due to optional music and co-op chat
         "summary": "A first-person puzzle-platform video game known for its physics-based puzzles and dark humor.",
         "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/f/f9/Portal2cover.jpg",
@@ -7122,8 +7360,9 @@ GAME_DATA = [
         "title": "Minecraft (Survival - Standard)",
         "developer": "Mojang Studios", "publisher": "Xbox Game Studios / Microsoft",
         "release_date": datetime.date(2011, 11, 18),
-        "rating_tier_id": "MSH", # Doubtful due to multiple moderate concerns
-        "requires_adjustment": True, # Online chat, optional magic-like systems
+        "rating_tier_id": "MSH", # Final achievable tier (if careful)
+        "original_rating_tier_id": "MSH", # Original state with optional magic/servers is Mashbouh
+        "requires_adjustment": True,
         "summary": "A sandbox game about placing blocks, crafting items, and going on adventures.",
         "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",
         "other_store_link": "https://www.minecraft.net/", # Official site
@@ -7250,7 +7489,8 @@ GAME_DATA = [
         "title": "Stardew Valley",
         "developer": "ConcernedApe", "publisher": "ConcernedApe",
         "release_date": datetime.date(2016, 2, 26),
-        "rating_tier_id": "MSH",
+        "rating_tier_id": "MSH", # Final achievable tier (if careful)
+        "original_rating_tier_id": "MSH", # Arguably Mashbouh due to normalization/options even before adjustment
         "requires_adjustment": True,
         "summary": "An open-ended country-life RPG focused on farming, socializing, and exploration.",
         "cover_image_url": "https://upload.wikimedia.org/wikipedia/en/a/a8/Stardew_Valley_cover_art.jpg",
@@ -7320,6 +7560,7 @@ class Command(BaseCommand):
             flags_symbols = game_data.pop('flags_symbols', [])
             adjustable_flags_symbols = game_data.pop('adjustable_flags_symbols', [])
             tier_id = game_data.pop('rating_tier_id', None)
+            original_tier_id = game_data.pop('original_rating_tier_id', None) # <-- Get original tier
 
             if not tier_id:
                 self.stderr.write(self.style.WARNING(f"Missing 'rating_tier_id' for game '{title}'. Skipping."))
@@ -7332,10 +7573,18 @@ class Command(BaseCommand):
                 skipped_count += 1
                 continue
 
+            original_rating_tier_obj = None
+            if original_tier_id:
+                original_rating_tier_obj = tiers_cache.get(original_tier_id)
+                if not original_rating_tier_obj:
+                     self.stderr.write(self.style.WARNING(f"Original RatingTier with code '{original_tier_id}' not found for game '{title}'. Skipping original tier assignment."))
+
+
             # Prepare defaults dictionary carefully
             # Ensure all Boolean fields have a default in case not provided in GAME_DATA
             defaults = {
                 'rating_tier': rating_tier,
+                **({'original_rating_tier': original_rating_tier_obj} if original_rating_tier_obj else {}),
                 'developer_slug': slugify(game_data.get('developer', '')),
                 'publisher_slug': slugify(game_data.get('publisher', '')),
                 'available_pc': game_data.get('available_pc', False),
@@ -7569,28 +7818,27 @@ class GameAdmin(TranslationAdmin):
         (_('Core Information'), {'fields': ('title', 'slug', 'cover_image_url', ('developer', 'developer_slug'), ('publisher', 'publisher_slug'), 'release_date', 'summary')}),
         (_('Platform Availability'), {'fields': (('available_pc', 'available_ps5', 'available_ps4'), ('available_xbox_series', 'available_xbox_one', 'available_switch'), ('available_android', 'available_ios', 'available_quest'))}),
         (_('Store Links'), {'classes': ('collapse',), 'fields': ('steam_link', 'epic_link', 'gog_link', 'other_store_link')}),
-        (_('Overall Rating & Flags'), {'fields': ('rating_tier', 'requires_adjustment', 'flags', 'adjustable_flags', 'rationale', 'has_spoilers_in_details')}),
-        # --- Consider adding suitability/positives here later ---
+        # --- UPDATED Fieldset ---
+        (_('Overall Rating & Flags'), {'fields': (
+            'rating_tier', # Final tier
+            'original_rating_tier', # <-- ADDED FIELD HERE
+            'requires_adjustment',
+            'flags',
+            'adjustable_flags',
+            'rationale',
+            'has_spoilers_in_details'
+        )}),
+        # --- END UPDATED Fieldset ---
         (_('Additional Info'), {'classes': ('collapse',), 'fields': ('adjustment_guide', 'critic_reviews')}),
-
-        # --- UPDATE FIELD NAMES HERE ---
         (_('Detailed MGC Breakdown'), {'classes': ('collapse',), 'fields': (
-            # Category 1
             ('aqidah_severity', 'aqidah_details', 'aqidah_reason'),
-            # Category 2 (NEW)
             ('haram_depictions_severity', 'haram_depictions_details', 'haram_depictions_reason'),
-            # Category 3 (NEW)
             ('simulation_haram_severity', 'simulation_haram_details', 'simulation_haram_reason'),
-            # Category 4 (NEW)
             ('normalization_haram_severity', 'normalization_haram_details', 'normalization_haram_reason'),
-            # Category 5
             ('violence_severity', 'violence_details', 'violence_reason'),
-            # Category 6
             ('time_addiction_severity', 'time_addiction_details', 'time_addiction_reason'),
-            # Category 7
             ('online_conduct_severity', 'online_conduct_details', 'online_conduct_reason'),
         )}),
-        # --- END UPDATED FIELDS ---
     )
 
 # --- Game Comment Admin (User content - usually NOT translated via modeltranslation) ---
@@ -7721,34 +7969,27 @@ class GameCommentForm(forms.ModelForm):
 === FILE: C:\Job\MGC\ratings\models.py ===
 
 # ratings/models.py
+# (No structural changes needed from the version AFTER adding original_rating_tier)
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
-from django.utils import timezone # Needed if you add date/time fields later
+from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _ # Import for translation
-from django.contrib.auth.models import User # Import User for comments
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import User
 from ckeditor_uploader.fields import RichTextUploadingField
 
-# ... (RatingTier, Flag, CriticReview, Game models remain the same as previous version) ...
 # Represents the overall rating category (Halal, Mashbouh, etc.)
 class RatingTier(models.Model):
-    # --- MODIFY TIER_CHOICES display names ---
     TIER_CHOICES = [
-        ('HAL', _('Halal')),      # Use simple name
-        ('MSH', _('Mashbouh')),   # Use simple name
-        ('HRM', _('Haram')),      # Use simple name
-        ('KFR', _('Kufr')),       # Use simple name (Assuming KFR code for Kufr)
+        ('HAL', _('Halal')),
+        ('MSH', _('Mashbouh')),
+        ('HRM', _('Haram')),
+        ('KFR', _('Kufr')),
     ]
     tier_code = models.CharField(max_length=3, choices=TIER_CHOICES, unique=True, primary_key=True)
-    # Use _() for verbose_name and help_text
     display_name = models.CharField(max_length=50, unique=True, verbose_name=_('Display Name'))
-    icon_name = models.CharField(
-        max_length=50,
-        default="help",
-        help_text=_("Material Symbols icon name (e.g., check_circle, warning, cancel, gpp_bad). See fonts.google.com/icons"),
-        verbose_name=_('Icon Name')
-    )
+    icon_name = models.CharField(max_length=50, default="help", help_text=_("Material Symbols icon name (e.g., check_circle, warning, cancel, gpp_bad). See fonts.google.com/icons"), verbose_name=_('Icon Name'))
     color_hex = models.CharField(max_length=7, help_text=_("Hex color code, e.g., #00FF00"), verbose_name=_('Color Hex'))
     description = models.TextField(blank=True, verbose_name=_('Description'))
     order = models.PositiveIntegerField(default=0, help_text=_("Order to display tiers (0=first)"), verbose_name=_('Display Order'))
@@ -7802,11 +8043,6 @@ class Game(models.Model):
     developer_slug = models.SlugField(max_length=110, blank=True, help_text=_("Auto-generated slug for developer filtering."))
     publisher_slug = models.SlugField(max_length=110, blank=True, help_text=_("Auto-generated slug for publisher filtering."))
 
-    steam_link = models.URLField(_("Steam Store URL"), max_length=300, blank=True, null=True)
-    epic_link = models.URLField(_("Epic Games Store URL"), max_length=300, blank=True, null=True)
-    gog_link = models.URLField(_("GOG Store URL"), max_length=300, blank=True, null=True)
-    other_store_link = models.URLField(_("Other Store URL"), max_length=300, blank=True, null=True)
-
     # --- Platform Availability Fields ---
     available_pc = models.BooleanField(_("Available on PC"), default=False)
     available_ps5 = models.BooleanField(_("Available on PS5"), default=False)
@@ -7818,45 +8054,43 @@ class Game(models.Model):
     available_ios = models.BooleanField(_("Available on iOS"), default=False)
     available_quest = models.BooleanField(_("Available on Meta Quest"), default=False)
 
-
     # --- MGC Rating & Flags ---
+    # **IMPORTANT**: rating_tier now always stores the FINAL/ACHIEVABLE tier after potential adjustments.
     rating_tier = models.ForeignKey(
         RatingTier,
         on_delete=models.PROTECT,
-        related_name='games',
-        help_text=_("Overall MGC Rating based on detailed assessment."),
-        verbose_name=_('Rating Tier')
+        related_name='games_final_tier',
+        help_text=_("Overall MGC Rating based on detailed assessment (AFTER adjustment, if any)."),
+        verbose_name=_('Rating Tier (Final/Achievable)') # Clarified verbose name
     )
-    requires_adjustment = models.BooleanField(...)
-    flags = models.ManyToManyField( # Existing flags
-        Flag,
-        blank=True,
-        related_name='games_with_flag', # Renamed related_name to avoid clash
-        help_text=_("Quick visual indicators for potential content types."),
-        verbose_name=_('Content Flags')
+    # **IMPORTANT**: original_rating_tier stores the tier BEFORE adjustments, ONLY IF requires_adjustment is True.
+    original_rating_tier = models.ForeignKey(
+        RatingTier,
+        on_delete=models.SET_NULL,
+        related_name='games_originally_this_tier',
+        null=True, blank=True,
+        verbose_name=_('Original Rating Tier (Before Adjustment)'),
+        help_text=_("The game's rating before required adjustments were applied. Only set if 'Requires Adjustment' is True.")
     )
-    # --- NEW Field ---
-    adjustable_flags = models.ManyToManyField(
-        Flag,
-        blank=True,
-        related_name='games_needing_adjustment', # New related_name
-        help_text=_("Select flags corresponding to content that CAN be adjusted/avoided."),
-        verbose_name=_('Adjustable Content Flags')
-    )
-    # -----------------
-    rationale = models.TextField(...)
-    adjustment_guide = models.TextField(...)
     requires_adjustment = models.BooleanField(
-        default=False, help_text=_("Check if this game needs user adjustments (settings, mods) to meet its assigned Halal/Mubah rating."),
+        default=False, help_text=_("Check if this game needs user adjustments (settings, mods) to meet its assigned final rating tier."),
         verbose_name=_('Requires Adjustment')
     )
     flags = models.ManyToManyField(
-        Flag, blank=True, related_name='games',
-        help_text=_("Quick visual indicators for potential content types."), verbose_name=_('Content Flags')
+        Flag,
+        blank=True,
+        related_name='games_with_flag',
+        help_text=_("Quick visual indicators for potential content types."),
+        verbose_name=_('Content Flags')
+    )
+    adjustable_flags = models.ManyToManyField(
+        Flag,
+        blank=True,
+        related_name='games_needing_adjustment',
+        help_text=_("Select flags corresponding to content that CAN be adjusted/avoided."),
+        verbose_name=_('Adjustable Content Flags')
     )
     rationale = models.TextField(blank=True, help_text=_("General rationale summary (optional)."), verbose_name=_('General Rationale'))
-
-    # --- Adjustment Guide ---
     adjustment_guide = models.TextField(
         blank=True, help_text=_("Instructions or links on how to adjust settings/mods for Halal/Mashbouh games."),
         verbose_name=_('Adjustment Guide')
@@ -7869,66 +8103,21 @@ class Game(models.Model):
     aqidah_severity = models.CharField(_('Aqidah Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     aqidah_details = models.TextField(_('Aqidah Details'), blank=True, help_text=_("Specific examples related to Aqidah concerns (magic, deities, ideologies etc)."))
     aqidah_reason = models.TextField(_('Aqidah Reason'), blank=True, help_text=_("Reasoning or reference for the Aqidah severity rating."))
-    violence_severity = models.CharField(_('Violence Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
-    violence_details = models.TextField(_('Violence Details'), blank=True, help_text=_("Specific examples of violence, gore, context."))
-    violence_reason = models.TextField(_('Violence Reason'), blank=True, help_text=_("Reasoning or reference for the Violence severity rating."))
-    immorality_severity = models.CharField(_('Immorality Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
-    immorality_details = models.TextField(_('Immorality Details'), blank=True, help_text=_("Examples of 'Awrah, suggestive themes, promotion of impermissible relationships, bad language/conduct."))
-    immorality_reason = models.TextField(_('Immorality Reason'), blank=True, help_text=_("Reasoning or reference for the Immorality severity rating."))
-    substances_gambling_severity = models.CharField(_('Substances/Gambling Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
-    substances_gambling_details = models.TextField(_('Substances/Gambling Details'), blank=True, help_text=_("Examples of substance use/promotion, gambling mechanics."))
-    substances_gambling_reason = models.TextField(_('Substances/Gambling Reason'), blank=True, help_text=_("Reasoning or reference for the Substances/Gambling severity rating."))
-    audio_music_severity = models.CharField(_('Audio/Music Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
-    audio_music_details = models.TextField(_('Audio/Music Details'), blank=True, help_text=_("Details about background music, lyrics, ability to mute."))
-    audio_music_reason = models.TextField(_('Audio/Music Reason'), blank=True, help_text=_("Reasoning or reference for the Audio/Music severity rating."))
-    time_addiction_severity = models.CharField(_('Time/Addiction Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
-    time_addiction_details = models.TextField(_('Time/Addiction Details'), blank=True, help_text=_("Notes on addictive mechanics, time investment required, potential for neglecting duties."))
-    time_addiction_reason = models.TextField(_('Time/Addiction Reason'), blank=True, help_text=_("Reasoning or reference for the Time/Addiction severity rating."))
-    online_conduct_severity = models.CharField(_('Online Conduct Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
-    online_conduct_details = models.TextField(_('Online Conduct Details'), blank=True, help_text=_("Risks related to online chat, community toxicity, moderation."))
-    online_conduct_reason = models.TextField(_('Online Conduct Reason'), blank=True, help_text=_("Reasoning or reference for the Online Conduct severity rating."))
-
-    # --- Spoiler Flag ---
-    has_spoilers_in_details = models.BooleanField(
-        default=False, help_text=_("Check this to enable the 'Show/Hide Details' toggle for categories containing potential spoilers."),
-        verbose_name=_('Has Spoilers in Details')
-    )
-
-    SEVERITY_CHOICES = [
-        ('N', _('None')), ('L', _('Low')), ('M', _('Medium')), ('H', _('High')), ('P', _('Prohibited')),
-    ]
-
-    # Category 1: Aqidah & Ideology (Keep original names)
-    aqidah_severity = models.CharField(_('Aqidah Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
-    aqidah_details = models.TextField(_('Aqidah Details'), blank=True, help_text=_("Specific examples related to Aqidah concerns (magic, deities, ideologies etc)."))
-    aqidah_reason = models.TextField(_('Aqidah Reason'), blank=True, help_text=_("Reasoning or reference for the Aqidah severity rating."))
-
-    # Category 2: Haram Depictions & Interactions (NEW NAMES)
     haram_depictions_severity = models.CharField(_('Haram Depictions Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     haram_depictions_details = models.TextField(_('Haram Depictions Details'), blank=True, help_text=_("Examples: Required exposure to 'Awrah, Haram music, gambling mechanics, etc."))
     haram_depictions_reason = models.TextField(_('Haram Depictions Reason'), blank=True, help_text=_("Reasoning for the Depictions severity rating."))
-
-    # Category 3: Simulation of Haram Acts (NEW NAMES)
     simulation_haram_severity = models.CharField(_('Simulation Haram Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     simulation_haram_details = models.TextField(_('Simulation Haram Details'), blank=True, help_text=_("Examples: Simulating drinking Khamr, simulated Zina, performing simulated Shirk acts."))
     simulation_haram_reason = models.TextField(_('Simulation Haram Reason'), blank=True, help_text=_("Reasoning for the Simulation Haram severity rating."))
-
-    # Category 4: Normalization of Haram (NEW NAMES)
     normalization_haram_severity = models.CharField(_('Normalization Haram Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     normalization_haram_details = models.TextField(_('Normalization Haram Details'), blank=True, help_text=_("Examples: Positive portrayal of impermissible relationships, casual depiction of sin, trivialization."))
     normalization_haram_reason = models.TextField(_('Normalization Haram Reason'), blank=True, help_text=_("Reasoning for the Normalization Haram severity rating."))
-
-    # Category 5: Violence & Aggression (Keep original names)
     violence_severity = models.CharField(_('Violence Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     violence_details = models.TextField(_('Violence Details'), blank=True, help_text=_("Specific examples of violence, gore, context, justification."))
     violence_reason = models.TextField(_('Violence Reason'), blank=True, help_text=_("Reasoning for the Violence severity rating."))
-
-    # Category 6: Time Commitment & Addiction Potential (Keep original names, maybe shorten?)
     time_addiction_severity = models.CharField(_('Time/Addiction Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     time_addiction_details = models.TextField(_('Time/Addiction Details'), blank=True, help_text=_("Notes on addictive mechanics, time investment required, potential for neglecting duties."))
     time_addiction_reason = models.TextField(_('Time/Addiction Reason'), blank=True, help_text=_("Reasoning for the Time/Addiction severity rating."))
-
-    # Category 7: Online Conduct & Interaction (Keep original names)
     online_conduct_severity = models.CharField(_('Online Conduct Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     online_conduct_details = models.TextField(_('Online Conduct Details'), blank=True, help_text=_("Risks related to online chat, community toxicity, moderation."))
     online_conduct_reason = models.TextField(_('Online Conduct Reason'), blank=True, help_text=_("Reasoning for the Online Conduct severity rating."))
@@ -7961,15 +8150,29 @@ class Game(models.Model):
         verbose_name_plural = _('Games')
 
     def save(self, *args, **kwargs):
+        # Auto-generate slugs if blank
         if not self.slug: self.slug = slugify(self.title)
         if self.developer and not self.developer_slug: self.developer_slug = slugify(self.developer)
         if self.publisher and not self.publisher_slug: self.publisher_slug = slugify(self.publisher)
-        original_slug = self.slug; counter = 1
+
+        # Ensure slug uniqueness if needed (add counter if duplicate)
+        original_slug = self.slug
+        counter = 1
         queryset = Game.objects.filter(slug=self.slug)
         if self.pk:
             queryset = queryset.exclude(pk=self.pk)
         while queryset.exists():
-            self.slug = f'{original_slug}-{counter}'; counter += 1
+            self.slug = f'{original_slug}-{counter}'
+            counter += 1
+            # Re-query with the new slug attempt
+            queryset = Game.objects.filter(slug=self.slug)
+            if self.pk:
+                queryset = queryset.exclude(pk=self.pk)
+
+        # Ensure original_rating_tier is cleared if requires_adjustment is False
+        if not self.requires_adjustment:
+            self.original_rating_tier = None
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -7978,55 +8181,26 @@ class Game(models.Model):
     def __str__(self):
         return self.title
 
-    # --- Cached Properties for Severity ---
+    # --- Cached Properties for Severity (no changes needed) ---
     @cached_property
     def aqidah_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.aqidah_severity, '?')
-    @cached_property
-    def aqidah_severity_css_class(self): return f"severity-{self.aqidah_severity}"
-
-    @cached_property
-    def haram_depictions_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.haram_depictions_severity, '?')
-    @cached_property
-    def haram_depictions_severity_css_class(self): return f"severity-{self.haram_depictions_severity}"
-
-    @cached_property
-    def simulation_haram_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.simulation_haram_severity, '?')
-    @cached_property
-    def simulation_haram_severity_css_class(self): return f"severity-{self.simulation_haram_severity}"
-
-    @cached_property
-    def normalization_haram_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.normalization_haram_severity, '?')
-    @cached_property
-    def normalization_haram_severity_css_class(self): return f"severity-{self.normalization_haram_severity}"
-
-    @cached_property
-    def violence_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.violence_severity, '?')
-    @cached_property
-    def violence_severity_css_class(self): return f"severity-{self.violence_severity}"
-
-    @cached_property
-    def time_addiction_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.time_addiction_severity, '?')
-    @cached_property
-    def time_addiction_severity_css_class(self): return f"severity-{self.time_addiction_severity}"
-
-    @cached_property
-    def online_conduct_severity_display(self): return dict(self.SEVERITY_CHOICES).get(self.online_conduct_severity, '?')
+    # ... (other severity display properties remain the same) ...
     @cached_property
     def online_conduct_severity_css_class(self): return f"severity-{self.online_conduct_severity}"
 
-
-# --- Game Comment Model (Updated) ---
+# --- GameComment Model ---
+# ... (No changes needed) ...
 class GameComment(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='game_comments')
     content = models.TextField(_('Comment'))
     created_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Date Posted'))
-    approved = models.BooleanField(default=True, verbose_name=_('Approved')) # Default changed to True
+    approved = models.BooleanField(default=True, verbose_name=_('Approved'))
     flagged_by = models.ManyToManyField(User, related_name='flagged_comments', blank=True, verbose_name=_('Flagged By'))
     moderator_attention_needed = models.BooleanField(default=False, verbose_name=_('Needs Attention'))
 
     class Meta:
-        ordering = ['created_date'] # Order oldest first for display
+        ordering = ['created_date']
         verbose_name = _('Game Comment')
         verbose_name_plural = _('Game Comments')
 
@@ -8043,20 +8217,20 @@ class GameComment(models.Model):
     @property
     def flag_count(self):
         return self.flagged_by.count()
-    
-# --- NEW: Methodology Page Model ---
+
+# --- MethodologyPage Model ---
+# ... (No changes needed) ...
 class MethodologyPage(models.Model):
     title = models.CharField(max_length=200, verbose_name=_('Page Title'))
-    content = RichTextUploadingField(verbose_name=_('Page Content')) # Corrected class name
+    content = RichTextUploadingField(verbose_name=_('Page Content'))
     last_updated = models.DateTimeField(auto_now=True, verbose_name=_('Last Updated'))
 
     class Meta:
         verbose_name = _("Methodology Page")
-        verbose_name_plural = _("Methodology Page") # Should only be one
+        verbose_name_plural = _("Methodology Page")
 
     def __str__(self):
         return self.title
-
 
 === FILE: C:\Job\MGC\ratings\tests.py ===
 
@@ -8173,7 +8347,7 @@ def homepage(request):
 
 # --- Game List View ---
 def game_list(request, developer_slug=None, publisher_slug=None):
-    games_queryset = Game.objects.select_related('rating_tier').prefetch_related('flags').all()
+    games_queryset = Game.objects.select_related('rating_tier', 'original_rating_tier').prefetch_related('flags', 'adjustable_flags').all() # Added original_rating_tier to select_related
     page_title = _("Game Ratings")
     filter_description = None
 
@@ -8191,13 +8365,14 @@ def game_list(request, developer_slug=None, publisher_slug=None):
         filter_description = gettext("Showing games published by <strong>%(publisher_name)s</strong>.") % {'publisher_name': pub_name}
 
     search_query = request.GET.get('q', '')
-    selected_tier = request.GET.get('tier', '')
+    selected_tier_code = request.GET.get('tier', '') # Renamed variable for clarity
     selected_flag = request.GET.get('flag', '')
     requires_adjustment_filter = request.GET.get('adj', '')
     sort_by = request.GET.get('sort', '-date_added')
     selected_platforms = request.GET.getlist('platform')
 
     if search_query:
+        # ... (search logic remains the same) ...
         games_queryset = games_queryset.filter(
             Q(title__icontains=search_query) |
             Q(developer__icontains=search_query) |
@@ -8205,8 +8380,11 @@ def game_list(request, developer_slug=None, publisher_slug=None):
             Q(summary__icontains=search_query)
         ).distinct()
 
-    if selected_tier and selected_tier != 'all':
-        games_queryset = games_queryset.filter(rating_tier__tier_code=selected_tier)
+    if selected_tier_code and selected_tier_code != 'all':
+        games_queryset = games_queryset.filter(
+            Q(rating_tier__tier_code=selected_tier_code) | # Matches final tier
+            (Q(requires_adjustment=True) & Q(original_rating_tier__tier_code=selected_tier_code)) # Matches original tier IF adjustable
+        ).distinct()
     if selected_flag:
         games_queryset = games_queryset.filter(flags__symbol=selected_flag).distinct()
     if requires_adjustment_filter == 'yes':
@@ -8248,12 +8426,12 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     context = {
         'games_page': games_page, 'page_title': page_title, 'filter_description': filter_description,
         'all_tiers': all_tiers, 'all_flags': all_flags, 'search_query': search_query,
-        'selected_tier': selected_tier, 'selected_flag': selected_flag,
+        'selected_tier': selected_tier_code, # Pass the code back to the template
+        'selected_flag': selected_flag,
         'requires_adjustment_filter': requires_adjustment_filter, 'sort_by': sort_by,
         'selected_platforms': selected_platforms, 'platform_list_for_template': platform_list_for_template,
     }
     return render(request, 'ratings/game_list.html', context)
-
 # --- Game Detail View (Updated for Comments) ---
 def game_detail(request, game_slug):
     game = get_object_or_404(
@@ -8536,8 +8714,8 @@ body.rtl .form-select {
   /* Shared Rating & Severity Colors */
   --rating-halal: #00e676;
   --rating-mashbouh: #ffc107;
-  --rating-haram: #ff5252;
-  --rating-kufr: #78909c;
+  --rating-haram: #ff6a6a;
+  --rating-kufr: #ada3fc;
   --rating-HAL: var(--rating-halal);
   --rating-MSH: var(--rating-mashbouh);
   --rating-HRM: var(--rating-haram);
@@ -8714,7 +8892,7 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .card-title { font-size: 1.1rem; margin-bottom: 0.25rem; color: var(--text-primary); font-weight: var(--font-heading-weight); text-transform: uppercase;}
 .game-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
 .rating-flags-container { margin-top: auto; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
-.rating-badge { display: inline-block; font-family: var(--font-heading); font-weight: 600; font-size: 0.75rem; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-right: 6px; margin-bottom: 6px; text-align: center; box-shadow: inset 0 -1px 1px rgba(0,0,0,0.3); }
+.rating-badge { display: inline-block; font-family: var(--font-heading); font-weight: 600; font-size: 0.75rem; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; color: #000; margin-bottom: 6px; text-align: center; box-shadow: inset 0 -1px 1px rgba(0,0,0,0.3); }
 .flag-symbol { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 1.1rem; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; color: var(--text-secondary); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; vertical-align: -2px; transition: color 0.2s, background-color 0.2s, border-color 0.2s; }
 .rating-icon { font-size: 1.7em; vertical-align: -2px; margin-right: 4px; position: relative; top: 1px; }
 .badge.adjustment-badge { background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); font-family: var(--font-primary); font-weight: 600; font-size: 0.75rem; padding: 9px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; }
@@ -8811,6 +8989,7 @@ html[dir="rtl"] .spoiler-alert svg { margin-left: 0.5rem; margin-right: 0; }
 .search-form .form-control:focus { background-color: var(--bg-element-lighter); border-color: var(--accent-primary); box-shadow: none; color: var(--text-primary); } /* Keep accent focus */
 .search-form .btn { color: var(--accent-primary); border-color: var(--accent-primary); border-radius: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; } /* Keep accent button */
 .search-form .btn:hover { background-color: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); }
+.form-check-label { color: var(--text-primary); }
 
 /* 11. Back Link (Detail Page) */
 /* Keep specific back link style */
@@ -8919,7 +9098,7 @@ html[dir="rtl"] #language-toggle-text { margin-top: 0px; }
    ========================================================================== */
 
 html[dir="rtl"] {
-  --font-primary: 'Tajawal', 'Inter', sans-serif;
+  --font-primary: 'Noto', 'Inter', sans-serif;
   --font-heading: 'Tajawal', 'Exo 2', sans-serif;
 }
 
@@ -8943,7 +9122,7 @@ html[dir="rtl"] .rating-badge .rating-icon { margin-left: 4px; margin-right: 0; 
 .flag-item-adjustable .flag-symbol { color: var(--accent-primary); }
 .flag-item-adjustable .flag-description { color: var(--text-primary); }
 .flag-item-adjustable .flag-description .text-adjustable { color: var(--accent-primary); font-weight: 600; font-size: 0.8em; }
-.no-flags-message { height: 30px;}
+.no-flags-message { height: 27px;}
 html[dir="rtl"] .flag-item .flag-symbol { margin-right: 0; margin-left: 8px; }
 html[dir="rtl"] .flag-item-adjustable { border-left: none; border-right: 3px solid var(--accent-primary); }
 html[dir="rtl"] .flag-item-adjustable .flag-description .text-adjustable.ms-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
@@ -9058,6 +9237,203 @@ html[dir="rtl"] .platform-badge { margin-right: 0; margin-left: 4px; }
 .platform-icon.platform-switch img:hover { filter: hue-rotate(0deg) saturate(1) brightness(1); }
 
 .list-group { padding: 0; }
+
+/* ==========================================================================
+   Sidebar / Lists (Includes Category List)
+   ========================================================================== */
+
+   .list-group {
+    /* Add border and rounding to the container */
+    border: 1px solid var(--border-color);
+    border-radius: 6px; /* Match card style */
+    overflow: hidden; /* Ensure rounded corners clip children */
+    background-color: var(--bg-element); /* Ensure container has base bg */
+}
+
+.list-group-item {
+    /* Default Dark Mode Styles */
+    background-color: var(--bg-element);
+    color: var(--text-secondary); /* Use secondary for less emphasis */
+    border-color: var(--border-color); /* Uses the dark border */
+    /* Remove Bootstrap's default borders if needed, rely on container/adjacent */
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    padding: 0.65rem 1rem; /* Slightly adjust padding */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Add border between items */
+.list-group-item + .list-group-item {
+    border-top: 1px solid var(--border-color);
+}
+
+.list-group-item-action {
+     /* Ensure link color is correct */
+     color: var(--text-secondary);
+     font-weight: 500;
+}
+
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+    /* Dark Mode Hover/Focus */
+    background-color: var(--bg-element-lighter);
+    color: var(--text-primary); /* Brighten text on hover */
+    outline: none;
+    box-shadow: none;
+}
+
+.list-group-item.active {
+    /* Dark Mode Active */
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary); /* Dark text on accent bg */
+    font-weight: 700; /* Make active item bolder */
+}
+.list-group-item.active:hover,
+.list-group-item.active:focus {
+     /* Ensure active hover doesn't change */
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary);
+}
+
+/* --- CORRECTED Light Mode Overrides for Category List --- */
+body.light-mode .list-group {
+    /* Use light mode border */
+     border-color: var(--border-color);
+     background-color: var(--bg-element); /* White */
+}
+
+body.light-mode .list-group-item {
+    /* Revert to near-default Bootstrap light styles or customize */
+    background-color: var(--bg-element); /* White */
+    color: var(--text-secondary);        /* Gray text */
+    border-color: var(--border-color);   /* Light border */
+}
+body.light-mode .list-group-item + .list-group-item {
+    border-top: 1px solid var(--border-color); /* Light border */
+}
+
+body.light-mode .list-group-item-action {
+     color: var(--text-secondary); /* Keep gray text for links */
+}
+
+body.light-mode .list-group-item-action:hover,
+body.light-mode .list-group-item-action:focus {
+    /* Standard Bootstrap light hover */
+    background-color: var(--bg-element-lighter); /* Light gray */
+    color: var(--text-primary); /* Darken text on hover */
+}
+
+body.light-mode .list-group-item.active {
+    /* Use the SITE'S light mode accent color */
+    background-color: var(--accent-primary); /* Uses the teal defined in light mode vars */
+    border-color: var(--accent-primary);
+    color: #fff; /* White text provides good contrast on the teal */
+}
+ body.light-mode .list-group-item.active:hover,
+ body.light-mode .list-group-item.active:focus {
+     /* Keep active styles on hover/focus */
+     background-color: var(--accent-primary);
+     border-color: var(--accent-primary);
+     color: #fff;
+ }
+/* --- END CORRECTED Light Mode Overrides --- */
+
+/* ==========================================================================
+   End Sidebar / Lists
+   ========================================================================== */
+
+   .comment-actions .comment-action-btn {
+    padding: 0.1rem 0.4rem;
+    font-size: 0.8rem;
+    margin-left: 5px; /* LTR spacing */
+}
+html[dir="rtl"] .comment-actions .comment-action-btn {
+    margin-left: 0;
+    margin-right: 5px; /* RTL spacing */
+}
+.comment-unapproved {
+    opacity: 0.6;
+    border-left: 3px solid var(--rating-mashbouh); /* Use Mashbouh color for pending */
+    padding-left: 10px;
+}
+html[dir="rtl"] .comment-unapproved {
+    border-left: none;
+    border-right: 3px solid var(--rating-mashbouh);
+    padding-left: 0;
+    padding-right: 10px;
+}
+/* Style for reCAPTCHA widget container if needed */
+.g-recaptcha { margin-bottom: 1rem; }
+/* Adjust comment error message styling */
+.comment-form-container .alert { font-size: 0.9rem; }
+
+/* ==========================================================================
+   Adjustable Badge (Bordered Text) Styles
+   ========================================================================== */
+
+   .adjustment-badge-bordered {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 0.65rem;
+    padding: 7px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+    line-height: 1;
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+    background-color: transparent;
+    position: relative;
+    top: -1px;
+}
+
+/* Border color variations based on FINAL achievable tier */
+.adjustment-badge-bordered.adjustable-border-hal {
+    border-color: var(--rating-halal);
+    color: var(--rating-halal); /* Match text color to border */
+}
+.adjustment-badge-bordered.adjustable-border-msh {
+    border-color: var(--rating-mashbouh);
+     color: var(--rating-mashbouh);
+}
+.adjustment-badge-bordered.adjustable-border-hrm {
+    border-color: var(--rating-haram);
+     color: var(--rating-haram);
+}
+.adjustment-badge-bordered.adjustable-border-kfr {
+    border-color: var(--rating-kufr);
+     color: var(--rating-kufr);
+}
+
+/* --- Light Mode Overrides for Adjustable Badge Border --- */
+body.light-mode .adjustment-badge-bordered {
+    border: 2px solid var(--border-color); /* Default light border */
+    color: var(--text-secondary);
+}
+body.light-mode .adjustment-badge-bordered.adjustable-border-hal {
+    border-color: var(--rating-halal);
+    color: var(--rating-halal);
+}
+body.light-mode .adjustment-badge-bordered.adjustable-border-msh {
+     border-color: var(--rating-mashbouh);
+     color: var(--rating-mashbouh);
+}
+ body.light-mode .adjustment-badge-bordered.adjustable-border-hrm {
+     border-color: var(--rating-haram);
+     color: var(--rating-haram);
+ }
+ body.light-mode .adjustment-badge-bordered.adjustable-border-kfr {
+    border-color: var(--rating-kufr);
+    color: var(--rating-kufr);
+ }
+/* ==========================================================================
+   End Adjustable Badge (Bordered Text) Styles
+   ========================================================================== */
+
 
 === FILE: C:\Job\MGC\staticfiles_collected\admin\css\vendor\select2\select2.css ===
 
@@ -22256,16 +22632,16 @@ body.rtl .form-select {
   --alert-warning-border: color-mix(in srgb, var(--highlight-gold) 80%, black);
 
   /* Shared Rating & Severity Colors */
-  --rating-mubah: #00e676;
+  --rating-halal: #00e676;
   --rating-mashbouh: #ffc107;
   --rating-haram: #ff5252;
   --rating-kufr: #78909c;
-  --rating-MUB: var(--rating-mubah);
+  --rating-HAL: var(--rating-halal);
   --rating-MSH: var(--rating-mashbouh);
   --rating-HRM: var(--rating-haram);
   --rating-KFR: var(--rating-kufr);
   --severity-n-color: #dddddd;
-  --severity-l-color: var(--rating-mubah);
+  --severity-l-color: var(--rating-halal);
   --severity-m-color: var(--rating-mashbouh);
   --severity-h-color: var(--rating-haram);
   --severity-p-color: var(--rating-kufr);
@@ -22427,20 +22803,21 @@ body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml
 .page-header h1 { margin-bottom: 0; color: var(--text-primary); font-size: 1.8rem;}
 
 /* 5. Game Card (List View) */
-.card.game-card { background-color: var(--bg-element); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 1.5rem; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; overflow: hidden; }
+.card.game-card { background-color: var(--bg-element); border: 1px solid var(--border-color); border-radius: 6px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; overflow: hidden; }
 .card-link-wrapper { display: block; text-decoration: none; color: inherit; transition: none; }
 .card-link-wrapper:hover .card.game-card { transform: translateY(-4px); border-color: var(--border-lighter); box-shadow: 0 6px 12px var(--shadow-color); }
-.card-img-top { aspect-ratio: 16 / 10; object-fit: cover; border-bottom: 1px solid var(--border-color); }
+.card-img-top { aspect-ratio: 3 / 4; object-fit: cover; border-bottom: 1px solid var(--border-color); }
 .card-img-top.bg-secondary { background-color: var(--bg-element-lighter) !important; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-family: var(--font-primary); font-size: 0.9rem; }
 .card-body { padding: 1rem 1.25rem; background-color: var(--bg-element); } /* Ensure body has bg */
 .card-title { font-size: 1.1rem; margin-bottom: 0.25rem; color: var(--text-primary); font-weight: var(--font-heading-weight); text-transform: uppercase;}
 .game-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
 .rating-flags-container { margin-top: auto; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
 .rating-badge { display: inline-block; font-family: var(--font-heading); font-weight: 600; font-size: 0.75rem; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-right: 6px; margin-bottom: 6px; text-align: center; box-shadow: inset 0 -1px 1px rgba(0,0,0,0.3); }
-.flag-symbol { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 1.1rem; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; color: var(--text-secondary); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 4px 6px; border-radius: 4px; margin-right: 6px; margin-bottom: 6px; vertical-align: -2px; transition: color 0.2s, background-color 0.2s, border-color 0.2s; }
+.flag-symbol { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 1.1rem; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; color: var(--text-secondary); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; vertical-align: -2px; transition: color 0.2s, background-color 0.2s, border-color 0.2s; }
 .rating-icon { font-size: 1.7em; vertical-align: -2px; margin-right: 4px; position: relative; top: 1px; }
-.badge.adjustment-badge { background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); font-family: var(--font-primary); font-weight: 600; font-size: 0.75rem; padding: 9px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; margin-bottom: 5px; }
+.badge.adjustment-badge { background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); font-family: var(--font-primary); font-weight: 600; font-size: 0.75rem; padding: 9px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; }
 .rating-label { position: relative; top: -2px; }
+html[dir="rtl"] .rating-label { position: relative; top: 0; }
 
 /* 6. Game Detail Page */
 .detail-image-wrapper { background-color: var(--bg-element-lighter); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 6px; margin-bottom: 1.5rem; }
@@ -22655,9 +23032,8 @@ html[dir="rtl"] .page-header .search-form { margin-right: auto !important; margi
 html[dir="rtl"] .filter-sort-form .text-end { text-align: left !important; }
 html[dir="rtl"] .game-meta, html[dir="rtl"] .detail-meta { text-align: right; }
 /* html[dir="rtl"] .detail-meta::after { left: auto; right: 0; } */ /* No longer needed if line removed */
-html[dir="rtl"] .rating-badge { display: inline-flex; flex-direction: row-reverse; align-items: center; margin-left: 6px; margin-right: 0; direction: ltr; }
+html[dir="rtl"] .rating-badge { display: inline-flex; flex-direction: row-reverse; align-items: center; margin-left: 0; margin-right: 0; direction: ltr; }
 html[dir="rtl"] .rating-badge .rating-icon { margin-left: 4px; margin-right: 0; }
-html[dir="rtl"] .flag-symbol { margin-right: 0; margin-left: 6px; }
 .flag-item { display: flex; align-items: center; margin-bottom: 0.5rem; padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid transparent; transition: background-color 0.2s ease; }
 .flag-item .flag-symbol { flex-shrink: 0; margin-right: 8px; font-size: 1.1em; color: var(--text-secondary); width: 32px; text-align: center; line-height: 1; margin-bottom: 0; }
 .flag-item .flag-description { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.3; }
@@ -22665,13 +23041,12 @@ html[dir="rtl"] .flag-symbol { margin-right: 0; margin-left: 6px; }
 .flag-item-adjustable .flag-symbol { color: var(--accent-primary); }
 .flag-item-adjustable .flag-description { color: var(--text-primary); }
 .flag-item-adjustable .flag-description .text-adjustable { color: var(--accent-primary); font-weight: 600; font-size: 0.8em; }
+.no-flags-message { height: 30px;}
 html[dir="rtl"] .flag-item .flag-symbol { margin-right: 0; margin-left: 8px; }
 html[dir="rtl"] .flag-item-adjustable { border-left: none; border-right: 3px solid var(--accent-primary); }
 html[dir="rtl"] .flag-item-adjustable .flag-description .text-adjustable.ms-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
 .flag-adjustable { border-color: var(--accent-primary); color: var(--accent-primary); }
 .flag-item-adjustable .flag-symbol { border-color: var(--accent-primary); }
-html[dir="rtl"] .badge.adjustment-badge.ms-1 { margin-right: 0.25rem !important; margin-left: 0 !important; }
-html[dir="rtl"] .badge.adjustment-badge.ms-2 { margin-right: 0.5rem !important; margin-left: 0 !important; }
 html[dir="rtl"] .detail-overall-rating { text-align: right; }
 html[dir="rtl"] .me-2 { margin-left: 0.5rem !important; margin-right: 0 !important; }
 html[dir="rtl"] .adjustment-guide-section { border-left: none; border-right: 4px solid var(--highlight-gold); }
@@ -22781,6 +23156,201 @@ html[dir="rtl"] .platform-badge { margin-right: 0; margin-left: 4px; }
 .platform-icon.platform-switch img:hover { filter: hue-rotate(0deg) saturate(1) brightness(1); }
 
 .list-group { padding: 0; }
+
+/* ==========================================================================
+   Sidebar / Lists (Includes Category List)
+   ========================================================================== */
+
+   .list-group {
+    /* Add border and rounding to the container */
+    border: 1px solid var(--border-color);
+    border-radius: 6px; /* Match card style */
+    overflow: hidden; /* Ensure rounded corners clip children */
+    background-color: var(--bg-element); /* Ensure container has base bg */
+}
+
+.list-group-item {
+    /* Default Dark Mode Styles */
+    background-color: var(--bg-element);
+    color: var(--text-secondary); /* Use secondary for less emphasis */
+    border-color: var(--border-color); /* Uses the dark border */
+    /* Remove Bootstrap's default borders if needed, rely on container/adjacent */
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    padding: 0.65rem 1rem; /* Slightly adjust padding */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Add border between items */
+.list-group-item + .list-group-item {
+    border-top: 1px solid var(--border-color);
+}
+
+.list-group-item-action {
+     /* Ensure link color is correct */
+     color: var(--text-secondary);
+     font-weight: 500;
+}
+
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+    /* Dark Mode Hover/Focus */
+    background-color: var(--bg-element-lighter);
+    color: var(--text-primary); /* Brighten text on hover */
+    outline: none;
+    box-shadow: none;
+}
+
+.list-group-item.active {
+    /* Dark Mode Active */
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary); /* Dark text on accent bg */
+    font-weight: 700; /* Make active item bolder */
+}
+.list-group-item.active:hover,
+.list-group-item.active:focus {
+     /* Ensure active hover doesn't change */
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary);
+}
+
+/* --- CORRECTED Light Mode Overrides for Category List --- */
+body.light-mode .list-group {
+    /* Use light mode border */
+     border-color: var(--border-color);
+     background-color: var(--bg-element); /* White */
+}
+
+body.light-mode .list-group-item {
+    /* Revert to near-default Bootstrap light styles or customize */
+    background-color: var(--bg-element); /* White */
+    color: var(--text-secondary);        /* Gray text */
+    border-color: var(--border-color);   /* Light border */
+}
+body.light-mode .list-group-item + .list-group-item {
+    border-top: 1px solid var(--border-color); /* Light border */
+}
+
+body.light-mode .list-group-item-action {
+     color: var(--text-secondary); /* Keep gray text for links */
+}
+
+body.light-mode .list-group-item-action:hover,
+body.light-mode .list-group-item-action:focus {
+    /* Standard Bootstrap light hover */
+    background-color: var(--bg-element-lighter); /* Light gray */
+    color: var(--text-primary); /* Darken text on hover */
+}
+
+body.light-mode .list-group-item.active {
+    /* Use the SITE'S light mode accent color */
+    background-color: var(--accent-primary); /* Uses the teal defined in light mode vars */
+    border-color: var(--accent-primary);
+    color: #fff; /* White text provides good contrast on the teal */
+}
+ body.light-mode .list-group-item.active:hover,
+ body.light-mode .list-group-item.active:focus {
+     /* Keep active styles on hover/focus */
+     background-color: var(--accent-primary);
+     border-color: var(--accent-primary);
+     color: #fff;
+ }
+/* --- END CORRECTED Light Mode Overrides --- */
+
+/* ==========================================================================
+   End Sidebar / Lists
+   ========================================================================== */
+
+   .comment-actions .comment-action-btn {
+    padding: 0.1rem 0.4rem;
+    font-size: 0.8rem;
+    margin-left: 5px; /* LTR spacing */
+}
+html[dir="rtl"] .comment-actions .comment-action-btn {
+    margin-left: 0;
+    margin-right: 5px; /* RTL spacing */
+}
+.comment-unapproved {
+    opacity: 0.6;
+    border-left: 3px solid var(--rating-mashbouh); /* Use Mashbouh color for pending */
+    padding-left: 10px;
+}
+html[dir="rtl"] .comment-unapproved {
+    border-left: none;
+    border-right: 3px solid var(--rating-mashbouh);
+    padding-left: 0;
+    padding-right: 10px;
+}
+/* Style for reCAPTCHA widget container if needed */
+.g-recaptcha { margin-bottom: 1rem; }
+/* Adjust comment error message styling */
+.comment-form-container .alert { font-size: 0.9rem; }
+
+/* ==========================================================================
+   Adjustable Badge (Bordered Text) Styles
+   ========================================================================== */
+
+   .adjustment-badge-bordered {
+    font-family: var(--font-primary); /* Use body font */
+    font-weight: 600;
+    font-size: 0.65rem; /* Slightly smaller */
+    padding: 3px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+    line-height: 1; /* Ensure consistent height */
+    border: 2px solid var(--border-color); /* Default border */
+    color: var(--text-secondary);
+    background-color: transparent; /* No background */
+}
+
+/* Border color variations based on FINAL achievable tier */
+.adjustment-badge-bordered.adjustable-border-hal {
+    border-color: var(--rating-halal);
+    color: var(--rating-halal); /* Match text color to border */
+}
+.adjustment-badge-bordered.adjustable-border-msh {
+    border-color: var(--rating-mashbouh);
+     color: var(--rating-mashbouh);
+}
+.adjustment-badge-bordered.adjustable-border-hrm {
+    border-color: var(--rating-haram);
+     color: var(--rating-haram);
+}
+.adjustment-badge-bordered.adjustable-border-kfr {
+    border-color: var(--rating-kufr);
+     color: var(--rating-kufr);
+}
+
+/* --- Light Mode Overrides for Adjustable Badge Border --- */
+body.light-mode .adjustment-badge-bordered {
+    border: 2px solid var(--border-color); /* Default light border */
+    color: var(--text-secondary);
+}
+body.light-mode .adjustment-badge-bordered.adjustable-border-hal {
+    border-color: var(--rating-halal);
+    color: var(--rating-halal);
+}
+body.light-mode .adjustment-badge-bordered.adjustable-border-msh {
+     border-color: var(--rating-mashbouh);
+     color: var(--rating-mashbouh);
+}
+ body.light-mode .adjustment-badge-bordered.adjustable-border-hrm {
+     border-color: var(--rating-haram);
+     color: var(--rating-haram);
+ }
+ body.light-mode .adjustment-badge-bordered.adjustable-border-kfr {
+    border-color: var(--rating-kufr);
+    color: var(--rating-kufr);
+ }
+/* ==========================================================================
+   End Adjustable Badge (Bordered Text) Styles
+   ========================================================================== */
+
 
 === FILE: C:\Job\MGC\staticfiles_collected\modeltranslation\css\tabbed_translation_fields.css ===
 
@@ -22893,40 +23463,137 @@ backward compatibility:
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
+{% load widget_tweaks %} {# Load widget_tweaks #}
 
 {% block title %}{{ article.title }} - {% translate "MGC Article" %}{% endblock %}
 
 {% block content %}
   <article class="article-detail-wrapper mb-4">
 
-      {% if article.header_image_url %}
-      <div class="article-header-image mb-4 text-center">
-          <img src="{{ article.header_image_url }}" class="img-fluid rounded shadow-sm" alt="{% blocktranslate %}{{ article.title }} Header Image{% endblocktranslate %}" style="max-height: 400px;">
-      </div>
-      {% endif %}
+      {# ... (Existing Article Header/Meta/Content code) ... #}
+       <h1 class="article-detail-title">{{ article.title }}</h1>
+       <p class="article-detail-meta mb-1"> {# Reduced bottom margin #}
+           {% translate "Published:" %} {{ article.published_date|date:"F j, Y" }}
+           {% if article.author_name %} | {% translate "By:" %} {{ article.author_name }}{% endif %}
+       </p>
+       {% if article.categories.exists %}
+           <p class="article-categories small text-secondary mb-3">
+               {% translate "Categories:" %}
+               {% for cat in article.categories.all %}
+                   <a href="{{ cat.get_absolute_url }}" class="badge bg-secondary text-decoration-none link-light me-1">{{ cat.name }}</a>
+               {% endfor %}
+           </p>
+       {% endif %}
+       <div class="article-content">
+           {{ article.content|safe }}
+       </div>
+       {# ... (Existing back link code) ... #}
+        <a href="{% url 'articles:article_list' %}" class="back-link mt-4">{% translate "← Back to Articles" %}</a>
 
-      <h1 class="article-detail-title">{{ article.title }}</h1>
-      <p class="article-detail-meta mb-1"> {# Reduced bottom margin #}
-          {% translate "Published:" %} {{ article.published_date|date:"F j, Y" }}
-          {% if article.author_name %} | {% translate "By:" %} {{ article.author_name }}{% endif %}
-      </p>
-      {# --- Display Categories --- #}
-      {% if article.categories.exists %}
-          <p class="article-categories small text-secondary mb-3">
-              {% translate "Categories:" %}
-              {% for cat in article.categories.all %}
-                  <a href="{{ cat.get_absolute_url }}" class="badge bg-secondary text-decoration-none link-light me-1">{{ cat.name }}</a>
-              {% endfor %}
-          </p>
-      {% endif %}
-      {# --- End Display Categories --- #}
-
-      <div class="article-content">
-          {{ article.content|safe }}
-      </div>
-
-      <a href="{% url 'articles:article_list' %}" class="back-link mt-4">{% translate "← Back to Articles" %}</a>
   </article>
+
+  {# --- START: Comments Section --- #}
+  <section class="comments-section mt-5 pt-4 border-top" id="comments-section">
+       <h3 class="mb-4 guide-section-title" style="text-align: inherit; font-size: 1.3rem;">
+           {# Count only approved comments for the title #}
+           {% with approved_comment_list=all_comments|dictsort:"approved"|slice:":-1" %}
+               {% blocktranslate count comment_count=approved_comment_list|length %}{{ approved_comment_list|length }} Comment{% plural %}{{ approved_comment_list|length }} Comments{% endblocktranslate %}
+           {% endwith %}
+       </h3>
+
+       {% for comment in all_comments %}
+           {# Display logic: Show if approved OR if the current user is staff #}
+           {% if comment.approved or user.is_staff %}
+               <div class="comment mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %} {% if not comment.approved %}comment-unapproved{% endif %}">
+                   <div class="comment-header d-flex justify-content-between align-items-center flex-wrap">
+                       <div>
+                           <span class="comment-author fw-bold">{{ comment.user.username }}</span>
+                           <small class="comment-date text-secondary ms-2">{{ comment.created_date|timesince }} {% translate "ago" %}</small>
+                           {# Staff-only status indicators #}
+                           {% if not comment.approved and user.is_staff %}<span class="badge bg-warning text-dark ms-2">{% translate "Pending Approval" %}</span>{% endif %}
+                           {% if comment.moderator_attention_needed and user.is_staff %}<span class="badge bg-danger ms-2" title="{% blocktranslate count flag_count=comment.flag_count %}{{ flag_count }} flag{% plural %}{{ flag_count }} flags{% endblocktranslate %}"><i class="fa-solid fa-flag me-1"></i> {% translate "Needs Review" %}</span>{% elif comment.moderator_attention_needed %}<span class="badge bg-secondary ms-2" title="{% translate 'Flagged for review' %}"><i class="fa-solid fa-flag"></i></span>{% endif %}
+                       </div>
+                       <div class="comment-actions mt-1 mt-sm-0">
+                           {# Flag Button (Only if logged in, not comment author, and not already flagged by this user) #}
+                           {% if user.is_authenticated and user != comment.user %}
+                               {% if user in comment.flagged_by.all %}
+                                   <span class="text-secondary small me-2"><i class="fa-solid fa-flag"></i> {% translate "Flagged" %}</span>
+                               {% else %}
+                                   <form action="{% url 'articles:flag_article_comment' comment.id %}" method="post" style="display: inline;">
+                                       {% csrf_token %}
+                                       <button type="submit" class="btn btn-sm btn-outline-warning comment-action-btn" title="{% translate 'Flag this comment for review' %}">
+                                           <i class="fa-regular fa-flag"></i> <span class="d-none d-md-inline">{% translate "Flag" %}</span>
+                                       </button>
+                                   </form>
+                               {% endif %}
+                           {% endif %}
+
+                           {# Delete Button (Only for staff) #}
+                           {% if user.is_staff %}
+                               <form action="{% url 'articles:delete_article_comment' comment.id %}" method="post" style="display: inline;" onsubmit="return confirm('{% translate "Are you sure you want to delete this comment?" %}');">
+                                   {% csrf_token %}
+                                   <button type="submit" class="btn btn-sm btn-outline-danger comment-action-btn" title="{% translate 'Delete this comment' %}">
+                                       <i class="fa-regular fa-trash-can"></i> <span class="d-none d-md-inline">{% translate "Delete" %}</span>
+                                   </button>
+                               </form>
+                           {% endif %}
+                       </div>
+                   </div>
+                   {# Comment Body (only visible if approved or user is staff) #}
+                   <div class="comment-body mt-2 {% if not comment.approved and not user.is_staff %}d-none{% endif %}">
+                       {{ comment.content|linebreaksbr }}
+                   </div>
+               </div>
+           {% endif %}
+       {% empty %}
+           <p class="text-secondary">{% translate "No comments yet. Be the first to comment!" %}</p>
+       {% endfor %}
+
+       {# --- Comment Form --- #}
+       {% if user.is_authenticated %}
+           <div class="comment-form-container mt-4 pt-4 border-top" id="comment-form"> {# Added anchor ID #}
+               <h4 class="mb-3">{% translate "Add Your Comment" %}</h4>
+                {% if messages %}
+                    {% for message in messages %}
+                        {# Filter messages specifically tagged for comment errors/success #}
+                        {% if 'comment_error' in message.tags or message.level == 40 %}
+                            <div class="alert alert-danger" role="alert">{{ message }}</div>
+                        {% elif 'comment_success' in message.tags %}
+                             <div class="alert alert-success" role="alert">{{ message }}</div>
+                         {% elif 'comment_warning' in message.tags %}
+                             <div class="alert alert-warning" role="alert">{{ message }}</div>
+                         {% endif %}
+                    {% endfor %}
+                {% endif %}
+               <form method="post" action="{{ request.path }}#comment-form"> {# Post to the current page with anchor #}
+                   {% csrf_token %}
+                   <div class="mb-3">
+                       {# Use widget_tweaks to render content field #}
+                       {% render_field comment_form.content class+="form-control" rows="3" placeholder=comment_form.content.field.widget.attrs.placeholder %}
+                       {% if comment_form.content.errors %}
+                           <div class="form-text text-danger">{{ comment_form.content.errors|striptags }}</div>
+                       {% endif %}
+                   </div>
+                    {# Render reCAPTCHA field using widget_tweaks #}
+                    <div class="mb-3">
+                        {% render_field comment_form.captcha %}
+                        {% if comment_form.captcha.errors %}
+                            <div class="form-text text-danger">{{ comment_form.captcha.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
+                   <button type="submit" class="btn btn-primary btn-sm">{% translate "Submit Comment" %}</button>
+               </form>
+               {# Removed "awaiting approval" message since we auto-approve #}
+           </div>
+       {% else %}
+           <p class="mt-4 pt-4 border-top">
+              {% url 'login' as login_url %}
+              {% blocktranslate %}Please <a href="{{ login_url }}?next={{ request.path }}" class="text-primary">login</a> to post a comment.{% endblocktranslate %}
+           </p>
+       {% endif %}
+  </section>
+  {# --- END: Comments Section --- #}
+
 {% endblock %}
 
 === FILE: C:\Job\MGC\templates\articles\article_list.html ===
@@ -23049,7 +23716,7 @@ document.addEventListener('DOMContentLoaded', function() {
           {% endif %}
           {% if game.available_ps5 %}
                <span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>
-          {% elif game.available_ps4 %} {# Show generic PS icon if only PS4 #}
+          {% elif game.available_ps4 %}
                <span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>
           {% endif %}
           {% if game.available_xbox_series %}
@@ -23077,55 +23744,53 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       {# --- END: Platform Icons --- #}
 
-      <div class="rating-flags-container mt-auto pt-2">
-         <span class="rating-badge rating-{{ game.rating_tier.tier_code }}"
-               style="background-color: var(--rating-{{ game.rating_tier.tier_code }}); color: {% if game.rating_tier.tier_code == 'KFR' %}#fff{% else %}#000{% endif %};">
-             <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>
-             <span class="rating-label">
-                {% if game.rating_tier.display_name == "Haram" %}{{ translated_haram }}
-                {% elif game.rating_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}
-                {% elif game.rating_tier.display_name == "Halal" %}{{ translated_halal }}
-                {% elif game.rating_tier.display_name == "Kufr" %}{{ translated_kufr }}
-                {% else %}{{ game.rating_tier.display_name }}
-                {% endif %}
-             </span>
-         </span>
-         {% if game.requires_adjustment %}
-              <span class="badge adjustment-badge">{% translate "Adjustable" %}</span>
-         {% endif %}
-         <br class="mt-1">
-         {# --- DEBUGGING FLAG LOOP --- #}
-         {% comment %}
-             Debug Info for game {{ game.pk }}:
-             Requires Adjustment: {{ game.requires_adjustment }}
-             All Flags PKs: {% for f in game.flags.all %}{{ f.pk }},{% endfor %}
-             Adjustable Flags PKs: {% for af in game.adjustable_flags.all %}{{ af.pk }},{% endfor %}
-         {% endcomment %}
-         
-         {# --- CLEANER FLAG LOOP --- #}
-         {% comment %} DEBUG: Game {{ game.pk }}, ReqAdj={{ game.requires_adjustment }}, AdjFlags={{ game.adjustable_flags.all }} {% endcomment %}
-         
-         {% for flag in game.flags.all %}
-             {# --- Direct Check (Prefetching is important here) --- #}
-             {% if game.requires_adjustment and flag in game.adjustable_flags.all %}
-                 {# Style for ADJUSTABLE flags #}
-                 <span class="flag-symbol material-symbols-outlined flag-adjustable"
-                       title="{{ flag.description }} ({% translate 'Can be adjusted/avoided' %})">
-                       {{ flag.symbol }}</span>
-             {% else %}
-                 {# Style for REGULAR flags #}
-                 <span class="flag-symbol material-symbols-outlined"
-                       title="{{ flag.description }}">
-                       {{ flag.symbol }}</span>
-             {% endif %}
-         {% empty %}
-         {# Message if no flags are assigned #}
-         <div class="no-flags-message"><small class="text-secondary">{% translate "No specific content flags noted." %}</small></div>
-         {% endfor %}
+     <div class="rating-flags-container mt-auto pt-2">
+        {# Determine which tier to display as the MAIN badge #}
+        {% with main_tier=game.original_rating_tier|default:game.rating_tier %}
+            {# If original_rating_tier is None (e.g., not adjustable, or data missing), it defaults to the final rating_tier #}
+            <span class="rating-badge rating-{{ main_tier.tier_code }}"
+                  style="background-color: var(--rating-{{ main_tier.tier_code }});">
+                <span class="material-symbols-outlined rating-icon">{{ main_tier.icon_name }}</span>
+                <span class="rating-label">
+                  {% comment %} Translate the displayed tier name {% endcomment %}
+                  {% if main_tier.display_name == "Haram" %}{{ translated_haram }}
+                  {% elif main_tier.display_name == "Mashbouh" %}{{ translated_mashbouh }}
+                  {% elif main_tier.display_name == "Halal" %}{{ translated_halal }}
+                  {% elif main_tier.display_name == "Kufr" %}{{ translated_kufr }}
+                  {% else %}{{ main_tier.display_name }}
+                  {% endif %}
+                </span>
+            </span>
+        {% endwith %}
+        
+        {% if game.requires_adjustment and game.original_rating_tier and game.rating_tier.tier_code != game.original_rating_tier.tier_code %}
+          {% with final_code=game.rating_tier.tier_code %}
+              <span class="adjustment-badge-bordered adjustable-border-{{ final_code|lower }}"
+                    title="{% blocktranslate %}Adjustable (Achieves {{ game.rating_tier.display_name }}){% endblocktranslate %}">
+                    {% translate "Adjustable" %}
+              </span>
+          {% endwith %}
+        {% endif %}
+        
+        <br class="mt-1">
+          {% for flag in game.flags.all %}
+              {% if game.requires_adjustment and flag in game.adjustable_flags.all %}
+                  <span class="flag-symbol material-symbols-outlined flag-adjustable"
+                        title="{{ flag.description }} ({% translate 'Can be adjusted/avoided' %})">
+                        {{ flag.symbol }}</span>
+              {% else %}
+                  <span class="flag-symbol material-symbols-outlined"
+                        title="{{ flag.description }}">
+                        {{ flag.symbol }}</span>
+              {% endif %}
+          {% empty %}
+          <div class="no-flags-message"><small class="text-secondary">{% translate "No specific content flags noted." %}</small></div>
+          {% endfor %}
       </div>
     </div>
   </div>
 </a>
+
 
 === FILE: C:\Job\MGC\templates\ratings\game_detail.html ===
 
@@ -23803,7 +24468,7 @@ html[dir="rtl"] .comment-unapproved { border-left: none; border-right: 3px solid
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   {# Consider adding an Arabic-friendly font like Noto Sans Arabic or Tajawal #}
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&family=Exo+2:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Material Symbols Font Link -->
@@ -23815,7 +24480,6 @@ html[dir="rtl"] .comment-unapproved { border-left: none; border-right: 3px solid
   <!-- Custom CSS (LOAD LAST) -->
   <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
-  {# Favicon Link #}
   <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 
 </head>
