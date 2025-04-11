@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'ckeditor',
     'ckeditor_uploader',
+    'compressor',
 ]
 
 
@@ -176,6 +177,34 @@ LOGOUT_REDIRECT_URL = '/'
 # Add these lines anywhere in settings.py
 RECAPTCHA_PUBLIC_KEY = '6LexugcrAAAAACDHcXQogzALwIC87hxMufE8WAcU'  # Paste your Site Key
 RECAPTCHA_PRIVATE_KEY = '6LexugcrAAAAAJnJge1mqszLJ9B7wATMRyi5KqcJ' # Paste your Secret Key
+
+# Set to True in production (usually based on DEBUG setting)
+COMPRESS_ENABLED = not DEBUG # Enable compression when DEBUG is False
+# Set to True if you want to pre-compress files during deployment using `manage.py compress`
+COMPRESS_OFFLINE = False
+
+# --- Compressor STATICFILES_FINDERS ---
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+# -------------------------------------------
+
+# --- Email Backend Configuration (REQUIRED for Contact Form) ---
+# For development, use the console backend:
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For production, configure your actual email provider (e.g., Gmail, SendGrid)
+# See: https://docs.djangoproject.com/en/5.0/topics/email/#smtp-backend
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.example.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@example.com'
+# EMAIL_HOST_PASSWORD = 'your-email-password-or-app-password'
+# DEFAULT_FROM_EMAIL = 'MGC Contact <noreply@yourdomain.com>' # Email shown as sender
+# SERVER_EMAIL = DEFAULT_FROM_EMAIL # Email for server errors
 
 # --- CKEDITOR CONFIGURATION ---
 CKEDITOR_UPLOAD_PATH = "uploads/" # Subdirectory within MEDIA_ROOT

@@ -4,7 +4,7 @@ body.rtl {
   /* Example: Ensure body text aligns right */
   text-align: right;
   /* Add an Arabic font family */
-  font-family: 'Cairo', var(--font-primary), sans-serif;
+  font-family: 'Tajawal', var(--font-primary), sans-serif;
 }
 
 /* Adjust margins/paddings that use left/right specifically */
@@ -90,7 +90,7 @@ body.rtl .critic-summary {
 
 /* Specific font adjustments for Arabic if needed */
 body.rtl h1, body.rtl h2, body.rtl h3, body.rtl h4, body.rtl h5, body.rtl h6 {
-    font-family: 'Cairo', var(--font-heading), sans-serif; /* Prioritize Arabic font */
+    font-family: 'Tajawal', var(--font-heading), sans-serif; /* Prioritize Arabic font */
 }
 body.rtl .site-brand,
 body.rtl .navbar .nav-link,
@@ -100,7 +100,7 @@ body.rtl .guide-section-title,
 body.rtl .form-title,
 body.rtl .btn-submit,
 body.rtl .back-link {
-     font-family: 'Cairo', var(--font-heading), sans-serif; /* Ensure heading/UI font where needed */
+     font-family: 'Tajawal', var(--font-heading), sans-serif; /* Ensure heading/UI font where needed */
 }
 
 /* Fix severity circle margin */
@@ -115,3 +115,32 @@ body.rtl .form-select {
     padding-left: 0.75rem;
     padding-right: 2.25rem;
 }
+
+/* Ensure main RTL font settings are applied */
+body.rtl {
+    font-family: 'Noto', 'Tajawal', var(--font-primary), sans-serif;
+  }
+  
+  body.rtl h1, body.rtl h2, body.rtl h3, body.rtl h4, body.rtl h5, body.rtl h6 {
+      font-family: 'Noto', 'Tajawal', var(--font-heading), sans-serif; /* Prioritize Arabic font */
+  }
+  
+  /* RTL logo margin */
+  body.rtl .site-logo {
+      margin-right: 0;
+      margin-left: 8px;
+  }
+  
+  /* Other specific RTL overrides if needed (most should be in custom.css now) */
+  
+  body.rtl .rating-badge .rating-label {
+     /* Adjust if vertical alignment is off specifically in RTL */
+      top: 0;
+  }
+  
+  body.rtl #language-toggle-text {
+     /* Adjust if vertical alignment is off specifically in RTL */
+      margin-top: 0px;
+  }
+  
+  /* Add any other very specific RTL-only rules here if they conflict with LTR */

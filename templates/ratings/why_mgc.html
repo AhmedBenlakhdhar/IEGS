@@ -1,0 +1,30 @@
+{# templates/ratings/why_mgc.html #}
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{# Use dynamic page title from view context #}
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  {# Use dynamic page title from view context #}
+  <h1>{{ page_title }}</h1>
+</div>
+
+{# Apply styling similar to article content #}
+<div class="why-mgc-content article-content">
+    {% if why_mgc_page and why_mgc_page.content %}
+        {{ why_mgc_page.content|safe }}
+    {% else %}
+        {# Message shown if the page hasn't been created/populated #}
+        <div class="alert alert-warning" role="alert">
+            {% translate "Page content is currently unavailable. Please check back later or contact the site administrator." %}
+        </div>
+    {% endif %}
+</div>
+
+{# Optional back link #}
+<p><a href="{% url 'home' %}" class="back-link mt-3">{% translate "← Back to Home" %}</a></p>
+
+{% endblock %}

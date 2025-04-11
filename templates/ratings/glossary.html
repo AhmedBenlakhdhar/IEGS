@@ -21,7 +21,7 @@
         {# Iterate through tiers passed from view #}
         {% for tier in all_tiers %}
             <dt class="col-sm-3">
-                <span class="rating-badge rating-{{ tier.tier_code }}" style="background-color: {{ tier.color_hex }};">
+                <span class="rating-badge rating-{{ tier.tier_code }}" style="background-color: var(--rating-{{ tier.tier_code }});">
                     <span class="material-symbols-outlined rating-icon">{{ tier.icon_name }}</span>
                     {# Display the translated name directly #}
                     <span class="rating-label">{{ tier.display_name }}</span>

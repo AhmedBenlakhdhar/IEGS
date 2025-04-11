@@ -1,0 +1,51 @@
+{# templates/ratings/contact.html - Icon Button #}
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% translate "Contact Us" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{% translate "Contact Us" %}</h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+         <p class="lead text-secondary mb-4">
+             {% blocktranslate %}Have questions, suggestions, or feedback about MGC? Please use the form below to get in touch. We appreciate your input!{% endblocktranslate %}
+         </p>
+
+         {% if messages %}
+            {% for message in messages %}
+                {% if 'form_error' in message.tags or message.level == 40 %}
+                    <div class="alert alert-danger form-error-alert" role="alert">{{ message }}</div>
+                {% elif message.level >= 25 %}
+                     <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+         {% endif %}
+
+        <form method="post" class="bg-element p-4 rounded border">
+            {% csrf_token %}
+            {% translate "e.g., Abdullah" as name_placeholder %}
+            {% translate "e.g., user@example.com" as email_placeholder %}
+            <div class="row g-3">
+                <div class="col-md-6 mb-3"><label for="{{ form.name.id_for_label }}" class="form-label form-label-sm">{{ form.name.label }}</label>{% render_field form.name class+="form-control" placeholder=name_placeholder %}{% if form.name.errors %}<div class="form-text text-danger small mt-1">{{ form.name.errors|striptags }}</div>{% endif %}</div>
+                <div class="col-md-6 mb-3"><label for="{{ form.email.id_for_label }}" class="form-label form-label-sm">{{ form.email.label }}</label>{% render_field form.email class+="form-control" placeholder=email_placeholder %}{% if form.email.errors %}<div class="form-text text-danger small mt-1">{{ form.email.errors|striptags }}</div>{% endif %}</div>
+                <div class="col-12 mb-3"><label for="{{ form.subject.id_for_label }}" class="form-label form-label-sm">{{ form.subject.label }}</label>{% render_field form.subject class+="form-control" %}{% if form.subject.errors %}<div class="form-text text-danger small mt-1">{{ form.subject.errors|striptags }}</div>{% endif %}</div>
+                <div class="col-12 mb-3"><label for="{{ form.message.id_for_label }}" class="form-label form-label-sm">{{ form.message.label }}</label>{% render_field form.message class+="form-control" rows="5" %}{% if form.message.errors %}<div class="form-text text-danger small mt-1">{{ form.message.errors|striptags }}</div>{% endif %}</div>
+                <div class="col-12 mb-3">{% render_field form.captcha %}{% if form.captcha.errors %}<div class="form-text text-danger small mt-1">{{ form.captcha.errors|striptags }}</div>{% endif %}</div>
+            </div>
+            <div class="d-grid mt-3">
+                {# Submit Button: Icon #}
+                <button type="submit" class="btn btn-primary filter-apply-btn" title="{% translate 'Send Message' %}">
+                    <span class="material-symbols-outlined" style="vertical-align: middle;">send</span>
+                    <span class="ms-1">{% translate "Send Message" %}</span> {# Keep text for clarity #}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

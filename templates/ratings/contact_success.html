@@ -1,0 +1,26 @@
+{# templates/ratings/contact_success.html - Icon Link #}
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "Message Sent" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{% translate "Message Sent Successfully" %}</h1>
+</div>
+
+<div class="alert alert-success text-center" role="alert">
+  <h4 class="alert-heading">{% translate "Thank You!" %}</h4>
+  <p>{% translate "Your message has been sent. We will review it and get back to you if necessary." %}</p>
+  <hr>
+  {# Homepage Link: Icon #}
+  <p class="mb-0">
+    <a href="{% url 'home' %}" class="alert-link" title="{% translate 'Return to Homepage' %}">
+        <span class="material-symbols-outlined" style="vertical-align: middle;">home</span>
+        <span class="ms-1">{% translate "Return to Homepage" %}</span> {# Keep text for clarity #}
+    </a>
+  </p>
+</div>
+
+{% endblock %}

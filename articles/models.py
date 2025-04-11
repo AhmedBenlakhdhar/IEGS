@@ -7,23 +7,6 @@ from django.utils.translation import gettext_lazy as _
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth.models import User
 
-class Article(models.Model):
-    # Use _() for verbose_name and help_text
-    title = models.CharField(max_length=250, verbose_name=_('Title'))
-    slug = models.SlugField(max_length=270, unique=True, blank=True, help_text=_("Unique URL-friendly name. Leave blank to auto-generate from title."))
-    header_image_url = models.URLField(max_length=300, blank=True, null=True, help_text=_("URL for an image to display at the top of the article."), verbose_name=_('Header Image URL'))
-    content = RichTextUploadingField(verbose_name=_('Content'))
-    author_name = models.CharField(max_length=100, blank=True, help_text=_("Display author name (if not linked to user)"), verbose_name=_('Author Name'))
-    published_date = models.DateTimeField(default=timezone.now, verbose_name=_('Published Date'))
-    created_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Created Date'))
-    updated_date = models.DateTimeField(auto_now=True, verbose_name=_('Updated Date'))
-
-    class Meta:
-        ordering = ['-published_date']
-        # Use _() for verbose names
-        verbose_name = _("Article")
-        verbose_name_plural = _("Articles")
-
 # --- NEW: Article Category Model ---
 class ArticleCategory(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name=_('Category Name'))
@@ -96,7 +79,7 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 # --- DEFINE the explicit intermediate model ---
 class ArticleCategoryMembership(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
