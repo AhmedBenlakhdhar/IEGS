@@ -8,8 +8,16 @@
 {% block content %}
 
   {# --- 1. Hero Section --- #}
-  <section class="homepage-hero text-center py-5 mb-5">
-      <h1 class="display-4 fw-bold mb-3">{% translate "Informed Gaming Choices for Muslims" %}</h1>
+  <section class="homepage-hero text-center py-5 mb-4">
+      <h1 class="logo mb-5">
+        <img src="{% static 'img/mgc_logo.svg' %}" alt="{% translate 'MGC Logo' %}" height="81">
+        {% if request.LANGUAGE_CODE == 'ar' %}
+        <div class="logo-text-ar">تصنيف<br>الألعاب<br>للمسلمين</div>
+        {% else %}
+        <div class="logo-text-en">Muslim<br>Game<br>Classification</div>
+        {% endif %}
+      </h1>
+      <h2 class="fw-bold mb-3">{% translate "Informed Gaming Choices for Muslims" %}</h2>
       <p class="lead col-lg-8 mx-auto text-secondary mb-4">
           {% translate "MGC provides clear, Shariah-based ratings and detailed analysis to help you navigate the world of video games according to Islamic values." %}
       </p>
@@ -38,8 +46,8 @@
               {% for tier in all_tiers %}
               <div class="col-md-3 col-6">
                   <div class="rating-explainer-item p-3 rounded">
-                       <span class="material-symbols-outlined rating-icon mb-2 d-block" style="font-size: 2.5rem; color: {{ tier.color_hex }};">{{ tier.icon_name }}</span>
-                       <h5 class="mb-1 fs-6" style="color: {{ tier.color_hex }};">{{ tier.display_name }}</h5>
+                       <span class="material-symbols-outlined rating-icon mb-2 d-block" style="font-size: 2.5rem; color: var(--rating-{{ tier.tier_code }});;">{{ tier.icon_name }}</span>
+                       <h5 class="mb-1 fs-6" style="color: var(--rating-{{ tier.tier_code }});">{{ tier.display_name }}</h5>
                        <p class="small text-secondary mb-0">{{ tier.description }}</p>
                   </div>
               </div>

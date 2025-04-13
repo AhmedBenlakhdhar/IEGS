@@ -46,7 +46,7 @@
   --alert-warning-border: color-mix(in srgb, var(--highlight-gold) 80%, black);
 
   --font-primary: 'Inter', sans-serif;
-  --font-heading: 'Exo 2', sans-serif;
+  --font-heading: 'Montserrat', sans-serif;
   --font-heading-weight: 800;
   --font-body-weight: 400;
 }
@@ -159,9 +159,9 @@ html[dir="rtl"] blockquote {
 .site-header { background: var(--bg-element); border-bottom: 1px solid var(--border-color); padding: 0.75rem 0; transition: background-color 0.3s ease, border-color 0.3s ease; }
 body.light-mode .site-header { box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
 .navbar { padding: 0; }
-.site-brand { font-weight: var(--font-heading-weight); font-size: 1.4rem; color: var(--accent-primary) !important; display: flex; align-items: center; letter-spacing: 1px; }
-.site-brand svg { color: var(--accent-primary); width: 20px; height: 20px; margin-right: 8px; }
-.site-brand:hover { color: var(--text-primary) !important; }
+.site-brand { filter: brightness(1) saturate(0.3) hue-rotate(65deg); font-size: 1.4rem; color: var(--accent-primary) !important; display: flex; align-items: center; letter-spacing: 1px; transition: filter 0.3s ease; }
+.site-brand:hover { filter: brightness(1) saturate(1); }
+.site-brand svg { width: 20px; height: 20px; margin-right: 8px; }
 .navbar .nav-link { font-family: var(--font-heading); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); padding: 0.5rem 1rem; border-bottom: 3px solid transparent; transition: color 0.2s ease, border-color 0.2s ease; }
 .navbar .nav-link:hover, .navbar .nav-link.active { color: var(--text-primary); border-bottom-color: var(--accent-primary); }
 body.light-mode .navbar .nav-link:hover, body.light-mode .navbar .nav-link.active { color: var(--accent-primary); }
@@ -170,15 +170,9 @@ body.light-mode .navbar .nav-link:hover, body.light-mode .navbar .nav-link.activ
 .navbar-toggler-icon { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(232, 234, 246, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); }
 body.light-mode .navbar-toggler-icon { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(33, 37, 41, 0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");}
 
-.site-logo {
-  max-height: 35px; /* Adjust max height as needed */
-  width: auto;
-  filter: var(--logo-filter-dark); /* Apply filter for dark mode */
-  transition: filter 0.3s ease;
-}
-body.light-mode .site-logo {
-  filter: var(--logo-filter-light); /* Use light mode filter */
-}
+.site-logo { max-height: 35px; width: auto; }
+body.light-mode .site-brand { filter: brightness(0.85) saturate(0); }
+body.light-mode .site-brand:hover { filter: brightness(1) saturate(1); }
 html[dir="rtl"] .site-logo { margin-right: 0; margin-left: 8px; } /* RTL logo margin */
 
 /* ... (keep nav link, toggler styles) ... */
@@ -209,7 +203,7 @@ html[dir="rtl"] .site-logo { margin-right: 0; margin-left: 8px; } /* RTL logo ma
 .rating-flags-container { padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
 
 /* Rating Badge */
-.rating-badge { display: inline-block; font-family: var(--font-heading); font-weight: 600; font-size: 0.75rem; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; margin-right: 6px; margin-bottom: 6px; text-align: center; box-shadow: inset 0 -1px 1px rgba(0,0,0,0.3); color: #000; }
+.rating-badge { display: inline-block; font-family: var(--font-heading); font-weight: 600; font-size: 0.75rem; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; text-align: center; color: #000; }
 
 .rating-icon { font-size: 1.7em; vertical-align: -2px; margin-right: 4px; position: relative; top: 1px; }
 .rating-label { position: relative; top: -2px; }
@@ -240,6 +234,7 @@ html[dir="rtl"] .rating-label { position: relative; top: 0; }
 .store-link.other { border-left: 3px solid var(--text-secondary); }
 .mgc-rating-section { margin-bottom: 1.5rem !important; }
 .critic-reviews-section { padding-top: 1.5rem; }
+.sharing-buttons { display: inline-block; position: relative; top: -2px; left: -5px; right: -5px;}
 .sharing-buttons .btn { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
 .sharing-buttons .btn:hover { background-color: var(--bg-element-lighter); border-color: var(--border-lighter); color: var(--text-primary); }
 
@@ -374,14 +369,18 @@ body.light-mode .filter-sort-form .form-check-input:focus {
 
 /* 12. Homepage Hero */
 .homepage-hero { background: var(--bg-element); padding: 3rem 1.5rem; margin-bottom: 3rem !important; border-radius: 6px; border: 1px solid var(--border-color); text-align: center; }
-.homepage-hero h1 { color: var(--text-primary); font-size: 2rem; font-weight: 800;}
+.homepage-hero .logo { margin-top: -33px; }
 .homepage-hero p.lead { color: var(--text-secondary); font-weight: 400; font-size: 1rem; max-width: 600px; margin: 0 auto 1.5rem auto; }
 .homepage-hero .btn { font-weight: 600; text-transform: uppercase; padding: 0.6rem 1.2rem; font-size: 0.9rem; letter-spacing: 0.5px; border-radius: 4px; border-width: 1px; }
 .homepage-hero .btn-primary { background-color: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); }
 .homepage-hero .btn-primary:hover { background-color: var(--accent-hover); border-color: var(--accent-hover); transform: translateY(-2px); }
+.homepage-hero input { font-size: 1rem; }
 .homepage-hero .btn-outline-secondary { color: var(--text-primary); border-color: var(--text-secondary); }
 .homepage-hero .btn-outline-secondary:hover { background-color: var(--bg-element-lighter); color: var(--text-primary); border-color: var(--text-primary); transform: translateY(-2px); }
 .homepage-hero .section-title { font-size: 1.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem !important; color: var(--accent-primary); text-align: left; font-weight: 800;}
+.homepage-hero .logo-text-ar { font-family: 'Tajawal', 'sans-serif'; font-weight: 800; text-align: right; }
+.homepage-hero .logo-text-en { font-family: 'Montserrat', 'sans-serif'; font-weight: 700; text-align: left; }
+.homepage-hero .logo-text-ar, .homepage-hero .logo-text-en { color: #00c891; display: inline-block; font-size: 30px; line-height: 1; position: relative; top: 31px; margin: 0 10px; }
 .article-summary h5 a { color: var(--text-primary); text-decoration: none; font-size: 1rem; font-weight: var(--font-heading-weight); }
 .article-summary h5 a:hover { color: var(--accent-primary); }
 .article-summary-meta { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem; }
@@ -501,8 +500,8 @@ body.light-mode .list-group-item.active:hover, body.light-mode .list-group-item.
 /* ==========================================================================
    RTL Overrides (Consolidated)
    ========================================================================== */
-html[dir="rtl"] body { text-align: right; font-family: 'Tajawal', 'Cairo', var(--font-primary), sans-serif; }
-html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3, html[dir="rtl"] h4, html[dir="rtl"] h5, html[dir="rtl"] h6 { font-family: 'Tajawal', 'Cairo', var(--font-heading), sans-serif; }
+html[dir="rtl"] body { text-align: right; font-family: 'Noto', var(--font-primary), sans-serif; }
+html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3, html[dir="rtl"] h4, html[dir="rtl"] h5, html[dir="rtl"] h6 { font-family: 'Tajawal', var(--font-heading), sans-serif; }
 html[dir="rtl"] .navbar-nav { margin-right: auto !important; margin-left: 0 !important; padding-right: 0; }
 html[dir="rtl"] .dropdown-menu-end { right: auto !important; left: 0 !important; }
 html[dir="rtl"] .dropdown-menu[data-bs-popper] { left: 0 !important; right: auto !important; }
@@ -511,7 +510,6 @@ html[dir="rtl"] .page-header::after { left: auto; right: 0; }
 html[dir="rtl"] .page-header .search-form { margin-right: auto !important; margin-left: 0 !important; }
 html[dir="rtl"] .filter-sort-form .text-end { text-align: left !important; }
 html[dir="rtl"] .game-meta, html[dir="rtl"] .detail-meta { text-align: right; }
-html[dir="rtl"] .rating-badge { margin-left: 6px; margin-right: 0; }
 html[dir="rtl"] .flag-item .flag-symbol { margin-right: 0; margin-left: 8px; }
 html[dir="rtl"] .store-link { margin-right: 0; margin-left: 5px; border-left: none; }
 html[dir="rtl"] .store-link.steam { border-right: 3px solid #66c0f4; }

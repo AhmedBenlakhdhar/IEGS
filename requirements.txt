@@ -7,5 +7,5 @@ tzdata
 django-modeltranslation
 django-recaptcha
 django-widget-tweaks
-django-ckeditor==6.7.1
+django-ckeditor==6.7.2
 django-compressor

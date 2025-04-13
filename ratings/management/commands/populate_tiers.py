@@ -10,8 +10,7 @@ TIER_DATA = [
     {'tier_code': 'HAL', 'display_name': _('Acceptable'),   'icon_name': 'check_circle', 'color_hex': '#00e676', 'order': 0, 'description': _('Permissible with minimal or no concerns.')},
     {'tier_code': 'MSH', 'display_name': _('Doubtful'),     'icon_name': 'warning',      'color_hex': '#ffc107', 'order': 1, 'description': _('Contains elements requiring caution or avoidance.')},
     {'tier_code': 'HRM', 'display_name': _('Haram'),        'icon_name': 'cancel',       'color_hex': '#ff5252', 'order': 2, 'description': _('Contains significant unavoidable Haram content.')},
-    # Keep Kufr/Shirk as two words for clarity, or choose one like 'Disbelief' if preferred
-    {'tier_code': 'KFR', 'display_name': _('Kufr/Shirk'),   'icon_name': 'gpp_bad',      'color_hex': '#78909c', 'order': 3, 'description': _('Contains elements contradicting core Aqidah (Kufr/Shirk).')},
+    {'tier_code': 'KFR', 'display_name': _('Kufr/Shirk'),   'icon_name': 'gpp_bad',      'color_hex': '#78909c', 'order': 3, 'description': _('Contains elements contradicting core Aqidah (Creed).')},
 ]
 
 class Command(BaseCommand):

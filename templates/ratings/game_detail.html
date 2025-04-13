@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 {% load widget_tweaks %}
-{% load ratings_extras %} {# Load custom tags #}
+{% load ratings_extras %}
 
 {% block title %}{{ game.title }} - {% translate "MGC Rating Details" %}{% endblock %}
 
@@ -12,38 +12,43 @@
 <div class="row mb-4">
     <div class="col-md-4">
         <div class="detail-image-wrapper mb-3"><img src="{% if game.cover_image_url %}{{ game.cover_image_url }}{% else %}https://via.placeholder.com/300x400.png/20232a/e8eaf6?text=No+Image{% endif %}" class="img-fluid" alt="{% blocktranslate %}{{ game.title }} Cover{% endblocktranslate %}" loading="lazy"></div>
-        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios or game.available_quest %}<div class="detail-platform-section mb-3"><h6 class="detail-platform-title">{% translate "Available On:" %}</h6><div class="platform-icons-container">{% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}{% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}{% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}{% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>{% endif %}{% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}{% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}{% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}</div></div>{% endif %}
-        {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}{% if game.rating_tier.tier_code != 'KFR' and game.rating_tier.tier_code != 'HRM' %}<div class="store-links-section mb-3"><h6 class="store-links-title">{% translate "Where to Buy:" %}</h6>{% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}{% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}{% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}{% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}</div>{% endif %}{% endif %}
     </div>
     <div class="col-md-8">
         <h1 class="detail-title mb-1">{{ game.title }}</h1>
         <p class="detail-meta text-secondary mb-3">{% if game.developer and game.developer_slug %}<a href="{% url 'ratings:games_by_developer' developer_slug=game.developer_slug %}">{{ game.developer }}</a>{% elif game.developer %}{{ game.developer }}{% endif %}{% if game.developer and game.publisher %} / {% endif %}{% if game.publisher and game.publisher_slug %}<a href="{% url 'ratings:games_by_publisher' publisher_slug=game.publisher_slug %}">{{ game.publisher }}</a>{% elif game.publisher %}{{ game.publisher }}{% endif %}{% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}</p>
-        <div class="mb-3"> <span class="rating-badge rating-{{ game.rating_tier.tier_code }}" style="background-color: var(--rating-{{ game.rating_tier.tier_code }});"><span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span><span class="rating-label">{{ game.rating_tier.display_name }}</span></span> <span class="rating-tier-description text-secondary small">{{ game.rating_tier.description }}</span></div>
-        <div class="sharing-buttons mb-3"> <span class="small text-secondary me-2">{% translate "Share:" %}</span> <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on Facebook' %}"><i class="fab fa-facebook-f"></i></a> <a href="https://x.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ game.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on X' %}"><i class="fab fa-x-twitter"></i></a> <a href="https://wa.me/?text={{ game.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary" title="{% translate 'Share on WhatsApp' %}"><i class="fab fa-whatsapp"></i></a> <button id="copy-link-btn" class="btn btn-sm btn-outline-secondary" title="{% translate 'Copy link' %}"><i class="fas fa-link"></i></button> <span id="copy-link-success" class="text-success small ms-2" style="display: none;">{% translate 'Link copied!' %}</span></div>
-        {# --- Quick Summary (Game Summary + Rationale) --- #}
+        {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}{% if game.rating_tier.tier_code != 'KFR' and game.rating_tier.tier_code != 'HRM' %}<div class="store-links-section mb-3"><h6 class="store-links-title">{% translate "Where to Buy:" %}</h6>{% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}{% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}{% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}{% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}</div>{% endif %}{% endif %}
+        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios or game.available_quest %}<div class="detail-platform-section mb-3"><h6 class="detail-platform-title">{% translate "Available On:" %}</h6><div class="platform-icons-container">{% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}{% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}{% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}{% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>{% endif %}{% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}{% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}{% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}</div></div>{% endif %}
+        <div class="mb-3"> <span class="rating-badge rating-{{ game.rating_tier.tier_code }}" style="background-color: var(--rating-{{ game.rating_tier.tier_code }});">
+            <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span><span class="rating-label">{{ game.rating_tier.display_name }}</span></span>
+            <div class="sharing-buttons mb-3"> <span class="small text-secondary me-2"></span> <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on Facebook' %}"><i class="fab fa-facebook-f"></i></a> <a href="https://x.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ game.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on X' %}"><i class="fab fa-x-twitter"></i></a> <a href="https://wa.me/?text={{ game.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary" title="{% translate 'Share on WhatsApp' %}"><i class="fab fa-whatsapp"></i></a> <button id="copy-link-btn" class="btn btn-sm btn-outline-secondary" title="{% translate 'Copy link' %}"><i class="fas fa-link"></i></button> <span id="copy-link-success" class="text-success small ms-2" style="display: none;">{% translate 'Link copied!' %}</span></div>
+            <br>
+            <span class="rating-tier-description text-secondary small">{{ game.rating_tier.description }}</span>
+        </div>
+    </div>
+</div>
+
+{# --- Row 2: MGC Descriptors --- #}
+<div class="row mb-4">
+    {# --- Quick Summary --- #}
+    <div class="col-md-6 col-lg-4">
         <div class="quick-summary mb-3">
-            <h4 class="section-title">{% translate "Rating Summary" %}</h4> {# Changed Title #}
+            <h4 class="section-title">{% translate "Rating Summary" %}</h4>
             <div class="quick-summary-content">
                 {% if game.summary %}<p>{{ game.summary|linebreaksbr }}</p>{% endif %}
-                {% if game.rationale %}<p>{{ game.rationale|linebreaksbr }}</p>{% endif %} {# Just the rationale #}
-                {% if not game.summary and not game.rationale %}
+                {% if not game.summary %}
                     <p class="text-secondary">{% translate "No summary available." %}</p>
                 {% endif %}
             </div>
         </div>
-         {# --- End Quick Summary --- #}
     </div>
-</div>
-
-{# --- Row 2: MGC Descriptors ONLY --- #}
-<div class="row mb-4">
-    <div class="col-12">
+    {# --- End Quick Summary --- #}
+    <div class="col-md-6 col-lg-4">
         <div class="content-descriptors">
              <h4 class="section-title">{% translate "MGC Content Descriptors" %}</h4>
              {% if mgc_concerns %}
                  <div class="row">
-                     {% for concern in mgc_concerns %} {# Loop through non-None MGC concerns from view #}
-                         <div class="col-md-6">
+                     {% for concern in mgc_concerns %}
+                         <div class="col-md-12">
                              <div class="descriptor-item">
                                  <span class="descriptor-icon material-symbols-outlined" title="{{ concern.name }}">{{ concern.icon }}</span>
                                  <span class="descriptor-name">{{ concern.name }}</span>
@@ -60,24 +65,21 @@
              {% endif %}
         </div>
     </div>
-</div>
-
-{# --- Row 3: Community Feedback & Contribution Form Trigger --- #}
-<div class="row">
-    <div class="col-12">
+    <div class="col-md-12 col-lg-4">
         <div class="user-contributions-section" id="user-contributions-section">
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
                  <h4 class="section-title mb-0 border-0 pb-0">{% translate "Community Feedback" %}</h4>
-                 {% if user.is_authenticated and user.is_active %}
-                     <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#contributionModal"><span class="material-symbols-outlined small-icon me-1">edit_note</span>{% translate "Add/Edit Contribution" %}</button>
-                 {% elif user.is_authenticated and not user.is_active %}
-                      <span class="badge bg-warning text-dark">{% translate "Account inactive - cannot contribute" %}</span>
-                 {% else %}
-                     {% url 'login' as login_url_contrib %}
-                     <a href="{{ login_url_contrib }}?next={{ request.path }}#user-contributions-section" class="btn btn-sm btn-outline-secondary">{% translate "Login to Contribute" %}</a>
-                 {% endif %}
             </div>
-
+            <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+                {% if user.is_authenticated and user.is_active %}
+                    <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#contributionModal"><span class="material-symbols-outlined small-icon me-1">edit_note</span>{% translate "Add/Edit Contribution" %}</button>
+                {% elif user.is_authenticated and not user.is_active %}
+                    <span class="badge bg-warning text-dark">{% translate "Account inactive - cannot contribute" %}</span>
+                {% else %}
+                    {% url 'login' as login_url_contrib %}
+                    <a href="{{ login_url_contrib }}?next={{ request.path }}#user-contributions-section" class="btn btn-sm btn-outline-secondary">{% translate "Login to Contribute" %}</a>
+                {% endif %}
+            </div>
             {# Community Consensus Overview #}
             <div class="mb-4">
                 <div class="row">
