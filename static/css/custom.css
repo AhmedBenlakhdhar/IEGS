@@ -259,7 +259,7 @@ html[dir="rtl"] .navbar .dropdown-menu.show { left: 0; right: auto; }
 .guide-category-header[data-bs-toggle="collapse"]:hover { background-color: var(--bg-element-lighter); }
 /* Style for headers that are NOT expandable (i.e., severity is None) */
 
-.category-title-text { font-size: 0.8rem; font-weight: var(--font-heading-weight); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; }
+.category-title-text { font-size: 0.8rem; font-weight: var(--font-heading-weight); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
 
 /* Severity Display */
 .severity-display { gap: 0.25rem; }
@@ -447,7 +447,7 @@ html[dir="rtl"] .comment-actions .comment-action-btn { margin-left: 0; margin-ri
 html[dir="rtl"] .comment-unapproved, html[dir="rtl"] .contribution-unapproved { border-left: none; border-right: 3px solid var(--rating-mashbouh); padding-left: 0; padding-right: 10px; /* RTL */ }
 .g-recaptcha { margin-bottom: 1rem; }
 .comment-form-container .alert, .contribution-form-container .alert { font-size: 0.9rem; }
-.guide-subsection-title { font-size: 1.1rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0; padding-top: 0.5rem; border-bottom: none; border-top: 1px dashed var(--border-lighter); }
+.guide-subsection-title { font-size: 1.1rem; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0; padding-top: 0.5rem; border-bottom: none; border-top: 1px dashed var(--border-lighter); }
 .sharing-buttons .btn { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
 html[dir="rtl"] .sharing-buttons .btn { margin-right: 0; margin-left: 0.25rem; }
 .user-stars i, .user-stars-input i { margin-right: 1px; } /* Spacing between stars */
@@ -679,6 +679,9 @@ html[dir="rtl"] .rating-risks {
 }
 .rating-risks>div {
   margin: 0 0 0 5%;
+}
+html[dir="rtl"] .rating-risks>div {
+  margin: 0 5% 0 0;
 }
 .rating-risks>div>div {
   font-family: 'Noto Sans', sans-serif;

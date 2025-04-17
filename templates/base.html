@@ -64,8 +64,6 @@
                       <li><a class="dropdown-item {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}" href="{% url 'ratings:profile_edit' %}"><span class="material-symbols-outlined me-2 small-icon">manage_accounts</span>{% translate "Edit Profile / Password" %}</a></li>
                     </span></li>
                   <li>
-                    <a class="dropdown-item" href="{% url 'password_change' %}">
-                      <span class="material-symbols-outlined me-2 small-icon">lock_reset</span>{% translate "Change Password" %}</a></li>
                       {% if user.is_staff %}
                         <li>
                           <a class="dropdown-item admin-link-dd" href="/admin/">
