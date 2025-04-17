@@ -50,7 +50,7 @@
                   <div class="rating-explainer-card">
                       <div class="rating-explainer-inner">
                           <div class="rating-explainer-front">
-                              <img src="{% static 'img/categories/'|add:tier.tier_code|add:'.svg' %}" alt="{{ tier.display_name }}" class="rating-explainer-icon">
+                              <img src="{% static 'img/categories/'|add:tier.tier_code|lower|add:'.svg' %}" alt="{{ tier.display_name }}" class="rating-explainer-icon">
                           </div>
                           <div class="rating-explainer-back p-5" style="border-bottom: 10px solid var(--rating-{{ tier.tier_code }});">
                             <h6 class="rating-tier-name pb-1" style="border-bottom: 3px solid var(--rating-{{ tier.tier_code }});">{{ tier.display_name }}</h6>

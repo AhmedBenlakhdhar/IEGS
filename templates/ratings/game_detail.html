@@ -46,7 +46,7 @@
             {# Rating Graphic #}
             <div class="row mx-0 mb-2">
                 <div class="col-4 rating-category">
-                    <img src="{% static 'img/categories/'|add:game.rating_tier.tier_code|add:'.svg' %}" alt="{{ game.rating_tier.display_name }}" class="rating-explainer-icon">
+                    <img src="{% static 'img/categories/'|add:game.rating_tier.tier_code|lower|add:'.svg' %}" alt="{{ game.rating_tier.display_name }}" class="rating-explainer-icon">
                 </div>
                 <div class="col-8 rating-risks">
                     <div>
