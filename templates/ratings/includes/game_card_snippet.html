@@ -6,15 +6,6 @@
 
 <a href="{{ game.get_absolute_url }}" class="card-link-wrapper">
   <div class="card game-card h-100">
-    {% if game.cover_image_url %}
-      {# ADD loading="lazy" HERE #}
-      <img src="{{ game.cover_image_url }}" class="card-img-top" alt="{% blocktranslate %}{{ game.title }} Cover{% endblocktranslate %}" loading="lazy">
-    {% else %}
-      <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 180px;">
-        <span>{% translate "No Image" %}</span>
-      </div>
-    {% endif %}
-
     <div class="card-body d-flex flex-column">
       <h4 class="card-title">{{ game.title }}</h4>
 

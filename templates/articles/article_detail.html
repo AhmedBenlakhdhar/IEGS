@@ -35,13 +35,6 @@
             <button id="copy-link-btn" class="btn btn-sm btn-outline-secondary" title="{% translate 'Copy link' %}"><i class="fas fa-link"></i></button>
             <span id="copy-link-success" class="text-success small ms-2" style="display: none;">{% translate 'Link copied!' %}</span>
         </div>
-
-        {# Back Link: Icon #}
-        <a href="{% url 'articles:article_list' %}" class="back-link mt-4">
-            <span class="material-symbols-outlined" style="vertical-align: middle;">arrow_back</span>
-            {% translate "Back to Articles" %}
-        </a>
-
   </article>
 
   {# --- Comments Section --- #}
@@ -106,6 +99,14 @@
        {% endif %}
   </section>
   {# --- END: Comments Section --- #}
+  
+  <div>
+    {# Back Link: Icon #}
+    <a href="{% url 'articles:article_list' %}" class="back-link mt-4">
+        <span class="material-symbols-outlined" style="vertical-align: middle;">arrow_back</span>
+        {% translate "Back to Articles" %}
+    </a>
+  </div>
 
 {% endblock %}
 

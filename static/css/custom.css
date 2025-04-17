@@ -1,4 +1,5 @@
 /* static/css/custom.css - UPDATED for v2.0 Rating System */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wdth@75&display=swap');
 
 /* 1. Variables and Base */
 :root {
@@ -33,11 +34,21 @@
   --rating-HRM: var(--rating-haram);
   --rating-KFR: var(--rating-kufr);
 
-  /* NEW Severity Colors & Variables */
+/* UPDATED Severity Colors & Variables */
   --severity-n-color: #9e9e9e; /* Grey for None */
   --severity-l-color: var(--rating-halal); /* Green for Mild */
   --severity-m-color: var(--rating-mashbouh); /* Yellow/Amber for Moderate */
   --severity-s-color: var(--rating-haram); /* Red for Severe (Replaces H/P) */
+
+body.light-mode {
+  /* ... other vars ... */
+  --severity-n-color: #adb5bd; /* Light mode grey */
+  /* L, M, S can inherit from dark mode vars if contrast is okay */
+  --severity-l-color: var(--rating-halal);
+  --severity-m-color: var(--rating-mashbouh);
+  --severity-s-color: var(--rating-haram);
+   /* REMOVE --severity-h-color, --severity-p-color */
+}
 
   /* Alert/Warning styles */
   --rating-mashbouh-text: var(--bg-primary);
@@ -175,15 +186,40 @@ body.light-mode .site-brand { filter: brightness(0.85) saturate(0); }
 body.light-mode .site-brand:hover { filter: brightness(1) saturate(1); }
 html[dir="rtl"] .site-logo { margin-right: 0; margin-left: 8px; } /* RTL logo margin */
 
-/* ... (keep nav link, toggler styles) ... */
 .navbar .nav-link, .navbar .dropdown-toggle { padding-top: 0.7rem; padding-bottom: 0.7rem; } /* Adjust padding for vertical centering */
 .navbar-nav .nav-item { display: flex; align-items: center; } /* Align items vertically */
-
-/* Account Dropdown Icons */
-.dropdown-menu .material-symbols-outlined.small-icon {
-  font-size: 1.1em;
-  vertical-align: -3px; /* Fine-tune vertical alignment */
+.dropdown-menu { background-color: var(--bg-element);}
+.dropdown-item { transition: all 0.2s ease; }
+.dropdown-item:hover { color: var(--bg-element); background-color: var(--accent-primary) }
+.dropdown-item, .dropdown-item-text { color: var(--text-primary) }
+.navbar .dropdown-menu { box-shadow: 0 1px 3px rgba(0,0,0,0.07); border-top: 10px solid var(--accent-primary); top: calc(100% + 10px); border-radius: 0 0 var(--bs-dropdown-border-radius) var(--bs-dropdown-border-radius); }
+.navbar .dropdown-menu { transform: translateY(-50%) scaleY(0); opacity: 0; right: 0; display: block; transition: all 0.2s ease;}
+.navbar .dropdown-menu.show { transform: translateY(0) scaleY(1); opacity: 1; right: 0; }
+.navbar .nav-icon .dropdown-menu {
+  top: calc(100% + 18px);
 }
+.navbar .dropdown-menu:before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-top: 5px solid var(--bg-primary);
+}
+html[dir="rtl"] .navbar .dropdown-menu:before {
+  right: auto;
+  left: 10px;
+}
+html[dir="rtl"] .navbar .dropdown-item, html[dir="rtl"] .navbar .dropdown-item-text {
+  text-align: right;
+}
+html[dir="rtl"] .navbar .dropdown-menu { left: 0; right: auto; }
+html[dir="rtl"] .navbar .dropdown-menu.show { left: 0; right: auto; }
 
 /* 4. Main Content & Page Headers */
 .main-content { padding-top: 3rem; padding-bottom: 4rem; }
@@ -195,8 +231,6 @@ html[dir="rtl"] .site-logo { margin-right: 0; margin-left: 8px; } /* RTL logo ma
 .card.game-card { background-color: var(--bg-element); border: 1px solid var(--border-color); border-radius: 6px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; overflow: hidden; }
 .card-link-wrapper { display: block; text-decoration: none; color: inherit; transition: none; height: 100%; }
 .card-link-wrapper:hover .card.game-card { transform: translateY(-4px); border-color: var(--border-lighter); box-shadow: 0 6px 12px var(--shadow-color); }
-.card-img-top { aspect-ratio: 2.14; object-fit: cover; border-bottom: 1px solid var(--border-color); }
-.card-img-top.bg-secondary { background-color: var(--bg-element-lighter) !important; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-family: var(--font-primary); font-size: 0.9rem; }
 .card-body { padding: 1rem 1.25rem; background-color: var(--bg-element); }
 .card-title { font-size: 1.1rem; margin-bottom: 0.25rem; color: var(--text-primary); font-weight: var(--font-heading-weight); text-transform: uppercase;}
 .game-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
@@ -224,8 +258,6 @@ html[dir="rtl"] .rating-label { position: relative; top: 0; }
 .detail-overall-rating { margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.95rem; }
 .detail-overall-rating .rating-badge { font-size: 0.8rem; padding: 4px 10px; vertical-align: middle; }
 .game-summary { font-size: 0.95rem; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 0; }
-.store-links-section { border-top: 1px solid var(--border-color); padding-top: 0.75rem; }
-.store-links-title { font-family: var(--font-heading); font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
 .store-link { display: inline-block; background-color: var(--bg-tertiary); color: var(--text-secondary); padding: 4px 10px; border-radius: 4px; margin-right: 5px; margin-bottom: 5px; font-size: 0.8rem; font-weight: 600; text-decoration: none; border: 1px solid var(--border-color); transition: all 0.2s ease; }
 .store-link:hover { color: var(--text-primary); background-color: var(--bg-element-lighter); border-color: var(--border-lighter); text-decoration: none; }
 .store-link.steam { border-left: 3px solid #66c0f4; }
@@ -234,7 +266,7 @@ html[dir="rtl"] .rating-label { position: relative; top: 0; }
 .store-link.other { border-left: 3px solid var(--text-secondary); }
 .mgc-rating-section { margin-bottom: 1.5rem !important; }
 .critic-reviews-section { padding-top: 1.5rem; }
-.sharing-buttons { display: inline-block; position: relative; top: -2px; left: -5px; right: -5px;}
+.sharing-buttons { display: inline-block; position: relative; }
 .sharing-buttons .btn { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
 .sharing-buttons .btn:hover { background-color: var(--bg-element-lighter); border-color: var(--border-lighter); color: var(--text-primary); }
 
@@ -242,27 +274,26 @@ html[dir="rtl"] .rating-label { position: relative; top: 0; }
 .mgc-guide-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
 .guide-section-title { font-weight: var(--font-heading-weight); color: var(--text-primary); margin-bottom: 1.5rem !important; text-align: center; text-transform: uppercase; letter-spacing: 1px; font-size: 1.5rem; }
 .guide-subsection-title { font-size: 1.1rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border-lighter); } /* Added styling for subsections */
-.guide-category-block { background-color: transparent; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 1rem; overflow: hidden; }
+.guide-category-block { margin-bottom: 1rem; overflow: hidden; }
 .descriptor-severity { min-width: 120px; line-height: 1.2; } /* Adjusted width */
 
 /* Category Header */
-.guide-category-header { background-color: var(--bg-element); padding: 0.75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; cursor: default; /* Default cursor */ position: relative; transition: background-color 0.2s ease; }
+.guide-category-header { display: flex; justify-content: space-between; align-items: center; position: relative; transition: background-color 0.2s ease; }
 /* Make header clickable only if it has the collapse attribute */
 .guide-category-header[data-bs-toggle="collapse"] { cursor: pointer; }
 .guide-category-header[data-bs-toggle="collapse"]:hover { background-color: var(--bg-element-lighter); }
 /* Style for headers that are NOT expandable (i.e., severity is None) */
-.guide-category-header:not([data-bs-toggle="collapse"]):hover { background-color: var(--bg-element); /* Prevent hover background change */ }
 
 .category-title-text { font-size: 0.8rem; font-weight: var(--font-heading-weight); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; }
 
 /* Severity Display */
 .severity-display { gap: 0.25rem; }
 .severity-text { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1; }
-.severity-circle { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-left: 10px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.2); }
+.severity-circle { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-left: 5px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.2); position: relative; top: 2px; }
 .severity-circle.severity-n { background-color: var(--severity-n-color); }
 .severity-circle.severity-l { background-color: var(--severity-l-color); }
 .severity-circle.severity-m { background-color: var(--severity-m-color); }
-.severity-circle.severity-s { background-color: var(--severity-s-color); } /* UPDATED */
+.severity-circle.severity-s { background-color: var(--severity-s-color); }
 html[dir="rtl"] .severity-circle { margin-left: 0; margin-right: 10px; }
 
 /* Toggle Indicator */
@@ -399,15 +430,14 @@ body.light-mode .filter-sort-form .form-check-input:focus {
 .glossary-content dt .material-symbols-outlined, .glossary-content dt .severity-circle { margin-right: 8px; vertical-align: -3px; font-size: 1.7em; }
 .glossary-content dt .severity-circle { width: 14px; height: 14px; border: none; display: inline-block; border-radius: 50%;}
 
-/* 15. Theme & Language Toggle Buttons */
-.theme-toggle-button, .language-toggle-button { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: color 0.2s, border-color 0.2s, background-color 0.2s; display: flex; align-items: center; justify-content: center; line-height: 1; }
-.theme-toggle-button { margin-left: 1rem; }
-.language-toggle-button { font-family: var(--font-heading); font-weight: 600; font-size: 0.9rem; margin-left: 0.5rem; } /* Reduced margin */
-.theme-toggle-button:hover, .language-toggle-button:hover { color: var(--accent-primary); border-color: var(--accent-primary); background-color: var(--bg-element-lighter); }
-.theme-toggle-button .material-symbols-outlined { font-size: 1.2rem; }
-html[dir="rtl"] .theme-toggle-button { margin-left: 0; margin-right: 1rem; }
+/* 15. Theme & Language & User Toggle Buttons */
+.theme-toggle-button, .language-toggle-button, .user-button { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: color 0.2s, border-color 0.2s, background-color 0.2s; display: flex; align-items: center; justify-content: center; line-height: 1; margin-left: 0.5rem; }
+.language-toggle-button { font-family: var(--font-heading); font-weight: 600; font-size: 0.9rem; }
+.theme-toggle-button:hover, .language-toggle-button:hover, .user-button:hover { color: var(--accent-primary); border-color: var(--accent-primary); background-color: var(--bg-element-lighter); }
+.theme-toggle-button .material-symbols-outlined, .user-button .material-symbols-outlined { font-size: 1.2rem; }
+html[dir="rtl"] .theme-toggle-button, html[dir="rtl"] .language-toggle-button, html[dir="rtl"] .user-button { margin-left: 0; margin-right: 0.5rem; }
 html[dir="rtl"] .language-toggle-button { margin-left: 0; margin-right: 0.5rem; }
-#language-toggle-text { margin-top: -4px; } /* Adjust vertical alignment */
+#language-toggle-text { margin-top: -4px; }
 html[dir="rtl"] #language-toggle-text { margin-top: 0px; }
 
 /* 16. Authentication Forms */
@@ -441,8 +471,8 @@ html[dir="rtl"] .comment-actions .comment-action-btn { margin-left: 0; margin-ri
 html[dir="rtl"] .comment-unapproved, html[dir="rtl"] .contribution-unapproved { border-left: none; border-right: 3px solid var(--rating-mashbouh); padding-left: 0; padding-right: 10px; /* RTL */ }
 .g-recaptcha { margin-bottom: 1rem; }
 .comment-form-container .alert, .contribution-form-container .alert { font-size: 0.9rem; }
-.guide-subsection-title { font-size: 1.1rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border-lighter); }
-.sharing-buttons .btn { padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-right: 0.25rem; }
+.guide-subsection-title { font-size: 1.1rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0; padding-top: 0.5rem; border-bottom: none; border-top: 1px dashed var(--border-lighter); }
+.sharing-buttons .btn { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
 html[dir="rtl"] .sharing-buttons .btn { margin-right: 0; margin-left: 0.25rem; }
 .user-stars i, .user-stars-input i { margin-right: 1px; } /* Spacing between stars */
 html[dir="rtl"] .user-stars i, html[dir="rtl"] .user-stars-input i { margin-right: 0; margin-left: 1px; }
@@ -657,3 +687,108 @@ html[dir="rtl"] .severity-circle { margin-left: 0; margin-right: 6px; }
 #contributionModal .form-label-sm { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600; }
 #contributionModal .small-icon { font-size: 1em; vertical-align: -2px; }
 #contributionModal .form-select-sm { height: calc(1.5em + 0.5rem + 2px); padding-top: 0.25rem; padding-bottom: 0.25rem; }
+
+.rating-category {
+  padding: 0;
+}
+.rating-risks {
+  border: solid black 1px;
+}
+html:not([dir="rtl"]) .rating-risks {
+  border-left: 0;
+}
+html[dir="rtl"] .rating-risks {
+  border-right: 0;
+}
+.rating-risks>div {
+  margin: 0;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.rating-risks>div>div {
+  font-family: 'Noto Sans', sans-serif;
+  font-variation-settings: 'wdth' 75;
+  font-size: 1.1rem;
+}
+
+.rating-explainer-item {
+  padding: 50px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Homepage - Rating Explainer Flip Cards */
+.rating-explainer-card {
+  background-color: transparent;
+  width: 100%;
+  min-height: 220px;
+  aspect-ratio: 1 / 1.3;
+  perspective: 3000px;
+}
+
+.rating-explainer-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.4s;
+  transform-style: preserve-3d;
+  box-shadow: 0 2px 2px var(--shadow-color);
+  border-radius: 8px;
+  background-color: var(--bg-element);
+  border: 1px solid var(--border-color);
+}
+
+/* Flip effect on hover */
+.rating-explainer-card:hover .rating-explainer-inner {
+  transform: rotateY(180deg) translateY(-5px) scale(1.08);
+  box-shadow: 0 12px 24px var(--shadow-color);
+}
+
+.rating-explainer-front,
+.rating-explainer-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+}
+
+.rating-explainer-front {
+  /* Front face is default */
+  background-color: var(--bg-element);
+  color: var(--text-primary);
+}
+
+.rating-explainer-back {
+  color: var(--text-secondary);
+  transform: rotateY(180deg);
+  overflow-y: auto;
+}
+
+.rating-tier-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 0;
+  letter-spacing: 0.5px;
+}
+
+.rating-explainer-back .rating-tier-name {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem !important;
+}
+
+.rating-tier-description {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}

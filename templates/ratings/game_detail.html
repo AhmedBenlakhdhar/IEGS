@@ -1,194 +1,354 @@
-{# templates/ratings/game_detail.html - Remove Summary Section, Update Layout #}
+{# templates/ratings/game_detail.html - Replaced Contributions with Suggestions #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
 {% load widget_tweaks %}
 {% load ratings_extras %}
 
-{% block title %}{{ game.title }} - {% translate "MGC Rating Details" %}{% endblock %}
+{% block title %}{{ game.title }} - {% translate "Rating Details" %}{% endblock %}
 
 {% block content %}
-{# --- Row 1: Header Info & Rating --- #}
 <div class="row mb-4">
     <div class="col-md-4">
-        <div class="detail-image-wrapper mb-3"><img src="{% if game.cover_image_url %}{{ game.cover_image_url }}{% else %}https://via.placeholder.com/300x400.png/20232a/e8eaf6?text=No+Image{% endif %}" class="img-fluid" alt="{% blocktranslate %}{{ game.title }} Cover{% endblocktranslate %}" loading="lazy"></div>
-    </div>
-    <div class="col-md-8">
         <h1 class="detail-title mb-1">{{ game.title }}</h1>
-        <p class="detail-meta text-secondary mb-3">{% if game.developer and game.developer_slug %}<a href="{% url 'ratings:games_by_developer' developer_slug=game.developer_slug %}">{{ game.developer }}</a>{% elif game.developer %}{{ game.developer }}{% endif %}{% if game.developer and game.publisher %} / {% endif %}{% if game.publisher and game.publisher_slug %}<a href="{% url 'ratings:games_by_publisher' publisher_slug=game.publisher_slug %}">{{ game.publisher }}</a>{% elif game.publisher %}{{ game.publisher }}{% endif %}{% if game.release_date %} ({{ game.release_date|date:"Y" }}){% endif %}</p>
-        {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}{% if game.rating_tier.tier_code != 'KFR' and game.rating_tier.tier_code != 'HRM' %}<div class="store-links-section mb-3"><h6 class="store-links-title">{% translate "Where to Buy:" %}</h6>{% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}{% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}{% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}{% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}</div>{% endif %}{% endif %}
-        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios or game.available_quest %}<div class="detail-platform-section mb-3"><h6 class="detail-platform-title">{% translate "Available On:" %}</h6><div class="platform-icons-container">{% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}{% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}{% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}{% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>{% endif %}{% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}{% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}{% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}</div></div>{% endif %}
-        <div class="mb-3"> <span class="rating-badge rating-{{ game.rating_tier.tier_code }}" style="background-color: var(--rating-{{ game.rating_tier.tier_code }});">
-            <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span><span class="rating-label">{{ game.rating_tier.display_name }}</span></span>
-            <div class="sharing-buttons mb-3"> <span class="small text-secondary me-2"></span> <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on Facebook' %}"><i class="fab fa-facebook-f"></i></a> <a href="https://x.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ game.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on X' %}"><i class="fab fa-x-twitter"></i></a> <a href="https://wa.me/?text={{ game.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary" title="{% translate 'Share on WhatsApp' %}"><i class="fab fa-whatsapp"></i></a> <button id="copy-link-btn" class="btn btn-sm btn-outline-secondary" title="{% translate 'Copy link' %}"><i class="fas fa-link"></i></button> <span id="copy-link-success" class="text-success small ms-2" style="display: none;">{% translate 'Link copied!' %}</span></div>
-            <br>
+        <div class="detail-meta-table">
+             {% if game.developer %} <div class="meta-row"> <span class="meta-label">{% translate "Developer" %}</span> <span class="meta-value">{% if game.developer_slug %}<a href="{% url 'ratings:games_by_developer' developer_slug=game.developer_slug %}">{{ game.developer }}</a>{% else %}{{ game.developer }}{% endif %}</span> </div> {% endif %}
+             {% if game.publisher %} <div class="meta-row"> <span class="meta-label">{% translate "Publisher" %}</span> <span class="meta-value">{% if game.publisher_slug %}<a href="{% url 'ratings:games_by_publisher' publisher_slug=game.publisher_slug %}">{{ game.publisher }}</a>{% else %}{{ game.publisher }}{% endif %}</span> </div> {% endif %}
+             {% if game.release_date %} <div class="meta-row"> <span class="meta-label">{% translate "Released" %}</span> <span class="meta-value">{{ game.release_date|date:"Y" }}</span> </div> {% endif %}
+        </div>
+        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios or game.available_quest %}
+            <div class="detail-platform-section mb-3">
+                <h6 class="detail-platform-title mt-5">{% translate "Available On" %}</h6>
+                <div class="platform-icons-container">
+                    {% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}
+                    {% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}
+                    {% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}
+                    {% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>{% endif %}
+                    {% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}
+                    {% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}
+                    {% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}
+                </div>
+            </div>
+            {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}{% if game.rating_tier.tier_code != 'KFR' and game.rating_tier.tier_code != 'HRM' %}
+                <div class="store-links-section mt-5">
+                    <h6 class="store-links-title">{% translate "Where to Buy" %}</h6>
+                    {% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}
+                    {% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}
+                    {% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}
+                    {% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            {# Rating Graphic #}
+            <div class="row mx-0 mb-2">
+                <div class="col-4 rating-category">
+                    <img src="{% static 'img/categories/'|add:game.rating_tier.tier_code|add:'.svg' %}" alt="{{ game.rating_tier.display_name }}" class="rating-explainer-icon">
+                </div>
+                <div class="col-8 rating-risks">
+                    <div>
+                        <div>
+                            {% if risk_summary_texts.A == 'None' %}
+                                No
+                            {% else %}
+                                {{ risk_summary_texts.A }}
+                            {% endif %}
+                            {% translate "Risks to Faith" %}
+                        </div>
+                        <div>
+                            {% if risk_summary_texts.B == 'None' %}
+                                No
+                            {% else %}
+                                {{ risk_summary_texts.B }}
+                            {% endif %}
+                            {% translate "Prohibition Exposure" %}
+                        </div>
+                        
+                        <div>
+                            {% if risk_summary_texts.C == 'None' %}
+                                No
+                            {% else %}
+                                {{ risk_summary_texts.C }}
+                            {% endif %}
+                            {% translate "Normalization Risks" %}
+                        </div>
+                        
+                        <div>
+                            {% if risk_summary_texts.D == 'None' %}
+                                No
+                            {% else %}
+                                {{ risk_summary_texts.D }}
+                            {% endif %}
+                            {% translate "Player Risks" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
             <span class="rating-tier-description text-secondary small">{{ game.rating_tier.description }}</span>
-        </div>
-    </div>
-</div>
 
-{# --- Row 2: MGC Descriptors --- #}
-<div class="row mb-4">
-    {# --- Quick Summary --- #}
-    <div class="col-md-6 col-lg-4">
-        <div class="quick-summary mb-3">
-            <h4 class="section-title">{% translate "Rating Summary" %}</h4>
-            <div class="quick-summary-content">
-                {% if game.summary %}<p>{{ game.summary|linebreaksbr }}</p>{% endif %}
-                {% if not game.summary %}
-                    <p class="text-secondary">{% translate "No summary available." %}</p>
-                {% endif %}
+             {# Sharing Buttons #}
+            <div class="sharing-buttons mb-3">
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on Facebook' %}"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://x.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ game.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on X' %}"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://wa.me/?text={{ game.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary" title="{% translate 'Share on WhatsApp' %}"><i class="fab fa-whatsapp"></i></a>
+                <button id="copy-link-btn" class="btn btn-sm btn-outline-secondary" title="{% translate 'Copy link' %}"><i class="fas fa-link"></i></button>
+                <span id="copy-link-success" class="text-success small ms-2" style="display: none;">{% translate 'Link copied!' %}</span>
             </div>
-        </div>
-    </div>
-    {# --- End Quick Summary --- #}
-    <div class="col-md-6 col-lg-4">
-        <div class="content-descriptors">
-             <h4 class="section-title">{% translate "MGC Content Descriptors" %}</h4>
-             {% if mgc_concerns %}
-                 <div class="row">
-                     {% for concern in mgc_concerns %}
-                         <div class="col-md-12">
-                             <div class="descriptor-item">
-                                 <span class="descriptor-icon material-symbols-outlined" title="{{ concern.name }}">{{ concern.icon }}</span>
-                                 <span class="descriptor-name">{{ concern.name }}</span>
-                                 <span class="descriptor-severity">
-                                     <span class="severity-label">{{ concern.severity_display }}</span>
-                                     <span class="severity-circle {{ concern.severity_class }}"></span>
-                                 </span>
-                             </div>
-                         </div>
-                     {% endfor %}
-                 </div>
-             {% else %}
-                 <p class="text-secondary small fst-italic">{% translate "No specific MGC content concerns noted." %}</p>
-             {% endif %}
-        </div>
-    </div>
-    <div class="col-md-12 col-lg-4">
-        <div class="user-contributions-section" id="user-contributions-section">
-            <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-                 <h4 class="section-title mb-0 border-0 pb-0">{% translate "Community Feedback" %}</h4>
-            </div>
-            <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-                {% if user.is_authenticated and user.is_active %}
-                    <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#contributionModal"><span class="material-symbols-outlined small-icon me-1">edit_note</span>{% translate "Add/Edit Contribution" %}</button>
-                {% elif user.is_authenticated and not user.is_active %}
-                    <span class="badge bg-warning text-dark">{% translate "Account inactive - cannot contribute" %}</span>
-                {% else %}
-                    {% url 'login' as login_url_contrib %}
-                    <a href="{{ login_url_contrib }}?next={{ request.path }}#user-contributions-section" class="btn btn-sm btn-outline-secondary">{% translate "Login to Contribute" %}</a>
-                {% endif %}
-            </div>
-            {# Community Consensus Overview #}
-            <div class="mb-4">
-                <div class="row">
-                    {% for flag in all_flags_info %} {# Iterate through all possible flags #}
-                        {% with consensus=user_consensus_severity|get_item:flag.symbol %}
-                        {% if consensus %} {# Only show if users have rated this category #}
-                            <div class="col-md-6">
-                                <details class="community-details">
-                                    <summary class="descriptor-item">
-                                        <span class="descriptor-icon material-symbols-outlined">{{ flag.symbol }}</span>
-                                        <span class="descriptor-name">{{ flag.description }}</span>
-                                        <span class="descriptor-severity">
-                                            {# User Consensus Rating #}
-                                            <span class="d-block severity-label">{% blocktranslate with count=consensus.count total=consensus.total %}Users ({{ count }}/{{ total }}):{% endblocktranslate %} {{ consensus.rating_display }} <span class="severity-circle {{ consensus.rating_css_class }}"></span></span>
-                                        </span>
-                                    </summary>
-                                    <div class="user-comments-for-category p-2 border-top border-secondary">
-                                        {% with category_contributions=contributions_by_category|get_item:flag.symbol %}
-                                            {% if category_contributions %}
-                                                {% for contrib in category_contributions|slice:":5" %}
-                                                    <div class="small mb-1 {% if contrib.is_spoiler %}text-warning border border-warning rounded p-1{% endif %}">
-                                                        <strong>{{ contrib.user.username }}:</strong>
-                                                        {% if contrib.content %} {{ contrib.content|linebreaksbr }}{% endif %}
-                                                        {% if contrib.is_spoiler %} <span class="badge bg-warning text-dark">{% translate "Spoiler" %}</span>{% endif %}
-                                                        <div class="comment-actions float-end"> {# Actions for individual comments #}
-                                                            {% if user.is_authenticated and user != contrib.user %}{% if user not in contrib.flagged_by.all %}<form action="{% url 'ratings:flag_contribution' contrib.id %}" method="post" style="display: inline;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-warning comment-action-btn py-0 px-1" title="{% translate 'Flag this contribution' %}"><i class="fa-regular fa-flag"></i></button></form>{% else %}<span class="text-secondary small"><i class="fa-solid fa-flag"></i></span>{% endif %}{% endif %}
-                                                            {% if user.is_staff or user == contrib.user %}<form action="{% url 'ratings:delete_contribution' contrib.id %}" method="post" style="display: inline;" onsubmit="return confirm('{% translate "Are you sure you want to delete this contribution?" %}');">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger comment-action-btn py-0 px-1" title="{% translate 'Delete this contribution' %}"><i class="fa-regular fa-trash-can"></i></button></form>{% endif %}
-                                                        </div>
-                                                    </div>
-                                                {% endfor %}
-                                                {% if category_contributions|length > 5 %}<p class="small text-secondary mb-0 mt-1 fst-italic">{% blocktranslate count remaining_count=category_contributions|length|add:"-5" %}...and {{ remaining_count }} more comment.{% plural %}...and {{ remaining_count }} more comments.{% endblocktranslate %}</p>{% endif %}
-                                            {% else %}
-                                                <p class="small text-secondary mb-0">{% translate "No user comments for this category yet." %}</p>
-                                            {% endif %}
-                                        {% endwith %}
-                                    </div>
-                                </details>
-                            </div>
-                        {% endif %}
-                        {% endwith %}
-                    {% endfor %}
-                    {% if not user_consensus_severity %}
-                        <p class="col-12 text-secondary small">{% translate "No user contributions have rated specific content concerns yet." %}</p>
+
+            {# Game Summary Text #}
+            <div class="quick-summary mt-2">
+                <h4 class="section-title">{% translate "Rating Summary" %}</h4>
+                <div class="quick-summary-content">
+                    {% if game.summary %}
+                        <p>{{ game.summary|linebreaksbr }}</p>
                     {% else %}
-                        <div class="col-12 mt-2"><small class="text-secondary">{% translate "Click on a concern to see user comments specific to that category." %}</small></div>
+                        <p class="text-secondary">{% translate "No summary available." %}</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
+    <div class="col-md-4">
+        <div class="content-descriptors">
+            <h4 class="section-title mb-0">{% translate "Content Descriptors" %}</h4>
+             <div class="row"> {# Use row for consistent layout #}
+                 {% for cat_prefix, concerns in grouped_mgc_concerns.items %}
+                    {% if concerns %} {# Only show category if it has non-'N' concerns #}
+                        <div class="col-lg-12"> {# Two columns within this section #}
+                            <h5 class="guide-subsection-title d-flex justify-content-between align-items-center">
+                                <span>{{ category_names|get_item:cat_prefix }}</span>
+                                {% with category_severity_code=highest_severities|get_item:cat_prefix %}
+                                    {% if category_severity_code and category_severity_code != 'N' %}
+                                        {% with category_severity_display=severity_choices_dict|get_item:category_severity_code %}
+                                            {% with category_severity_var_name="--severity-"|add:category_severity_code|lower|add:"-color" %}
+                                                <span class="descriptor-severity ms-2" style="min-width: auto;">
+                                                    <span class="severity-label small" style="color: var({{ category_severity_var_name }});">
+                                                        {{ category_severity_display }}
+                                                    </span>
+                                                </span>
+                                            {% endwith %}
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endwith %}
+                            </h5>
+                            <div> {# Wrapper for items in this category #}
+                                {% for concern in concerns %}
+                                     {# Use the simplified include (no details/reason) #}
+                                     {% include 'ratings/includes/guidance_category.html' with category_name=concern.name severity_display=concern.severity_display severity_class=concern.severity_class icon_symbol=concern.icon icon_title=concern.name %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                 {% empty %}
+                     <p class="col-12 text-secondary small fst-italic">{% translate "No specific content concerns noted." %}</p>
+                 {% endfor %}
+                 <div class="user-suggestions-section pt-4 border-top" id="user-suggestions"> {# Changed ID #}
+                    <p class="text-secondary small">{% translate "See a potential issue with the rating or have a suggestion for a new descriptor? Let us know!" %}</p>
+                    {# Button to trigger Suggestion Modal #}
+                    <button type="button" class="btn btn-sm btn-outline-success w-100" data-bs-toggle="modal" data-bs-target="#suggestionModal">
+                        <span class="material-symbols-outlined small-icon me-1">lightbulb</span> {# Changed Icon #}
+                        {% translate "Submit Suggestion" %} {# Changed Button Text #}
+                    </button>
+                    {# Display success/error messages for suggestions #}
+                    {% if messages %}
+                       {% for message in messages %}
+                           {% if 'suggestion_error' in message.tags or message.level == 40 %}
+                               <div class="alert alert-danger alert-dismissible fade show small p-2" role="alert">
+                                   {{ message }}
+                                   <button type="button" class="btn-close btn-sm p-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                               </div>
+                           {% elif 'suggestion_success' in message.tags %}
+                                <div class="alert alert-success alert-dismissible fade show small p-2" role="alert">
+                                   {{ message }}
+                                   <button type="button" class="btn-close btn-sm p-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                               </div>
+                           {% endif %}
+                       {% endfor %}
+                    {% endif %}
+               </div>
+             </div>
+        </div>
+    </div>
 </div>
 
-{# --- Row 4: Discussion Comments (Keep as is) --- #}
-{# ... #}
-<div class="row"><div class="col-12"><section class="comments-section" id="comments-section"><h4 class="section-title">{% translate "Discussion Comments" %}</h4>{% for comment in all_comments %}{% if comment.approved or user.is_staff %}<div class="comment mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %} {% if not comment.approved %}comment-unapproved{% endif %}"><div class="comment-header d-flex justify-content-between align-items-center flex-wrap"><div><span class="comment-author fw-bold">{{ comment.user.username }}</span><small class="comment-date text-secondary ms-2">{{ comment.created_date|timesince }} {% translate "ago" %}</small>{% if not comment.approved and user.is_staff %}<span class="badge bg-warning text-dark ms-2">{% translate "Pending Approval" %}</span>{% endif %}{% if comment.moderator_attention_needed and user.is_staff %}<span class="badge bg-danger ms-2" title="{% blocktranslate count flag_count=comment.flag_count %}{{ flag_count }} flag{% plural %}{{ flag_count }} flags{% endblocktranslate %}"><i class="fa-solid fa-flag me-1"></i> {% translate "Needs Review" %}</span>{% elif comment.moderator_attention_needed %}<span class="badge bg-secondary ms-2" title="{% translate 'Flagged for review' %}"><i class="fa-solid fa-flag"></i></span>{% endif %}</div><div class="comment-actions mt-1 mt-sm-0">{% if user.is_authenticated and user != comment.user %}{% if user in comment.flagged_by.all %}<span class="text-secondary small me-2"><i class="fa-solid fa-flag"></i> {% translate "Flagged" %}</span>{% else %}<form action="{% url 'ratings:flag_comment' comment.id %}" method="post" style="display: inline;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-warning comment-action-btn" title="{% translate 'Flag this comment for review' %}"><i class="fa-regular fa-flag"></i></button></form>{% endif %}{% endif %}{% if user.is_staff %}<form action="{% url 'ratings:delete_comment' comment.id %}" method="post" style="display: inline;" onsubmit="return confirm('{% translate "Are you sure you want to delete this comment?" %}');">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger comment-action-btn" title="{% translate 'Delete this comment' %}"><i class="fa-regular fa-trash-can"></i></button></form>{% endif %}</div></div><div class="comment-body mt-2 {% if not comment.approved and not user.is_staff %}d-none{% endif %}">{{ comment.content|linebreaksbr }}</div></div>{% endif %}{% empty %} <p class="text-secondary">{% translate "No comments yet. Be the first to comment!" %}</p>{% endfor %}{% if user.is_authenticated %}<div class="comment-form-container mt-4 pt-4 border-top" id="comment-form"><h5 class="mb-3">{% translate "Add Your Comment" %}</h5>{% if messages %}{% for message in messages %}{% if 'comment_error' in message.tags %}<div class="alert alert-danger" role="alert">{{ message }}</div>{% elif 'comment_success' in message.tags %}<div class="alert alert-success" role="alert">{{ message }}</div>{% elif 'comment_warning' in message.tags %}<div class="alert alert-warning" role="alert">{{ message }}</div>{% endif %}{% endfor %}{% endif %}<form method="post" action="{{ request.path }}#comment-form">{% csrf_token %}<div class="mb-3">{% render_field comment_form.content class+="form-control" rows="3" placeholder=comment_form.content.field.widget.attrs.placeholder %}{% if comment_form.content.errors %}<div class="form-text text-danger">{{ comment_form.content.errors|striptags }}</div>{% endif %}</div><div class="mb-3">{% render_field comment_form.captcha %}{% if comment_form.captcha.errors %}<div class="form-text text-danger">{{ comment_form.captcha.errors|striptags }}</div>{% endif %}</div><button type="submit" name="submit_comment" class="btn btn-primary btn-sm" title="{% translate 'Submit Comment' %}"><span class="material-symbols-outlined" style="vertical-align: middle;">send</span></button></form></div>{% else %} <p class="mt-4 pt-4 border-top">{% url 'login' as login_url %}{% blocktranslate %}Please <a href="{{ login_url }}?next={{ request.path }}#comment-form" class="text-primary">login</a> to post a comment.{% endblocktranslate %}</p>{% endif %}</section></div></div>
+<div class="row"><div class="col-12"><section class="comments-section pt-4 mt-4 border-top" id="comments-section"><h4 class="section-title mb-4">{% translate "Discussion Comments" %}</h4>{% for comment in all_comments %}{% if comment.approved or user.is_staff %}<div class="comment mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %} {% if not comment.approved %}comment-unapproved{% endif %}"><div class="comment-header d-flex justify-content-between align-items-center flex-wrap"><div><span class="comment-author fw-bold">{{ comment.user.username }}</span><small class="comment-date text-secondary ms-2">{{ comment.created_date|timesince }} {% translate "ago" %}</small>{% if not comment.approved and user.is_staff %}<span class="badge bg-warning text-dark ms-2">{% translate "Pending Approval" %}</span>{% endif %}{% if comment.moderator_attention_needed and user.is_staff %}<span class="badge bg-danger ms-2" title="{% blocktranslate count flag_count=comment.flag_count %}{{ flag_count }} flag{% plural %}{{ flag_count }} flags{% endblocktranslate %}"><i class="fa-solid fa-flag me-1"></i> {% translate "Needs Review" %}</span>{% elif comment.moderator_attention_needed %}<span class="badge bg-secondary ms-2" title="{% translate 'Flagged for review' %}"><i class="fa-solid fa-flag"></i></span>{% endif %}</div><div class="comment-actions mt-1 mt-sm-0">{% if user.is_authenticated and user != comment.user %}{% if user in comment.flagged_by.all %}<span class="text-secondary small me-2"><i class="fa-solid fa-flag"></i> {% translate "Flagged" %}</span>{% else %}<form action="{% url 'ratings:flag_comment' comment.id %}" method="post" style="display: inline;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-warning comment-action-btn" title="{% translate 'Flag this comment for review' %}"><i class="fa-regular fa-flag"></i></button></form>{% endif %}{% endif %}{% if user.is_staff %}<form action="{% url 'ratings:delete_comment' comment.id %}" method="post" style="display: inline;" onsubmit="return confirm('{% translate "Are you sure you want to delete this comment?" %}');">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger comment-action-btn" title="{% translate 'Delete this comment' %}"><i class="fa-regular fa-trash-can"></i></button></form>{% endif %}</div></div><div class="comment-body mt-2 {% if not comment.approved and not user.is_staff %}d-none{% endif %}">{{ comment.content|linebreaksbr }}</div></div>{% endif %}{% empty %} <p class="text-secondary">{% translate "No comments yet. Be the first to comment!" %}</p>{% endfor %}{% if user.is_authenticated %}<div class="comment-form-container mt-4 pt-4 border-top" id="comment-form"><h5 class="mb-3">{% translate "Add Your Comment" %}</h5>{% if messages %}{% for message in messages %}{% if 'comment_error' in message.tags %}<div class="alert alert-danger" role="alert">{{ message }}</div>{% elif 'comment_success' in message.tags %}<div class="alert alert-success" role="alert">{{ message }}</div>{% elif 'comment_warning' in message.tags %}<div class="alert alert-warning" role="alert">{{ message }}</div>{% endif %}{% endfor %}{% endif %}<form method="post" action="{{ request.path }}#comment-form">{% csrf_token %}<div class="mb-3">{% render_field comment_form.content class+="form-control" rows="3" placeholder=comment_form.content.field.widget.attrs.placeholder %}{% if comment_form.content.errors %}<div class="form-text text-danger">{{ comment_form.content.errors|striptags }}</div>{% endif %}</div><div class="mb-3">{% render_field comment_form.captcha %}{% if comment_form.captcha.errors %}<div class="form-text text-danger">{{ comment_form.captcha.errors|striptags }}</div>{% endif %}</div><button type="submit" name="submit_comment" class="btn btn-primary btn-sm" title="{% translate 'Submit Comment' %}"><span class="material-symbols-outlined" style="vertical-align: middle;">send</span></button></form></div>{% else %} <p class="mt-4 pt-4 border-top">{% url 'login' as login_url %}{% blocktranslate %}Please <a href="{{ login_url }}?next={{ request.path }}#comment-form" class="text-primary">login</a> to post a comment.{% endblocktranslate %}</p>{% endif %}</section></div></div>
+{# --- ADD Suggestion Modal (Replaces Contribution Modal) --- #}
+<div class="modal fade" id="suggestionModal" tabindex="-1" aria-labelledby="suggestionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="suggestionModalLabel">{% translate "Submit Suggestion or Feedback" %}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            {# Form points to current page, handled by game_detail view #}
+            <form id="suggestion-form" method="post" action="{{ request.path }}#user-suggestions">
+                 <div class="modal-body">
+                    {% csrf_token %}
+                    {# Display non-field errors for suggestion form #}
+                    {% if suggestion_form.non_field_errors %}
+                        <div class="alert alert-danger small p-2">{% for error in suggestion_form.non_field_errors %} {{ error }} {% endfor %}</div>
+                    {% endif %}
 
-<a href="{% url 'ratings:game_list' %}" class="back-link mt-4" title="{% translate 'Back to Game Ratings' %}"><span class="material-symbols-outlined" style="vertical-align: middle;">arrow_back</span></a>
+                    {# Suggestion Type Selection #}
+                    <div class="mb-3">
+                        <label for="{{ suggestion_form.suggestion_type.id_for_label }}" class="form-label form-label-sm">{{ suggestion_form.suggestion_type.label }}</label>
+                        {% render_field suggestion_form.suggestion_type class+="form-select form-select-sm" %}
+                        {% if suggestion_form.suggestion_type.errors %}<div class="form-text text-danger small mt-1">{{ suggestion_form.suggestion_type.errors|striptags }}</div>{% endif %}
+                    </div>
 
-{# --- Contribution Modal (Keep as is) --- #}
-{# ... #}
-<div class="modal fade" id="contributionModal" tabindex="-1" aria-labelledby="contributionModalLabel" aria-hidden="true"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"> <div class="modal-header"><h5 class="modal-title" id="contributionModalLabel">{% if user_contribution %}{% translate "Edit Contribution" %}{% else %}{% translate "Add Contribution" %}{% endif %}</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div><form method="post" action="{{ request.path }}#user-contributions-section"> <div class="modal-body">{% csrf_token %}<p class="text-secondary small mb-3">{% translate "Select a content category, choose the severity you observed, and optionally add details/context. Your input helps the community!" %}</p>{% if contribution_form.non_field_errors %}<div class="alert alert-danger small p-2">{% for error in contribution_form.non_field_errors %} {{ error }} {% endfor %}</div>{% endif %}<div class="mb-3"><label for="{{ contribution_form.category.id_for_label }}" class="form-label form-label-sm">{{ contribution_form.category.label }}</label>{% render_field contribution_form.category class+="form-select form-select-sm" %}{% if contribution_form.category.errors %}<div class="form-text text-danger small mt-1">{{ contribution_form.category.errors|striptags }}</div>{% endif %}</div><div class="mb-3"><label for="{{ contribution_form.severity_rating.id_for_label }}" class="form-label form-label-sm">{{ contribution_form.severity_rating.label }}</label>{% render_field contribution_form.severity_rating class+="form-select form-select-sm" %}{% if contribution_form.severity_rating.errors %}<div class="form-text text-danger small mt-1">{{ contribution_form.severity_rating.errors|striptags }}</div>{% endif %}</div><div class="mb-3"><label for="{{ contribution_form.content.id_for_label }}" class="form-label form-label-sm">{{ contribution_form.content.label }}</label>{% translate "Explain your rating for this specific category (e.g., where it occurs, context, how to avoid)..." as details_placeholder %}{% render_field contribution_form.content class+="form-control" rows="4" placeholder=details_placeholder %}{% if contribution_form.content.errors %}<div class="form-text text-danger small mt-1">{{ contribution_form.content.errors|striptags }}</div>{% endif %}</div><div class="form-check mb-3">{% render_field contribution_form.is_spoiler class+="form-check-input" %}<label class="form-check-label small" for="{{ contribution_form.is_spoiler.id_for_label }}">{{ contribution_form.is_spoiler.label }}</label></div></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">{% translate "Cancel" %}</button><button type="submit" name="submit_contribution" class="btn btn-sm btn-success"><span class="material-symbols-outlined small-icon me-1">add_comment</span> {% translate "Submit Contribution" %}</button></div></form></div></div></div>
+                    {# Conditional Fields container - shown/hidden by JS #}
+                    <div id="suggestion-fields-severity" style="display: none;">
+                         <div class="alert alert-info small p-2 mb-3">{% translate "Suggesting a change to an existing descriptor's severity rating for this specific game." %}</div>
+                         <div class="mb-3">
+                             <label for="{{ suggestion_form.game.id_for_label }}" class="form-label form-label-sm">{{ suggestion_form.game.label }}</label>
+                             {# Pre-filled and hidden #}
+                             <input type="hidden" name="{{ suggestion_form.game.html_name }}" value="{{ game.pk }}">
+                             <input type="text" class="form-control form-control-sm" value="{{ game.title }}" disabled readonly>
+                             {% if suggestion_form.game.errors %}<div class="form-text text-danger small mt-1">{{ suggestion_form.game.errors|striptags }}</div>{% endif %}
+                         </div>
+                         <div class="mb-3">
+                            <label for="{{ suggestion_form.existing_descriptor.id_for_label }}" class="form-label form-label-sm">{{ suggestion_form.existing_descriptor.label }}</label>
+                            {% render_field suggestion_form.existing_descriptor class+="form-select form-select-sm" %}
+                            {% if suggestion_form.existing_descriptor.errors %}<div class="form-text text-danger small mt-1">{{ suggestion_form.existing_descriptor.errors|striptags }}</div>{% endif %}
+                        </div>
+                         <div class="mb-3">
+                            <label for="{{ suggestion_form.suggested_severity.id_for_label }}" class="form-label form-label-sm">{{ suggestion_form.suggested_severity.label }}</label>
+                            {% render_field suggestion_form.suggested_severity class+="form-select form-select-sm" %}
+                            {% if suggestion_form.suggested_severity.errors %}<div class="form-text text-danger small mt-1">{{ suggestion_form.suggested_severity.errors|striptags }}</div>{% endif %}
+                        </div>
+                    </div>
 
+                    <div id="suggestion-fields-new" style="display: none;">
+                        <div class="alert alert-info small p-2 mb-3">{% translate "Suggesting a new content descriptor to be added to the MGC system." %}</div>
+                        <div class="mb-3">
+                            <label for="{{ suggestion_form.suggested_descriptor_name.id_for_label }}" class="form-label form-label-sm">{{ suggestion_form.suggested_descriptor_name.label }}</label>
+                            {% render_field suggestion_form.suggested_descriptor_name class+="form-control form-control-sm" %}
+                             {% if suggestion_form.suggested_descriptor_name.errors %}<div class="form-text text-danger small mt-1">{{ suggestion_form.suggested_descriptor_name.errors|striptags }}</div>{% endif %}
+                        </div>
+                         {# Optional Icon Suggestion field could go here #}
+                    </div>
+
+                    {# Justification (Always Visible) #}
+                    <div class="mb-3">
+                        <label for="{{ suggestion_form.justification.id_for_label }}" class="form-label form-label-sm">{{ suggestion_form.justification.label }}</label>
+                        {% render_field suggestion_form.justification class+="form-control" rows="4" %}
+                        {% if suggestion_form.justification.errors %}<div class="form-text text-danger small mt-1">{{ suggestion_form.justification.errors|striptags }}</div>{% endif %}
+                    </div>
+
+                    {# Captcha (Always Visible) #}
+                     <div class="mb-3">
+                        {% render_field suggestion_form.captcha %}
+                        {% if suggestion_form.captcha.errors %}<div class="form-text text-danger small mt-1">{{ suggestion_form.captcha.errors|striptags }}</div>{% endif %}
+                    </div>
+                 </div>
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">{% translate "Cancel" %}</button>
+                    <button type="submit" name="submit_suggestion" class="btn btn-sm btn-success">
+                        <span class="material-symbols-outlined small-icon me-1">lightbulb</span>
+                        {% translate "Submit Suggestion" %}
+                    </button>
+                 </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div>
+    {# Back Link: Icon #}
+    <a href="{% url 'ratings:game_list' %}" class="back-link mt-4">
+        <span class="material-symbols-outlined" style="vertical-align: middle;">arrow_back</span>
+        {% translate "Back to Games" %}
+    </a>
+</div>
 {% endblock %}
 
 {% block extra_css %}
-{# Combine styles #}
+{# Combine styles - Removed Community Consensus styles, kept necessary ones #}
 <style>
 .comment-actions .comment-action-btn { padding: 0.1rem 0.4rem; font-size: 0.8rem; margin-left: 5px; /* LTR */ }
 html[dir="rtl"] .comment-actions .comment-action-btn { margin-left: 0; margin-right: 5px; /* RTL */ }
-.comment-unapproved, .contribution-unapproved { opacity: 0.7; border-left: 3px solid var(--rating-mashbouh); padding-left: 10px; /* LTR */ }
-html[dir="rtl"] .comment-unapproved, html[dir="rtl"] .contribution-unapproved { border-left: none; border-right: 3px solid var(--rating-mashbouh); padding-left: 0; padding-right: 10px; /* RTL */ }
+.comment-unapproved { opacity: 0.7; border-left: 3px solid var(--rating-mashbouh); padding-left: 10px; /* LTR */ }
+html[dir="rtl"] .comment-unapproved { border-left: none; border-right: 3px solid var(--rating-mashbouh); padding-left: 0; padding-right: 10px; /* RTL */ }
 .g-recaptcha { margin-bottom: 1rem; }
-.comment-form-container .alert, .contribution-form-container .alert { font-size: 0.9rem; }
-.guide-subsection-title { font-size: 1.1rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border-lighter); }
-.sharing-buttons .btn { padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-right: 0.25rem; width: 30px; height: 30px; position: relative; }
+.comment-form-container .alert, .suggestion-form-container .alert { font-size: 0.9rem; } /* Added suggestion form */
+.guide-subsection-title { font-size: 0.9rem; margin-bottom: 0.5rem; padding-bottom: 0.5rem; }
+.content-descriptors>div>div:first-child .guide-subsection-title { border-top: none; }
+.sharing-buttons .btn { padding: 0.25rem 0.5rem; font-size: 0.8rem; width: 30px; height: 30px; position: relative; }
 html[dir="rtl"] .sharing-buttons .btn { margin-right: 0; margin-left: 0.25rem; }
-.user-stars i, .user-stars-input i { margin-right: 1px; } /* Spacing between stars */
-html[dir="rtl"] .user-stars i, html[dir="rtl"] .user-stars-input i { margin-right: 0; margin-left: 1px; }
-.user-stars-input i { font-size: 1.1em; }
-.contribution-form-container .form-check-input { margin-top: 0.1em; }
-.contribution-form-container .form-check-label { cursor: pointer; }
 .back-link .material-symbols-outlined { font-size: 1.3em; }
 .small-icon { font-size: 1em; vertical-align: -2px; }
-.community-details summary { cursor: pointer; list-style: none; /* Hide default marker */ }
-.community-details summary::-webkit-details-marker { display: none; } /* Hide default marker */
-.community-details summary .descriptor-item { transition: background-color 0.2s ease; border-bottom: none; padding: 0.6rem 0; }
-.community-details summary .descriptor-item:hover { background-color: var(--bg-element-lighter); }
-.community-details[open] summary .descriptor-item { background-color: var(--bg-element-lighter); }
-.user-comments-for-category { background-color: var(--bg-primary); border-radius: 0 0 4px 4px; padding: 0.75rem 1rem; margin-top: -1px; border: 1px solid #404552; border-top: none; }
-.user-comments-for-category p { margin-bottom: 0.5rem !important; }
-.user-comments-for-category p:last-child { margin-bottom: 0 !important; }
 .modal-content { background-color: var(--bg-element); color: var(--text-primary); }
 .modal-header, .modal-footer { border-color: var(--border-color); }
 .btn-close-white { filter: invert(90%) sepia(15%) saturate(300%) hue-rotate(190deg) brightness(100%) contrast(90%); }
 .btn-close-white:hover { filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%); }
-#contributionModal .form-label-sm { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600; }
-#contributionModal .small-icon { font-size: 1em; vertical-align: -2px; }
-#contributionModal .form-select-sm { height: calc(1.5em + 0.5rem + 2px); padding-top: 0.25rem; padding-bottom: 0.25rem; }
-.descriptor-severity .severity-label { font-size: 0.7rem; } /* Smaller label */
+#suggestionModal .form-label-sm { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600; }
+#suggestionModal .small-icon { font-size: 1em; vertical-align: -2px; }
+#suggestionModal .form-select-sm { height: calc(1.5em + 0.5rem + 2px); padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.content-descriptors .section-title, .quick-summary .section-title, .user-suggestions-section .section-title, .comments-section .section-title { margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border-lighter); }
+.quick-summary-content p { margin-bottom: 0.75rem; }
+.quick-summary-content p:last-child { margin-bottom: 0; }
+.descriptor-severity .severity-label { font-size: 0.7rem; }
 .sharing-buttons .fas, .sharing-buttons .fab { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-.rating-tier-description { width: 200px; display: inline-grid; position: relative; top: -10px; font-size: 0.8rem; line-height: normal; }
+.rating-tier-description { display: inline-grid; position: relative; top: -10px; font-size: 0.8rem; line-height: normal; }
+.detail-meta-table { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+.meta-row { margin-bottom: 0.25rem; }
+.meta-label { display: inline-block; min-width: 80px; font-weight: 600; color: var(--text-tertiary); }
+.meta-value a { color: var(--text-secondary); text-decoration: underline; text-decoration-color: transparent; transition: color 0.2s ease, text-decoration-color 0.2s ease; }
+.meta-value a:hover { color: var(--link-hover-color); text-decoration-color: var(--link-hover-color); }
+html[dir="rtl"] .meta-label { margin-left: 0.5em; margin-right: 0; }
+.descriptor-item { display: flex; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border-color); }
+.descriptor-item:last-child { border-bottom: none; }
+.descriptor-icon { flex: 0 0 30px; text-align: center; margin-right: 10px; font-size: 1.3em; color: var(--text-secondary); }
+.descriptor-name { flex-grow: 1; font-size: 0.9rem; color: var(--text-primary); padding-right: 10px; }
+.descriptor-severity { flex-shrink: 0; text-align: right; min-width: 120px; line-height: 1.2; display: flex; align-items: center; justify-content: flex-end; margin-top: 3px; }
+.severity-circle { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.2); position: relative; top: -1px; }
+.severity-circle.severity-n { background-color: var(--severity-n-color); }
+.severity-circle.severity-l { background-color: var(--severity-l-color); }
+.severity-circle.severity-m { background-color: var(--severity-m-color); }
+.severity-circle.severity-s { background-color: var(--severity-s-color); }
+html[dir="rtl"] .descriptor-icon { margin-right: 0; margin-left: 10px; }
+html[dir="rtl"] .descriptor-name { padding-right: 0; padding-left: 10px; text-align: right; }
+html[dir="rtl"] .descriptor-severity { text-align: left; justify-content: flex-start; }
+html[dir="rtl"] .descriptor-severity .severity-label { margin-right: 0; margin-left: 6px; }
+html[dir="rtl"] .severity-circle { margin-left: 0; margin-right: 0; }
 </style>
 {% endblock %}
 
 {% block extra_js %}
-{# Combined JS #}
+{# Combined JS - Updated for Suggestion Modal #}
 <script>
+    // Copy Link Button
     document.getElementById('copy-link-btn')?.addEventListener('click', function() { navigator.clipboard.writeText(window.location.href).then(() => { const successMsg = document.getElementById('copy-link-success'); if (successMsg) { successMsg.style.display = 'inline'; setTimeout(() => { successMsg.style.display = 'none'; }, 2500); } }).catch(err => { console.error('Failed to copy link: ', err); alert('{% translate "Failed to copy link." %}'); }); });
+    // Share Popups
     const sharePopups = document.querySelectorAll('.share-popup'); sharePopups.forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); const url = this.href; const windowFeatures = 'width=600,height=400,resizable=yes,scrollbars=yes'; window.open(url, 'ShareWindow', windowFeatures); }); });
-    // TODO: Add JS to handle modal display if form has errors on page load?
+
+    // --- JS for Suggestion Modal ---
+    const suggestionModalElement = document.getElementById('suggestionModal');
+    const suggestionTypeSelect = document.getElementById('{{ suggestion_form.suggestion_type.id_for_label }}');
+    const severityFieldsDiv = document.getElementById('suggestion-fields-severity');
+    const newFieldsDiv = document.getElementById('suggestion-fields-new');
+
+    function toggleSuggestionFields() {
+        const selectedType = suggestionTypeSelect ? suggestionTypeSelect.value : '';
+        if (severityFieldsDiv) severityFieldsDiv.style.display = (selectedType === 'CHANGE_SEVERITY' ? 'block' : 'none');
+        if (newFieldsDiv) newFieldsDiv.style.display = (selectedType === 'NEW_DESCRIPTOR' ? 'block' : 'none');
+    }
+
+    // Initial check and event listener only if elements exist
+    if (suggestionTypeSelect) {
+        toggleSuggestionFields(); // Call on load
+        suggestionTypeSelect.addEventListener('change', toggleSuggestionFields);
+    }
+
+    // Show modal if there were suggestion form errors on page load
+    {% if 'suggestion_error' in messages|join:", " %}
+        var suggestionModalInstance = new bootstrap.Modal(suggestionModalElement);
+        if (suggestionModalInstance) {
+            suggestionModalInstance.show();
+        }
+    {% endif %}
+    // --- END Suggestion Modal JS ---
 </script>
 {% endblock %}

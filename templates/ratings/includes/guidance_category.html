@@ -5,7 +5,7 @@
 
 {# Only render if severity is NOT 'None' #}
 {% if severity_display|slice:":4"|lower != "none" %}
-<div class="col-md-6 col-lg-4">
+<div class="col-12">
     <div class="guide-category-block">
         {# --- Header: Always visible for non-'None' categories --- #}
         <div class="guide-category-header {% if details or reason %}collapsible-header{% endif %}"

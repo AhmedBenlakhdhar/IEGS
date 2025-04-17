@@ -10,14 +10,16 @@
   {# --- 1. Hero Section --- #}
   <section class="homepage-hero text-center py-5 mb-4">
       <h1 class="logo mb-5">
+        <div class="d-sm-none mt-4 pt-2"></div>
         <img src="{% static 'img/mgc_logo.svg' %}" alt="{% translate 'MGC Logo' %}" height="81">
+        <br class="d-sm-none">
         {% if request.LANGUAGE_CODE == 'ar' %}
-        <div class="logo-text-ar">تصنيف<br>الألعاب<br>للمسلمين</div>
+        <div class="logo-text-ar text-center text-sm-end">تصنيف<br>الألعاب<br>للمسلمين</div>
         {% else %}
-        <div class="logo-text-en">Muslim<br>Game<br>Classification</div>
+        <div class="logo-text-en text-center text-sm-start">Muslim<br>Game<br>Classification</div>
         {% endif %}
       </h1>
-      <h2 class="fw-bold mb-3">{% translate "Informed Gaming Choices for Muslims" %}</h2>
+      <h2 class="fw-bold pt-5 pt-sm-0 mb-3">{% translate "Informed Gaming Choices for Muslims" %}</h2>
       <p class="lead col-lg-8 mx-auto text-secondary mb-4">
           {% translate "MGC provides clear, Shariah-based ratings and detailed analysis to help you navigate the world of video games according to Islamic values." %}
       </p>
@@ -37,18 +39,24 @@
       </div>
   </section>
 
+  
   {# --- 2. Understanding Our Ratings Section --- #}
   <section id="rating-explanation" class="py-5 mb-5">
       <div class="container">
           <h2 class="section-title text-center mb-5">{% translate "Understanding Our Ratings" %}</h2>
-          <div class="row text-center g-4">
-              {# Fetch tiers for dynamic display #}
+          <div class="row text-center g-4 rating-explainer-row justify-content-center">
               {% for tier in all_tiers %}
-              <div class="col-md-3 col-6">
-                  <div class="rating-explainer-item p-3 rounded">
-                       <span class="material-symbols-outlined rating-icon mb-2 d-block" style="font-size: 2.5rem; color: var(--rating-{{ tier.tier_code }});;">{{ tier.icon_name }}</span>
-                       <h5 class="mb-1 fs-6" style="color: var(--rating-{{ tier.tier_code }});">{{ tier.display_name }}</h5>
-                       <p class="small text-secondary mb-0">{{ tier.description }}</p>
+              <div class="col-lg-3 col-md-4 col-sm-6 col-10 mb-4">
+                  <div class="rating-explainer-card">
+                      <div class="rating-explainer-inner">
+                          <div class="rating-explainer-front">
+                              <img src="{% static 'img/categories/'|add:tier.tier_code|add:'.svg' %}" alt="{{ tier.display_name }}" class="rating-explainer-icon">
+                          </div>
+                          <div class="rating-explainer-back p-5" style="border-bottom: 10px solid var(--rating-{{ tier.tier_code }});">
+                            <h6 class="rating-tier-name pb-1" style="border-bottom: 3px solid var(--rating-{{ tier.tier_code }});">{{ tier.display_name }}</h6>
+                            <p class="rating-tier-description text-secondary mt-2 mb-0">{{ tier.description }}</p>
+                          </div>
+                      </div>
                   </div>
               </div>
               {% endfor %}
@@ -108,33 +116,4 @@
         </div>
     </div>
   </section>
-
-  {# --- 5. Recent Articles / Insights Section --- #}
-  <section id="recent-articles" class="py-5 bg-element rounded mt-5 mb-5">
-    <div class="container">
-        <h2 class="section-title text-center mb-4">{% translate "Recent Articles & Insights" %}</h2>
-        {% if latest_articles %}
-            <div class="list-group list-group-flush article-list-simple">
-              {% for article in latest_articles %}
-                  <a href="{{ article.get_absolute_url }}" class="list-group-item list-group-item-action bg-transparent article-summary-simple">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1 article-summary-title">{{ article.title }}</h5>
-                        <small class="text-secondary">{{ article.published_date|date:"M d" }}</small>
-                      </div>
-                      <p class="mb-1 text-secondary article-summary-excerpt">{{ article.content|striptags|truncatewords:20 }}</p>
-                      {% if article.author_name %}
-                        <small class="text-tertiary">{% blocktranslate %}By {{ article.author_name }}{% endblocktranslate %}</small>
-                      {% endif %}
-                  </a>
-               {% endfor %}
-            </div>
-             <div class="text-center mt-4">
-                  <a href="{% url 'articles:article_list' %}" class="btn btn-sm btn-outline-secondary">{% translate "View All Articles" %}</a>
-              </div>
-        {% else %}
-            <p class="text-center text-secondary">{% translate "No articles published yet." %}</p>
-        {% endif %}
-    </div>
-  </section>
-
 {% endblock %}

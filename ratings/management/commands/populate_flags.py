@@ -3,53 +3,62 @@
 from django.core.management.base import BaseCommand, CommandError
 from ratings.models import Flag
 from django.db import transaction
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _ # Keep for potential future use
 
-# --- NEW FLAG DATA (v2.0 - Using Material Symbols Icons) ---
-# Symbols are Material Symbols names. Descriptions are the translatable concern names.
+# --- FLAG DATA (v3.2 - Unique Icons, English Only Descriptors) ---
+# Assigning distinct icons for each descriptor based on previous structure.
+# Using English directly as _() wrapper seemed premature here since models aren't translated yet.
 FLAG_DATA = [
-    # 1. Aqidah & Ideology
-    {"symbol": "gpp_bad", "description": _('Forced Shirk/Kufr Action')},
-    {"symbol": "hub", "description": _('Presence/Promotion of Shirk/Kufr')}, # 'hub' for interconnected false beliefs/pantheons
-    {"symbol": "report_problem", "description": _('Insulting Islam')},
-    {"symbol": "cloud_off", "description": _('Tampering/Depicting Unseen')}, # 'cloud_off' distinct from nudity
-    {"symbol": "auto_fix_high", "description": _('Magic & Sorcery')}, # Sparkles icon
-    {"symbol": "record_voice_over", "description": _('Contradictory Ideologies')}, # Promoting conflicting narratives/worldviews
+    # A. Risks to Faith
+    {"symbol": "history_edu", "description": 'Distorting Islam'},
+    {"symbol": "hub", "description": 'Promoting Kufr/Shirk'},
+    {"symbol": "stars", "description": 'Assuming Divinity'},
+    {"symbol": "visibility", "description": 'Tampering Ghaib'},
+    {"symbol": "balance", "description": 'Deviant Ideologies'},
 
-    # 2. Haram Actions & Scenes
-    {"symbol": "visibility_off", "description": _('Nudity & Lewd Scenes')}, # Hidden/Covered 'Awrah
-    {"symbol": "music_off", "description": _('Forbidden Music/Instruments')},
-    {"symbol": "casino", "description": _('Engaging in Gambling/Maysir')},
-    {"symbol": "front_hand", "description": _('Intentional Lying (by Player)')}, # Hiding the truth
+    # B. Prohibition Exposure
+    {"symbol": "casino", "description": 'Gambling'},
+    {"symbol": "front_hand", "description": 'Lying'},
+    {"symbol": "visibility_off", "description": 'Indecency'},
+    {"symbol": "music_off", "description": 'Music/Instruments'},
+    {"symbol": "hourglass_top", "description": 'Time Waste'},
 
-    # 3. Simulation & Normalization
-    {"symbol": "swords", "description": _('Simulating Unjustified Aggression')}, # Represents combat/violence
-    {"symbol": "local_police", "description": _('Simulating Theft & Crime')}, # Represents law-breaking
-    {"symbol": "heart_broken", "description": _('Normalizing Forbidden Relationships')},
-    {"symbol": "local_bar", "description": _('Normalizing Alcohol/Drugs')}, # Covers alcohol, general substances
-    {"symbol": "speaker_notes_off", "description": _('Profanity/Obscenity')}, # Censored/forbidden speech
+    # C. Normalization Risks
+    {"symbol": "sentiment_dissatisfied", "description": 'Disdain/Arrogance'},
+    {"symbol": "auto_fix_high", "description": 'Magic'},
+    {"symbol": "local_bar", "description": 'Intoxicants'},
+    {"symbol": "local_police", "description": 'Crime/Violence'},
+    {"symbol": "speaker_notes_off", "description": 'Profanity'},
 
-    # 4. Effects & Risks
-    {"symbol": "hourglass_top", "description": _('Excessive Time Wasting')},
-    {"symbol": "monetization_on", "description": _('Financial Extravagance (Microtransactions)')}, # Spending money
-    {"symbol": "forum", "description": _('Online Communication Risks')}, # Online interaction
-    {"symbol": "extension", "description": _('User-Generated Content Risks')}, # Add-ons/Mods
+    # D. Player Risks
+    {"symbol": "report", "description": 'Horror/Fear'},
+    {"symbol": "sentiment_sad", "description": 'Despair'},
+    {"symbol": "monetization_on", "description": 'Spending'},
+    {"symbol": "forum", "description": 'Online Interactions'},
+    {"symbol": "extension", "description": 'User Content'},
 ]
 
+
 class Command(BaseCommand):
-    help = 'Populates the database with initial Flag data (v2.0 - Material Symbols names).'
+    help = 'Populates/Synchronizes the database with Flag data (v3.2 - Descriptors).' # Updated help
 
     @transaction.atomic
     def handle(self, *args, **options):
-        self.stdout.write(self.style.NOTICE("Starting flag population (v2.0 - Material Symbols)..."))
+        self.stdout.write(self.style.NOTICE("Starting flag population/sync (v3.2 - Descriptors)...")) # Updated notice
 
         created_count = 0
         updated_count = 0
+        checked_count = 0 # Count existing flags that didn't need updating
         errors = 0
+        deleted_count = 0 # Track deletions
 
+        current_symbols_in_code = {item['symbol'] for item in FLAG_DATA}
+        existing_symbols_in_db = set(Flag.objects.values_list('symbol', flat=True))
+
+        # --- 1. Update or Create flags from FLAG_DATA ---
         for flag_item in FLAG_DATA:
-            symbol_name = flag_item.get('symbol') # This is the icon NAME
-            description = flag_item.get('description') # This is the translatable concern text
+            symbol_name = flag_item.get('symbol')
+            description = flag_item.get('description')
 
             if not symbol_name or not description:
                 self.stderr.write(self.style.ERROR(f"Skipping invalid flag data item: {flag_item}"))
@@ -57,32 +66,55 @@ class Command(BaseCommand):
                 continue
 
             try:
-                # Use update_or_create based on the icon name (symbol)
+                # Use update_or_create based on the symbol (which is unique)
                 flag, created = Flag.objects.update_or_create(
-                    symbol=symbol_name, # The icon name is stored in the 'symbol' field
-                    defaults={'description': description} # Store the translatable description
+                    symbol=symbol_name,
+                    defaults={'description': description} # Update description if needed
                 )
 
                 if created:
-                    # Use .description for display (will show translated if available)
-                    self.stdout.write(self.style.SUCCESS(f"  CREATED Flag: {flag.symbol} - {flag.description}"))
+                    self.stdout.write(self.style.SUCCESS(f"  CREATED Flag: {flag.symbol} - '{flag.description}'"))
                     created_count += 1
                 else:
-                    # Check if description actually changed before claiming update
-                    flag_check = Flag.objects.get(symbol=symbol_name)
-                    # Comparing lazy translation objects should work correctly
-                    if flag_check.description != description:
-                        self.stdout.write(f"  UPDATED Flag Description for: {flag.symbol}")
-                    updated_count += 1
+                    # Check if the description actually changed during the update_or_create call
+                    # Need to fetch original state if we want precise "updated" vs "checked"
+                    # For simplicity, we can assume update_or_create tried to update.
+                    # A more accurate way:
+                    try:
+                        original_flag = Flag.objects.get(symbol=symbol_name) # Get before potential update
+                        if original_flag.description != description:
+                             # The description was different, so it was updated.
+                             self.stdout.write(f"  UPDATED Flag Description for: {flag.symbol} to '{description}'")
+                             updated_count += 1
+                        else:
+                             # Description was the same, so it existed but wasn't updated.
+                             self.stdout.write(f"  Checked/Existing Flag: {flag.symbol}")
+                             checked_count += 1
+                    except Flag.DoesNotExist: # Should not happen if created is False, but safety check
+                         self.stderr.write(self.style.ERROR(f"Consistency Error: Flag '{symbol_name}' reported as existing but not found."))
+                         errors += 1
+
 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"Error processing flag '{symbol_name}': {e}"))
                 errors += 1
 
-        total = created_count + updated_count
+        # --- 2. Delete flags that are in DB but no longer in FLAG_DATA ---
+        symbols_to_delete = existing_symbols_in_db - current_symbols_in_code
+        if symbols_to_delete:
+            deleted_flags = Flag.objects.filter(symbol__in=symbols_to_delete)
+            deleted_count, _ = deleted_flags.delete()
+            if deleted_count > 0:
+                self.stdout.write(self.style.WARNING(f"  DELETED {deleted_count} obsolete flags: {', '.join(symbols_to_delete)}"))
+
+        # --- 3. Final summary ---
         if errors > 0:
              self.stdout.write(self.style.WARNING(f"Finished flag population with {errors} errors."))
         else:
-            self.stdout.write(self.style.SUCCESS("Finished flag population successfully."))
+            self.stdout.write(self.style.SUCCESS("Finished flag population/sync successfully."))
 
-        self.stdout.write(f"Summary: Created={created_count}, Updated/Existing={updated_count}, Errors={errors}, Total Processed={len(FLAG_DATA)-errors}")
+        total_final = Flag.objects.count()
+        self.stdout.write(
+            f"Summary: Created={created_count}, Updated={updated_count}, Checked/Existing={checked_count}, "
+            f"Deleted={deleted_count}, Errors={errors}. Total Flags in DB: {total_final}"
+        )
