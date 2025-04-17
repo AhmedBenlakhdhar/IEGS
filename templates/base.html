@@ -1,3 +1,4 @@
+{# templates/base.html - Added Contact link to footer #}
 {% load static %}
 {% load i18n %}
 {% load compress %}
@@ -6,7 +7,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="{% translate 'MGC - Islamic Guidance for Video Games. Find Shariah-based ratings and analysis for informed gaming choices.' %}"> {# Added Meta Description #}
+  <meta name="description" content="{% translate 'MGC - Islamic Guidance for Video Games. Find Shariah-based ratings and analysis for informed gaming choices.' %}">
   <title>{% block title %}{% translate "MGC Ratings" %}{% endblock %} - {% translate "MGC" %}</title>
 
   {# --- CSS Links --- #}
@@ -28,29 +29,25 @@
   <link rel="icon" href="{% static 'img/mgc_logo.svg' %}" type="image/x-icon">
   {% block extra_css %}{% endblock %}
 </head>
-<body class="d-flex flex-column min-vh-100 light-mode">
+<body class="d-flex flex-column min-vh-100 light-mode {% if request.LANGUAGE_CODE == 'ar' %}rtl{% else %}ltr{% endif %}"> {# Added ltr/rtl class #}
     {% get_current_language as LANGUAGE_CODE %}
     <header class="site-header sticky-top">
       <nav class="navbar navbar-expand-lg">
         <div class="container">
-           {# --- Logo Integration --- #}
            <a class="navbar-brand site-brand d-flex align-items-center" href="{% url 'home' %}">
-                {# Replace with your actual logo image #}
                 <img src="{% static 'img/mgc_logo.svg' %}" alt="{% translate 'MGC Logo' %}" height="30" class="me-2 site-logo">
-                <!-- {% translate "MGC" %} -->
            </a>
-           {# --- End Logo Integration --- #}
            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
            <div class="collapse navbar-collapse" id="navbarNav">
               <ul class="navbar-nav ms-auto align-items-center">
                   <li class="nav-item"><a class="nav-link {% if request.resolver_match.app_name == 'ratings' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'ratings:game_list' %}">{% translate "Games" %}</a></li>
                   <li class="nav-item"><a class="nav-link {% if request.resolver_match.app_name == 'articles' %}active{% endif %}" href="{% url 'articles:article_list' %}">{% translate "Blog" %}</a></li>
                   <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'why_mgc' or request.resolver_match.url_name == 'methodology' or request.resolver_match.url_name == 'glossary' %}active{% endif %}" href="#" id="infoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{% translate "About" %}</a>
+                    <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'why_mgc' or request.resolver_match.url_name == 'methodology' %}active{% endif %}" href="#" id="infoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{% translate "About" %}</a>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end border-color" aria-labelledby="infoDropdown">
                       <li><a class="dropdown-item {% if request.resolver_match.url_name == 'why_mgc' %}active{% endif %}" href="{% url 'ratings:why_mgc' %}">{% translate "Why MGC?" %}</a></li>
                       <li><a class="dropdown-item {% if request.resolver_match.url_name == 'methodology' %}active{% endif %}" href="{% url 'ratings:methodology' %}">{% translate "Rating Methodology" %}</a></li>
-                      <li><a class="dropdown-item {% if request.resolver_match.url_name == 'glossary' %}active{% endif %}" href="{% url 'ratings:glossary' %}">{% translate "Glossary" %}</a></li>
+                      {# Glossary link removed from dropdown #}
                     </ul>
                   </li>
                   <li class="nav-item nav-icon"><button id="language-toggle" class="language-toggle-button" type="button"><span id="language-toggle-text"></span></button><form id="lang-form-ar" action="{% url 'set_language' %}" method="post" style="display: none;">{% csrf_token %}<input name="next" type="hidden" value="{{ request.get_full_path }}"><input name="language" type="hidden" value="ar"></form><form id="lang-form-en" action="{% url 'set_language' %}" method="post" style="display: none;">{% csrf_token %}<input name="next" type="hidden" value="{{ request.get_full_path }}"><input name="language" type="hidden" value="en"></form></li>
@@ -61,9 +58,8 @@
                     {% if user.is_authenticated %}
                       <li><span class="dropdown-item-text bg-accent-primary text-bg-element">
                         {% blocktranslate %}As-Salamu Alaykum, {{ user.username }} {% endblocktranslate %}
+                      </span></li>
                       <li><a class="dropdown-item {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}" href="{% url 'ratings:profile_edit' %}"><span class="material-symbols-outlined me-2 small-icon">manage_accounts</span>{% translate "Edit Profile / Password" %}</a></li>
-                    </span></li>
-                  <li>
                       {% if user.is_staff %}
                         <li>
                           <a class="dropdown-item admin-link-dd" href="/admin/">
@@ -71,14 +67,14 @@
                             {% translate "Site Admin" %}
                           </a>
                         </li>
-                        {% endif %}
-                        <li>
+                      {% endif %}
+                      <li>
                           <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">{% csrf_token %}</form>
                           <a class="dropdown-item" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
                             <span class="material-symbols-outlined me-2 small-icon">logout</span>{% translate "Logout" %}
                           </a>
-                        </li>
-                        {% else %}
+                      </li>
+                    {% else %}
                         <li>
                           <a class="dropdown-item" href="{% url 'login' %}?next={{ request.path }}">
                             <span class="material-symbols-outlined me-2 small-icon">login</span>
@@ -91,17 +87,8 @@
                             {% translate "Sign Up" %}
                           </a>
                         </li>
-                        {% if user.is_staff %}
-                        <li>
-                          <li>
-                            <a class="dropdown-item admin-link-dd" href="/admin/">
-                              <span class="material-symbols-outlined me-2 small-icon">admin_panel_settings</span>
-                              {% translate "Site Admin" %}
-                            </a>
-                          </li>
-                          {% endif %}
-                          {% endif %}
-                        </ul>
+                    {% endif %}
+                    </ul>
                 </li>
               </ul>
            </div>
@@ -116,7 +103,12 @@
     <footer class="site-footer mt-auto">
         <div class="container">
         {% now "Y" as current_year %}
-        <p class="footer-text">{% blocktranslate %}Muslim Game Classification © {{ current_year }}.{% endblocktranslate %}<a href="{% url 'ratings:methodology' %}" class="text-secondary ms-2 footer-link">{% translate "Rating Methodology" %}</a><span class="mx-1 text-secondary">|</span><a href="{% url 'ratings:contact' %}" class="text-secondary footer-link">{% translate "Contact Us" %}</a></p>
+        <p class="footer-text">
+            {% blocktranslate %}Muslim Game Classification © {{ current_year }}.{% endblocktranslate %}
+            <a href="{% url 'ratings:methodology' %}" class="text-secondary ms-2 footer-link">{% translate "Rating Methodology" %}</a>
+            {# --- ADDED CONTACT LINK --- #}
+            <span class="mx-1 text-secondary">|</span><a href="{% url 'ratings:contact' %}" class="text-secondary footer-link">{% translate "Contact Us" %}</a>
+        </p>
         </div>
     </footer>
 

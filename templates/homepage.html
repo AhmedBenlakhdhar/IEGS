@@ -1,4 +1,4 @@
-{# templates/homepage.html - Revamped #}
+{# templates/homepage.html #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -7,7 +7,7 @@
 
 {% block content %}
 
-  {# --- 1. Hero Section --- #}
+  {# --- 1. Hero Section (No changes) --- #}
   <section class="homepage-hero text-center py-5 mb-4">
       <h1 class="logo mb-5">
         <div class="d-sm-none mt-4 pt-2"></div>
@@ -23,7 +23,6 @@
       <p class="lead col-lg-8 mx-auto text-secondary mb-4">
           {% translate "MGC provides clear, Shariah-based ratings and detailed analysis to help you navigate the world of video games according to Islamic values." %}
       </p>
-      {# --- Search Bar --- #}
       <div class="row justify-content-center mb-4">
           <div class="col-md-8 col-lg-6">
               <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form">
@@ -32,14 +31,13 @@
               </form>
           </div>
       </div>
-      {# --- End Search Bar --- #}
       <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
           <a href="{% url 'ratings:game_list' %}" class="btn btn-outline-secondary px-4">{% translate "Browse All Ratings" %}</a>
           <a href="{% url 'ratings:why_mgc' %}" class="btn btn-outline-secondary px-4">{% translate "Learn More (Why MGC?)" %}</a>
       </div>
   </section>
 
-  
+
   {# --- 2. Understanding Our Ratings Section --- #}
   <section id="rating-explanation" class="py-5 mb-5">
       <div class="container">
@@ -61,13 +59,10 @@
               </div>
               {% endfor %}
           </div>
-           <div class="text-center mt-4">
-                <a href="{% url 'ratings:glossary' %}" class="btn btn-sm btn-outline-info">{% translate "View Full Glossary" %}</a>
-            </div>
       </div>
   </section>
 
-  {# --- 3. How MGC Works Section --- #}
+  {# --- 3. How MGC Works Section (No changes needed here) --- #}
   <section id="how-it-works" class="py-5 bg-element rounded mb-5">
        <div class="container">
            <h2 class="section-title text-center mb-4">{% translate "How MGC Works" %}</h2>
@@ -75,17 +70,17 @@
                <div class="col-md-4">
                     <span class="material-symbols-outlined mb-2 d-block" style="font-size: 3rem; color: var(--accent-primary);">checklist</span>
                    <h5>{% translate "1. Detailed Analysis" %}</h5>
-                   <p class="text-secondary">{% blocktranslate %}We evaluate games across 19 specific Islamic concerns, assessing content severity and avoidability.{% endblocktranslate %}</p>
+                   <p class="text-secondary">{% blocktranslate %}Games are assessed against 20 specific Islamic concerns, evaluating content severity and avoidability.{% endblocktranslate %}</p>
                </div>
                <div class="col-md-4">
                    <span class="material-symbols-outlined mb-2 d-block" style="font-size: 3rem; color: var(--accent-primary);">rule</span>
-                   <h5>{% translate "2. Clear Rating" %}</h5>
-                   <p class="text-secondary">{% blocktranslate %}Based on the analysis, an overall tier (Acceptable, Doubtful, Haram, Kufr/Shirk) is assigned using defined rules.{% endblocktranslate %}</p>
+                   <h5>{% translate "2. Tier Calculation" %}</h5>
+                   <p class="text-secondary">{% blocktranslate %}An overall rating (Acceptable, Doubtful, Haram, Kufr/Shirk) is automatically determined by defined severity rules.{% endblocktranslate %}</p>
                </div>
                <div class="col-md-4">
                    <span class="material-symbols-outlined mb-2 d-block" style="font-size: 3rem; color: var(--accent-primary);">info</span>
                    <h5>{% translate "3. Informed Choice" %}</h5>
-                   <p class="text-secondary">{% blocktranslate %}Our detailed breakdowns and ratings empower you to make choices aligned with your values.{% endblocktranslate %}</p>
+                   <p class="text-secondary">{% blocktranslate %}Clear ratings, content flags, and rationale empower you to choose games aligned with Islamic values.{% endblocktranslate %}</p>
                </div>
            </div>
             <div class="text-center mt-4">
@@ -94,11 +89,10 @@
        </div>
    </section>
 
-  {# --- 4. Recently Rated Games --- #}
+  {# --- 4. Recently Rated Games (No changes) --- #}
   <section id="recent-games" class="py-5">
     <div class="container">
         <h2 class="section-title text-center mb-4">{% translate "Recently Rated Games" %}</h2>
-         {# Pre-translate for cards #}
          {% translate "Haram" as translated_haram %} {% translate "Doubtful" as translated_mashbouh %} {% translate "Acceptable" as translated_halal %} {% translate "Kufr/Shirk" as translated_kufr %}
         <div class="row justify-content-center">
             {% if recent_games %}

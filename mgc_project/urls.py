@@ -1,7 +1,7 @@
-# mgc_project/urls.py (snippet)
+# mgc_project/urls.py
 from django.contrib import admin
-from django.urls import path, include # Ensure include is imported
-from ratings import views as rating_views
+from django.urls import path, include
+from ratings import views as rating_views # Ensure this line is correct
 from . import views as project_views
 from django.conf.urls.i18n import i18n_patterns
 from django.utils.translation import gettext_lazy as _
@@ -13,10 +13,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup/', rating_views.signup, name='signup'),
-    path('i18n/', include('django.conf.urls.i18n')),
-    # --- ADD CKEDITOR URLS ---
+    path('i18n/', include('django.conf.urls.i18n')), # Language switcher URLs
     path('ckeditor/', include('ckeditor_uploader.urls')),
-    # -------------------------
 ]
 
 urlpatterns += i18n_patterns(
@@ -26,7 +24,6 @@ urlpatterns += i18n_patterns(
     prefix_default_language=True
 )
 
-# --- ADD MEDIA URLS FOR DEVELOPMENT ONLY ---
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-# ------------------------------------------
+    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) # Usually not needed

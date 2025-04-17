@@ -79,9 +79,20 @@ class SuggestionForm(forms.ModelForm):
             if not cleaned_data.get('suggested_descriptor_name'): self.add_error('suggested_descriptor_name', _("Please provide a name for the new descriptor."))
         return cleaned_data
 
-# --- ContactForm (No changes needed here) ---
+# --- ContactForm (UPDATED choices) ---
 class ContactForm(forms.Form):
-    SUBJECT_CHOICES = [ ('', _('-- Select Subject --')), ('GENERAL_QUESTION', _('General Question')), ('RATING_FEEDBACK', _('Feedback on a Game Rating')), ('METHODOLOGY_QUESTION', _('Question about Methodology')), ('SUGGESTION', _('Suggestion for the Site')), ('TECHNICAL_ISSUE', _('Technical Issue/Bug Report')), ('OTHER', _('Other')), ]
+    SUBJECT_CHOICES = [
+        ('', _('-- Select Subject --')),
+        ('GENERAL_QUESTION', _('General Question')),
+        ('RATING_FEEDBACK', _('Feedback on a Game Rating')),
+        # --- NEW CHOICE ---
+        ('GAME_REVIEW_REQUEST', _('Request a Game Review')),
+        # -----------------
+        ('METHODOLOGY_QUESTION', _('Question about Methodology')),
+        ('SUGGESTION', _('Suggestion for the Site')),
+        ('TECHNICAL_ISSUE', _('Technical Issue/Bug Report')),
+        ('OTHER', _('Other')),
+    ]
     name = forms.CharField(max_length=100, required=True, label=_('Your Name'))
     email = forms.EmailField(required=True, label=_('Your Email'))
     country = CountryField(blank_label=_('-- Select Country --')).formfield(required=True, label=_('Country'), widget=forms.Select(attrs={'class': 'form-select'}))

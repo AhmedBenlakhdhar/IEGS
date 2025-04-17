@@ -1,30 +1,72 @@
-{# templates/ratings/why_mgc.html #}
+{# templates/ratings/why_mgc.html - Added "How MGC Differs" section #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
 
-{# Use dynamic page title from view context #}
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
 <div class="page-header">
-  {# Use dynamic page title from view context #}
   <h1>{{ page_title }}</h1>
 </div>
 
-{# Apply styling similar to article content #}
 <div class="why-mgc-content article-content">
     {% if why_mgc_page and why_mgc_page.content %}
+        {# If content exists in the DB via admin, use that #}
         {{ why_mgc_page.content|safe }}
     {% else %}
-        {# Message shown if the page hasn't been created/populated #}
-        <div class="alert alert-warning" role="alert">
-            {% translate "Page content is currently unavailable. Please check back later or contact the site administrator." %}
-        </div>
+        {# Default content based on your provided text #}
+        <p>{% blocktranslate %}In an era where digital entertainment, especially video games, occupies a significant portion of our time and influences our thoughts and actions, the need for guidance rooted in Islamic principles becomes paramount. The Muslim Game Classification (MGC) project was established to address this need, providing a framework for evaluating games based on the Quran, the authentic Sunnah, and the understanding of the righteous predecessors (As-Salaf As-Salih).{% endblocktranslate %}</p>
+
+        <h3>{% translate "The Need for Islamic Guidance in Gaming" %}</h3>
+        <ul>
+            <li><strong>{% translate "Time Allocation" %} (<em>Waqt</em>):</strong> {% blocktranslate %}Islam emphasizes the value of time. Games, particularly those designed to be highly engaging or time-consuming, can potentially lead to neglecting religious obligations (like Salah), family responsibilities, work, or study. MGC assesses the risk of excessive time wastage (<em>Israf</em>).{% endblocktranslate %}</li>
+            <li><strong>{% translate "Content Concerns" %} (<em>Muharramat</em>):</strong> {% blocktranslate %}Many mainstream games contain elements explicitly forbidden (<em>Haram</em>) or discouraged in Islam. This includes:{% endblocktranslate %}
+            <ul>
+                <li><strong>{% translate "Risks to Faith (Aqidah)" %}:</strong> {% blocktranslate %}Promotion or normalization of Shirk (polytheism), Kufr (disbelief), assuming divinity, distorting Islamic teachings, tampering with the unseen (Ghaib), magic (Sihr), or ideologies contradicting Tawhid (e.g., atheism, secularism).{% endblocktranslate %}</li>
+                <li><strong>{% translate "Prohibition Exposure" %}:</strong> {% blocktranslate %}Depictions or simulation of 'Awrah (nudity), Fahisha (obscenity/profanity), Zina/Liwat (unlawful sexual acts), impermissible relationships (including LGBTQ+ themes), consuming Khamr (intoxicants), engaging in Maysir/Qimar (gambling), using impermissible musical instruments (Ma'azif), or engaging in Kadhib (lying).{% endblocktranslate %}</li>
+                <li><strong>{% translate "Normalization Risks" %}:</strong> {% blocktranslate %}Glorification or casual presentation of unjustified violence/crime, arrogance (Kibr), profanity, intoxicants, or magic.{% endblocktranslate %}</li>
+                 <li><strong>{% translate "Player Risks" %}:</strong> {% blocktranslate %}Exposure to excessive horror/fear, themes promoting despair (Qunut), predatory spending mechanics (Israf), harmful online interactions (Fitnah), or problematic user-generated content.{% endblocktranslate %}</li>
+            </ul>
+            </li>
+            <li><strong>{% translate "Normalization & Desensitization" %}:</strong> {% blocktranslate %}Repeated exposure to Haram content, even in a virtual setting, can desensitize individuals and normalize sinful behavior, weakening one's adherence to Islamic values (<em>Akhlaq</em>). MGC specifically assesses the normalization aspect.{% endblocktranslate %}</li>
+        </ul>
+
+        <h3>{% translate "MGC's Objective" %}</h3>
+        <p>{% blocktranslate %}MGC aims to provide Muslims with clear, consistent, and Shariah-compliant information about video games. My goal is not merely to label games as "Halal" or "Haram" but to offer a detailed breakdown of potential concerns, allowing individuals and parents to:{% endblocktranslate %}</p>
+        <ul>
+            <li><strong>{% translate "Make Informed Choices" %}:</strong> {% blocktranslate %}Select games that align with their Islamic values and avoid those containing major violations.{% endblocktranslate %}</li>
+            <li><strong>{% translate "Understand Potential Risks" %}:</strong> {% blocktranslate %}Be aware of specific issues within a game, even if deemed generally 'Acceptable' or 'Doubtful', allowing for caution.{% endblocktranslate %}</li>
+            <li><strong>{% translate "Facilitate Discussion" %}:</strong> {% blocktranslate %}Provide a basis for discussion within families and communities about navigating digital entertainment responsibly.{% endblocktranslate %}</li>
+            <li><strong>{% translate "Promote Alternatives" %}:</strong> {% blocktranslate %}Encourage the development and consumption of games with positive or permissible themes.{% endblocktranslate %}</li>
+        </ul>
+
+        {# --- NEW SECTION: How MGC Differs --- #}
+        <h3 class="mt-5">{% translate "How MGC Differs from Other Rating Systems" %}</h3>
+        <p>{% blocktranslate %}While various game rating systems exist globally (like ESRB, PEGI), and some may operate within Muslim-majority regions, MGC offers a unique perspective specifically tailored to Shariah compliance:{% endblocktranslate %}</p>
+        <ul>
+            <li><strong>Focus on Islamic Principles:</strong> {% blocktranslate %}Standard rating systems primarily focus on age-appropriateness based on levels of violence, sexual content, language, etc. They do not evaluate content based on core Islamic tenets (Aqidah), specific prohibitions (Haram actions like Shirk, consuming Khamr, Maysir), the concept of 'Awrah, the ruling on musical instruments, or the sin of wasting time (Israf). A game rated "Teen" by ESRB could still contain significant elements of Kufr or promote Haram lifestyles according to MGC criteria.{% endblocktranslate %}</li>
+            <li><strong>Emphasis on Tawhid & Aqidah:</strong> {% blocktranslate %}MGC places the highest importance on protecting the core creed (Aqidah) of a Muslim. Concerns related to Shirk, Kufr, assuming divinity, or distorting Islam are treated with the utmost severity, often leading directly to a 'Kufr/Shirk' or 'Haram' rating, regardless of other content.{% endblocktranslate %}</li>
+            <li><strong>Beyond Depiction to Normalization:</strong> {% blocktranslate %}MGC doesn't just note the presence of Haram elements but assesses how they are presented. It specifically evaluates the risk of normalizing impermissible actions, beliefs, or lifestyles, even if the player doesn't directly participate in them.{% endblocktranslate %}</li>
+            <li><strong>Adherence to Quran, Sunnah, Salaf:</strong> {% blocktranslate %}While other systems, even those in Muslim regions, might incorporate cultural factors or less stringent interpretations, MGC strives to adhere strictly to the Quran, the authentic Sunnah, and the understanding of the righteous predecessors (Salaf as-Salih) in its assessments and methodology.{% endblocktranslate %}</li>
+            <li><strong>Specific Islamic Concerns:</strong> {% blocktranslate %}Issues like the impermissibility of most musical instruments (Ma'azif), specific forms of indecency (Tabarruj, Ikhtilat), and the spiritual danger of wasting time (Israf/Lagw) are explicitly considered within the MGC framework, unlike secular systems.{% endblocktranslate %}</li>
+        </ul>
+        <p>{% blocktranslate %}Therefore, MGC serves as a necessary supplementary guide for Muslims seeking to ensure their entertainment choices do not compromise their faith and values, offering a level of detail and a perspective not found in standard industry or purely cultural rating systems.{% endblocktranslate %}</p>
+        {# --- END NEW SECTION --- #}
+
+
+        {% url 'ratings:methodology' as methodology_url %}
+        <p>{% blocktranslate %}I strive to apply Islamic principles objectively using the methodology outlined <a href="{{ methodology_url }}">here</a>. I recognize that <em>ijtihad</em> is involved, and individual piety (<em>Taqwa</em>) remains crucial. MGC is a tool to aid discernment, not replace personal responsibility before Allah.{% endblocktranslate %}</p>
     {% endif %}
+
+    {# Contact Prompt (Remains the same) #}
+    {% url 'ratings:contact' as contact_url %}
+    <p class="mt-4 pt-3 border-top text-secondary small">
+        {% blocktranslate %}Have more questions about the purpose or goals of MGC? Please feel free to <a href="{{ contact_url }}">contact us</a>.{% endblocktranslate %}
+    </p>
+
 </div>
 
-{# Optional back link #}
 <p><a href="{% url 'home' %}" class="back-link mt-3">{% translate "← Back to Home" %}</a></p>
 
 {% endblock %}

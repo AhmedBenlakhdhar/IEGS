@@ -10,14 +10,12 @@ urlpatterns = [
     path('developer/<slug:developer_slug>/', views.game_list, name='games_by_developer'),
     path('publisher/<slug:publisher_slug>/', views.game_list, name='games_by_publisher'),
 
-    # Glossary & Info Pages
-    path('glossary/', views.glossary_view, name='glossary'),
     path('methodology/', views.methodology_view, name='methodology'),
     path('why-mgc/', views.why_mgc_view, name='why_mgc'),
     path('contact/', views.contact_view, name='contact'),
     path('contact/success/', views.contact_success_view, name='contact_success'),
 
-    # --- NEW User Profile URL ---
+    # User Profile URL
     path('profile/', views.user_profile_edit, name='profile_edit'),
 
     # Comment actions
