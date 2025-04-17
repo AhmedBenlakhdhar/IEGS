@@ -2,7 +2,7 @@
 {% load static %}
 {% load i18n %}
 
-{# Expects: game, translated_haram, translated_mashbouh, translated_halal, translated_kufr #}
+{# Expects: game object (which now has game.risk_summary_texts attached by the view) #}
 
 <a href="{{ game.get_absolute_url }}" class="card-link-wrapper">
   <div class="card game-card h-100">
@@ -20,24 +20,10 @@
           {% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}
       </div>
 
-     <div class="rating-flags-container pt-2">
-        {# Display FINAL rating tier badge - Uses display_name #}
-        <span class="rating-badge rating-{{ game.rating_tier.tier_code }}"
-              style="background-color: var(--rating-{{ game.rating_tier.tier_code }});">
-            <span class="material-symbols-outlined rating-icon">{{ game.rating_tier.icon_name }}</span>
-            <span class="rating-label">{{ game.rating_tier.display_name }}</span> {# Directly display name e.g. "Acceptable", "Doubtful" #}
-        </span>
+      {# --- Include the Reusable Rating Badge Graphic --- #}
+      {% include 'ratings/includes/rating_badge_graphic.html' with game=game %}
+      {# --- End Include --- #}
 
-        <br class="mt-1">
-          {# Display flags (Icons) #}
-          {% for flag in game.flags.all %}
-              <span class="flag-symbol material-symbols-outlined mb-1"
-                    title="{{ flag.description }}"> {# Tooltip shows the concern name #}
-                    {{ flag.symbol }}</span>
-          {% empty %}
-             <div class="no-flags-message"><small class="text-secondary">{% translate "No specific content flags noted." %}</small></div>
-          {% endfor %}
-      </div>
     </div>
   </div>
 </a>

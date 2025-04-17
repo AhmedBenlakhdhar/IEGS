@@ -100,11 +100,11 @@
         <h2 class="section-title text-center mb-4">{% translate "Recently Rated Games" %}</h2>
          {# Pre-translate for cards #}
          {% translate "Haram" as translated_haram %} {% translate "Doubtful" as translated_mashbouh %} {% translate "Acceptable" as translated_halal %} {% translate "Kufr/Shirk" as translated_kufr %}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center"> {# Changed to 4 columns for recents #}
+        <div class="row justify-content-center">
             {% if recent_games %}
                 {% for game in recent_games %}
-                   <div class="col">
-                       {% include 'ratings/includes/game_card_snippet.html' with game=game translated_haram=translated_haram translated_mashbouh=translated_mashbouh translated_halal=translated_halal translated_kufr=translated_kufr %}
+                   <div class="col-12 col-md-6 col-lg-4 mb-4">
+                       {% include 'ratings/includes/game_card_snippet.html' with game=game %}
                    </div>
                 {% endfor %}
             {% else %}

@@ -1,0 +1,116 @@
+{# templates/ratings/includes/rating_badge_graphic.html #}
+{% load static %}
+{% load i18n %}
+
+{# Expects: game object #}
+{# Assumes game object has game.risk_summary_texts attached by the view #}
+
+<div class="game-rating-badge" data-resize-target="true">
+  <div class="row mx-0 mb-2 g-0 align-items-center">
+    <div class="col-4 rating-category">
+        <img src="{% static 'img/categories/'|add:game.rating_tier.tier_code|lower|add:'.svg' %}" alt="{{ game.rating_tier.display_name }}" class="rating-explainer-icon img-fluid">
+    </div>
+    <div class="col-8 rating-risks">
+        <div class="rating-risks-text-content" style="overflow: hidden; line-height: 1.1;">
+            <div>{% with severity=game.risk_summary_texts.A %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Risks to Faith"          %}</div>
+            <div>{% with severity=game.risk_summary_texts.B %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Prohibition Exposure"    %}</div>
+            <div>{% with severity=game.risk_summary_texts.C %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Normalization Risks"     %}</div>
+            <div>{% with severity=game.risk_summary_texts.D %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Player Risks"            %}</div>
+        </div>
+      </div>
+  </div>
+</div>
+
+<script>
+  // Utility to delay function execution after resize events
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => { clearTimeout(timeout); func(...args); };
+      clearTimeout(timeout); timeout = setTimeout(later, wait);
+    };
+   };
+
+  function resizeRiskTextElements() {
+    const badgeElements = document.querySelectorAll('[data-resize-target="true"]');
+
+    badgeElements.forEach((badge) => { // Removed index as it wasn't used
+      const textContentWrapper = badge.querySelector('.rating-risks-text-content');
+      const badgeWidth = badge.offsetWidth; // Use the width of the entire badge
+      const textLines = badge.querySelectorAll('.rating-risks-text-content > div');
+      const parentContainer = badge.querySelector('.rating-risks'); // Still needed for context potentially
+
+      if (textContentWrapper && parentContainer && textLines.length > 0) {
+
+        // --- Font Size Formula Constants (Adjust as needed) ---
+        const fontSlope = 0.05;
+        const fontIntercept = -1;
+
+        let newFontSize = fontSlope * badgeWidth + fontIntercept;
+
+        // Apply font size to each text line
+        textLines.forEach(line => {
+            line.style.setProperty('font-size', newFontSize + 'px', 'important');
+        });
+
+        // --- Height Formula Constants (Adjust as needed) ---
+        const heightSlope = 0.43;
+        const heightIntercept = -1;
+
+        let newHeight = heightSlope * badgeWidth + heightIntercept;
+
+        // Apply height and flex centering to the wrapper
+        textContentWrapper.style.height = newHeight + 'px';
+        textContentWrapper.style.display = 'flex';
+        textContentWrapper.style.flexDirection = 'column';
+        textContentWrapper.style.justifyContent = 'center';
+      }
+    });
+  }
+
+  // Debounced resize function
+  const debouncedResize = debounce(resizeRiskTextElements, 150);
+
+  // Function to run the resize, ensuring images are loaded
+  function initializeAndResize() {
+      const badgeImages = document.querySelectorAll('[data-resize-target="true"] img');
+      let imagesPending = badgeImages.length;
+
+      const attemptResize = () => {
+          imagesPending--;
+          if (imagesPending <= 0) {
+              resizeRiskTextElements(); // Run actual resize logic
+          }
+      };
+
+      if (imagesPending === 0) {
+           // No images, or all cached - run immediately
+           resizeRiskTextElements();
+      } else {
+          // Wait for images
+          badgeImages.forEach(img => {
+              if (img.complete && img.naturalHeight !== 0) {
+                  imagesPending--; // Already loaded
+              } else {
+                  img.addEventListener('load', attemptResize, { once: true });
+                  img.addEventListener('error', attemptResize, { once: true }); // Count errors too
+              }
+          });
+          // If all images were already loaded initially
+          if (imagesPending <= 0) {
+               resizeRiskTextElements();
+          }
+      }
+  }
+
+  // Run initialization logic after the DOM is ready
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initializeAndResize();
+  } else {
+    document.addEventListener('DOMContentLoaded', initializeAndResize);
+  }
+
+  // Attach resize listener
+  window.addEventListener('resize', debouncedResize);
+
+</script>

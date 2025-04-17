@@ -31,7 +31,7 @@
         <form method="GET" action="{% if current_category %}{{ current_category.get_absolute_url }}{% else %}{% url 'articles:article_list' %}{% endif %}" class="d-flex search-form ms-md-auto" style="max-width: 300px;">
             <input class="form-control me-2" type="search" placeholder="{% translate 'Search Articles...' %}" aria-label="{% translate 'Search Articles' %}" name="q" value="{{ search_query|default:'' }}">
             {# Search Button: Icon #}
-            <button class="btn btn-outline-secondary flex-shrink-0" type="submit" title="{% translate 'Search' %}">
+            <button class="btn btn-outline-secondary flex-shrink-0 search-button" type="submit" title="{% translate 'Search' %}">
                  <span class="material-symbols-outlined" style="vertical-align: middle;">search</span>
             </button>
         </form>

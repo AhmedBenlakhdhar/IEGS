@@ -65,7 +65,7 @@
             </div>
             <div class="card-footer text-end"> {# Apply Button: Icon #}
                  <button type="submit" class="btn btn-sm btn-primary filter-apply-btn" title="{% translate 'Apply Filters' %}">
-                     <span class="material-symbols-outlined" style="vertical-align: middle;">filter_alt</span>
+                     <span class="material-symbols-outlined" style="vertical-align: middle;">filter_alt</span> {% translate 'Apply Filters' %}
                  </button>
             </div>
         </form>
@@ -80,7 +80,7 @@
             <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form ms-md-auto" style="max-width: 300px;">
                 <input class="form-control me-2" type="search" placeholder="{% translate 'Search Title/Dev...' %}" aria-label="{% translate 'Search' %}" name="q" value="{{ search_query|default:'' }}">
                 {# Search Button: Icon #}
-                <button class="btn btn-outline-secondary flex-shrink-0" type="submit" title="{% translate 'Search' %}">
+                <button class="btn btn-outline-secondary flex-shrink-0 search-button" type="submit" title="{% translate 'Search' %}">
                      <span class="material-symbols-outlined" style="vertical-align: middle;">search</span>
                 </button>
             </form>
@@ -97,9 +97,9 @@
         {% endif %}
 
         {# --- Game Grid --- #}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="row">
             {% for game in games_page %}
-            <div class="col">
+            <div class="col-12 col-lg-6 mb-4">
                 {% include 'ratings/includes/game_card_snippet.html' with game=game %}
             </div>
             {% empty %}

@@ -43,50 +43,10 @@
     </div>
     <div class="col-md-4">
         <div class="mb-3">
-            {# Rating Graphic #}
-            <div class="row mx-0 mb-2">
-                <div class="col-4 rating-category">
-                    <img src="{% static 'img/categories/'|add:game.rating_tier.tier_code|lower|add:'.svg' %}" alt="{{ game.rating_tier.display_name }}" class="rating-explainer-icon">
-                </div>
-                <div class="col-8 rating-risks">
-                    <div>
-                        <div>
-                            {% if risk_summary_texts.A == 'None' %}
-                                No
-                            {% else %}
-                                {{ risk_summary_texts.A }}
-                            {% endif %}
-                            {% translate "Risks to Faith" %}
-                        </div>
-                        <div>
-                            {% if risk_summary_texts.B == 'None' %}
-                                No
-                            {% else %}
-                                {{ risk_summary_texts.B }}
-                            {% endif %}
-                            {% translate "Prohibition Exposure" %}
-                        </div>
-                        
-                        <div>
-                            {% if risk_summary_texts.C == 'None' %}
-                                No
-                            {% else %}
-                                {{ risk_summary_texts.C }}
-                            {% endif %}
-                            {% translate "Normalization Risks" %}
-                        </div>
-                        
-                        <div>
-                            {% if risk_summary_texts.D == 'None' %}
-                                No
-                            {% else %}
-                                {{ risk_summary_texts.D }}
-                            {% endif %}
-                            {% translate "Player Risks" %}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {# --- Include the Reusable Rating Badge Graphic --- #}
+            {% include 'ratings/includes/rating_badge_graphic.html' with game=game %}
+            {# --- End Include --- #}
+
             <span class="rating-tier-description text-secondary small">{{ game.rating_tier.description }}</span>
 
              {# Sharing Buttons #}

@@ -1,0 +1,108 @@
+{# templates/registration/user_profile_edit.html #}
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% translate "Edit Profile" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{% translate "Edit Profile" %}</h1>
+</div>
+
+<div class="row">
+  {# Column for Profile Details #}
+  <div class="col-md-6 mb-4">
+    <div class="form-wrapper p-4 border rounded bg-element h-100">
+      <h4 class="section-title">{% translate "Profile Details" %}</h4>
+
+      {# Display profile-specific messages #}
+      {% if messages %}
+        {% for message in messages %}
+          {% if 'profile_success' in message.tags %}
+            <div class="alert alert-success small p-2">{{ message }}</div>
+          {% elif 'profile_error' in message.tags %}
+            <div class="alert alert-danger small p-2">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% if user_form.non_field_errors %}
+         <div class="alert alert-danger small p-2">
+             {% for error in user_form.non_field_errors %}{{ error }}{% endfor %}
+         </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        {% for field in user_form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label form-label-sm">{{ field.label_tag }}</label>
+            {# Render field using widget_tweaks, errors handled by Bootstrap automatically or via if tag below #}
+            {% render_field field class+="form-control form-control-sm" %}
+            {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in field.errors %}{{ error }}{% endfor %}
+                </div>
+            {% elif field.help_text %}
+                <div class="form-text text-secondary small mt-1">{{ field.help_text|safe }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+        <div class="d-grid">
+          <button type="submit" name="update_profile" class="btn btn-sm btn-primary">
+              <span class="material-symbols-outlined small-icon me-1">save</span> {% translate "Update Profile" %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {# Column for Password Change #}
+  <div class="col-md-6 mb-4">
+    <div class="form-wrapper p-4 border rounded bg-element h-100">
+      <h4 class="section-title">{% translate "Change Password" %}</h4>
+
+      {# Display password-specific messages #}
+      {% if messages %}
+        {% for message in messages %}
+          {% if 'password_success' in message.tags %}
+            <div class="alert alert-success small p-2">{{ message }}</div>
+          {% elif 'password_error' in message.tags %}
+            <div class="alert alert-danger small p-2">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+       {% if password_form.non_field_errors %}
+         <div class="alert alert-danger small p-2">
+             {% for error in password_form.non_field_errors %}{{ error }}{% endfor %}
+         </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+         {% for field in password_form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label form-label-sm">{{ field.label_tag }}</label>
+            {# Render field using widget_tweaks #}
+            {% render_field field class+="form-control form-control-sm" %}
+            {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in field.errors %}{{ error }}{% endfor %}
+                </div>
+            {% elif field.help_text %}
+                <div class="form-text text-secondary small mt-1">{{ field.help_text|safe }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+        <div class="d-grid">
+          <button type="submit" name="change_password" class="btn btn-sm btn-secondary">
+            <span class="material-symbols-outlined small-icon me-1">lock_reset</span> {% translate "Change Password" %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

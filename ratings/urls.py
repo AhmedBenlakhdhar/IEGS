@@ -17,19 +17,16 @@ urlpatterns = [
     path('contact/', views.contact_view, name='contact'),
     path('contact/success/', views.contact_success_view, name='contact_success'),
 
-    # Discussion Comment actions (Keep these)
+    # --- NEW User Profile URL ---
+    path('profile/', views.user_profile_edit, name='profile_edit'),
+
+    # Comment actions
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
     path('comment/<int:comment_id>/flag/', views.flag_comment, name='flag_comment'),
 
-    # --- REMOVE User Contribution Action URLs ---
-    # path('contribution/<int:contribution_id>/delete/', views.delete_contribution, name='delete_contribution'),
-    # path('contribution/<int:contribution_id>/flag/', views.flag_contribution, name='flag_contribution'),
-
-    # --- ADD Suggestion Action URLs (Optional - Primarily for Admin/Staff Use) ---
-    # These might not be directly linked from the frontend unless you add buttons.
+    # Suggestion Actions (Optional)
     path('suggestion/<int:suggestion_id>/delete/', views.delete_suggestion, name='delete_suggestion'),
-    # path('suggestion/<int:suggestion_id>/flag/', views.flag_suggestion, name='flag_suggestion'), # Add if needed
 
-    # Game detail (Keep last as it uses a general slug)
+    # Game detail (Keep last)
     path('<slug:game_slug>/', views.game_detail, name='game_detail'),
 ]
