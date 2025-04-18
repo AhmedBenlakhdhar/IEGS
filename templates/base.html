@@ -40,8 +40,9 @@
            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
            <div class="collapse navbar-collapse" id="navbarNav">
               <ul class="navbar-nav ms-auto align-items-center">
-                  <li class="nav-item"><a class="nav-link {% if request.resolver_match.app_name == 'ratings' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'ratings:game_list' %}">{% translate "Games" %}</a></li>
+                  <li class="nav-item"><a class="nav-link {% if request.resolver_match.app_name == 'ratings' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'ratings:game_list' %}">{% translate "Ratings" %}</a></li>
                   <li class="nav-item"><a class="nav-link {% if request.resolver_match.app_name == 'articles' %}active{% endif %}" href="{% url 'articles:article_list' %}">{% translate "Blog" %}</a></li>
+                  <li class="nav-item"><a class="nav-link {% if request.resolver_match.app_name == 'articles' %}active{% endif %}" href="{% url 'ratings:contact' %}">{% translate "Contact" %}</a></li>
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'why_mgc' or request.resolver_match.url_name == 'methodology' %}active{% endif %}" href="#" id="infoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{% translate "About" %}</a>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end border-color" aria-labelledby="infoDropdown">

@@ -21,41 +21,46 @@ from urllib.parse import unquote
 
 
 # Helper function
-def calculate_risk_summary_for_game(game):
-    """Calculates the highest severity text display for each category based on new rules."""
-    severity_order = {'N': 0, 'L': 1, 'M': 2, 'S': 3}
-    risk_map_a = {'N': _("None"), 'L': _("Doubtful"), 'M': _("Haram"), 'S': _("Kufr/Shirk")}
-    risk_map_b = {'N': _("None"), 'L': _("Acceptable"), 'M': _("Doubtful"), 'S': _("Haram")}
-    risk_map_c = {'N': _("None"), 'L': _("Acceptable"), 'M': _("Doubtful"), 'S': _("Doubtful")}
-    risk_map_d = {'N': _("None"), 'L': _("Acceptable"), 'M': _("Acceptable"), 'S': _("Doubtful")}
+SEVERITY_ORDER = {'N': 0, 'L': 1, 'M': 2, 'S': 3}
+DEFAULT_SEVERITY_CODE = 'N'
+RISK_SEVERITY_TEXT_MAP = {
+    'N': _("No"),
+    'L': _("Mild"),
+    'M': _("Moderate"),
+    'S': _("Severe"),
+}
 
-    category_fields = {
-        'A': (Game.CATEGORY_A_FIELDS, risk_map_a),
-        'B': (Game.CATEGORY_B_FIELDS, risk_map_b),
-        'C': (Game.CATEGORY_C_FIELDS, risk_map_c),
-        'D': (Game.CATEGORY_D_FIELDS, risk_map_d),
+def calculate_risk_summary_for_game(game):
+    """Calculates the highest severity text display for each category."""
+    category_field_map = {
+        'A': Game.CATEGORY_A_FIELDS,
+        'B': Game.CATEGORY_B_FIELDS,
+        'C': Game.CATEGORY_C_FIELDS,
+        'D': Game.CATEGORY_D_FIELDS,
     }
     risk_summary_texts = {}
-
-    for cat_prefix, (fields, risk_map) in category_fields.items():
-        max_severity_code = 'N'
-        max_severity_level = 0
+    for cat_prefix, fields in category_field_map.items():
+        max_severity_code = DEFAULT_SEVERITY_CODE
         for field_name in fields:
-            if hasattr(game, field_name):
-                current_severity = getattr(game, field_name, 'N')
-                current_level = severity_order.get(current_severity, 0)
-                if current_level > max_severity_level:
-                    max_severity_level = current_level
-                    max_severity_code = current_severity
-        risk_summary_texts[cat_prefix] = risk_map.get(max_severity_code, _("None"))
+            current_severity = getattr(game, field_name, DEFAULT_SEVERITY_CODE)
+            # Treat None explicitly as default severity
+            if current_severity is None:
+                current_severity = DEFAULT_SEVERITY_CODE
 
+            # Update max severity if current field's severity is higher
+            if SEVERITY_ORDER.get(current_severity, 0) > SEVERITY_ORDER.get(max_severity_code, 0):
+                max_severity_code = current_severity
+
+        # Map the highest severity code found to its display text
+        risk_summary_texts[cat_prefix] = RISK_SEVERITY_TEXT_MAP.get(
+            max_severity_code, RISK_SEVERITY_TEXT_MAP[DEFAULT_SEVERITY_CODE]
+        )
     return risk_summary_texts
-
 
 # --- Homepage View ---
 def homepage(request):
     latest_articles = Article.objects.filter(published_date__isnull=False).order_by('-published_date')[:3]
-    recent_games_qs = Game.objects.select_related('rating_tier').prefetch_related('flags').order_by('-date_updated')[:4]
+    recent_games_qs = Game.objects.select_related('rating_tier').prefetch_related('flags').order_by('-date_updated')[:6]
     all_tiers = RatingTier.objects.all()
 
     recent_games_with_summary = []

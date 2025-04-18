@@ -796,3 +796,12 @@ html[dir="rtl"] .rating-risks>div {
 .border-color {
   border-color: var(--border-color);
 }
+
+.boycott-badge-card {
+  position: absolute;
+  top: 60px;
+  right: 0;
+}
+.boycott-badge-card .badge {
+  border-radius: 100px 0 0 100px;
+}
