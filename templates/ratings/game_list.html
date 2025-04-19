@@ -1,4 +1,4 @@
-{# templates/ratings/game_list.html - UPDATED for Single Form Submission #}
+{# templates/ratings/game_list.html - UPDATED for Single Form Submission & IARC Filter #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -15,14 +15,27 @@
     <div class="row g-3 align-items-end mb-3"> {# Added mb-3 for space before search #}
 
         {# Tier Filter #}
-        <div class="col-md-3 col-sm-6">
-          <label for="tierFilter" class="form-label form-label-sm d-block">{% translate "Rating Tier" %}</label>
+        <div class="col-md-2 col-sm-6">
+          <label for="tierFilter" class="form-label form-label-sm d-block">{% translate "MGC Tier" %}</label>
           <select class="form-select form-select-sm" id="tierFilter" name="tier">
             <option value="" {% if not selected_tier %}selected{% endif %}>{% translate "All Tiers" %}</option>
             {% for tier in all_tiers %}
               <option value="{{ tier.tier_code }}" {% if selected_tier == tier.tier_code %}selected{% endif %}>{{ tier.display_name }}</option>
             {% endfor %}
           </select>
+        </div>
+
+        {# IARC Filter #}
+         <div class="col-md-2 col-sm-6">
+            <label for="iarcFilter" class="form-label form-label-sm d-block">{% translate "Age Rating" %}</label>
+            <select class="form-select form-select-sm" id="iarcFilter" name="iarc">
+                <option value="" {% if not selected_iarc %}selected{% endif %}>{% translate "Any Age" %}</option>
+                {% for code, name in iarc_rating_choices %}
+                    {% if code %} {# Skip the 'Not Rated' blank option here #}
+                    <option value="{{ code }}" {% if selected_iarc == code %}selected{% endif %}>{{ name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
         </div>
 
         {# Flag Filter #}
@@ -37,7 +50,7 @@
         </div>
 
          {# Platform Filter (Single Select Dropdown) #}
-         <div class="col-md-3 col-sm-6"> {# Adjusted width #}
+         <div class="col-md-2 col-sm-6"> {# Adjusted width #}
             <label for="platformFilter" class="form-label form-label-sm d-block">{% translate "Platform" %}</label> {# Changed label, added for attribute #}
             <select class="form-select form-select-sm" id="platformFilter" name="platform"> {# Changed ID and Name #}
                 <option value="" {% if not selected_platforms %}selected{% endif %}>{% translate "All Platforms" %}</option>
@@ -61,6 +74,9 @@
             <option value="-title" {% if sort_by == '-title' %}selected{% endif %}>{% translate "Title (Z-A)" %}</option>
             <option value="-release_date" {% if sort_by == '-release_date' %}selected{% endif %}>{% translate "Release Date (Newest)" %}</option>
             <option value="release_date" {% if sort_by == 'release_date' %}selected{% endif %}>{% translate "Release Date (Oldest)" %}</option>
+            {# Add IARC sorting if needed - requires model/view changes for ordering #}
+            {# <option value="iarc_rating" {% if sort_by == 'iarc_rating' %}selected{% endif %}>{% translate "Age Rating (Asc)" %}</option> #}
+            {# <option value="-iarc_rating" {% if sort_by == '-iarc_rating' %}selected{% endif %}>{% translate "Age Rating (Desc)" %}</option> #}
           </select>
         </div>
 
@@ -74,7 +90,7 @@
                 <div class="col-auto"> {# Takes only button width #}
                     <button class="btn btn-sm btn-primary search-submit-button" type="submit" title="{% translate 'Search / Apply Filters' %}">
                         <span class="material-symbols-outlined">search</span>
-                        Search
+                        {% translate 'Search' %}
                     </button>
                 </div>
             </div>
@@ -192,10 +208,6 @@
         font-size: 1.1em;
         vertical-align: -2px;
      }
-
-    /* Remove styles related to old platform list and apply button */
-    /* .filter-platform-list { ... } */
-    /* .filter-apply-btn { ... } */
 
     /* Ensure input fields take appropriate height */
     .filter-search-form .form-control-sm,

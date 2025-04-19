@@ -1,4 +1,4 @@
-{# templates/ratings/game_detail.html - SIMPLIFIED Boycott Alert Display #}
+{# templates/ratings/game_detail.html - Display IARC, Parent Guide, Alternatives #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -10,89 +10,110 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-md-4">
-        <h1 class="detail-title mb-1">{{ game.title }}</h1>
+        <div class="bg-element p-4 rounded border mb-3">
+            <h1 class="detail-title mb-1">{{ game.title }}</h1>
 
-        {# --- START: SIMPLIFIED Boycott Alert (Conditional) --- #}
-        {% if game.show_boycott_notice %}
-        <div class="alert alert-danger mt-3 mb-3 boycott-alert" role="alert">
-            <h5 class="alert-heading"><span class="material-symbols-outlined me-1" style="font-size: 1.1em; vertical-align: -2px;">block</span> {% translate "Boycott Notice" %}</h5>
-            {# Game Specific Boycott #}
-            {% if game.is_boycotted %}
-                <p class="mb-1"><strong>{% translate "Game Specific Boycott:" %}</strong></p>
-                <p class="small mb-2">{{ game.boycott_reason|default:_("This game is currently subject to a specific boycott.")|linebreaksbr }}</p>
+            {# --- START: SIMPLIFIED Boycott Alert (Conditional) --- #}
+            {% if game.show_boycott_notice %}
+            <div class="alert alert-danger mt-3 mb-3 boycott-alert" role="alert">
+                <h5 class="alert-heading"><span class="material-symbols-outlined me-1" style="font-size: 1.1em; vertical-align: -2px;">block</span> {% translate "Boycott Notice" %}</h5>
+                {# Game Specific Boycott #}
+                {% if game.is_boycotted %}
+                    <p class="mb-1"><strong>{% translate "Game Specific Boycott:" %}</strong></p>
+                    <p class="small mb-2">{{ game.boycott_reason|default:_("This game is currently subject to a specific boycott.")|linebreaksbr }}</p>
+                {% endif %}
+
+                {# Developer Boycott #}
+                {% if game.is_developer_boycotted %}
+                    {# Simplified message - no specific name shown here #}
+                    <p class="mb-1"><strong>{% translate "Developer Boycotted:" %}</strong></p>
+                    <p class="small {% if game.is_publisher_boycotted or game.is_boycotted %}mb-2{% else %}mb-0{% endif %}">{{ game.get_developer_boycott_reason|default:_("The developer of this game is currently subject to a boycott.")|linebreaksbr }}</p>
+                {% endif %}
+
+                {# Publisher Boycott #}
+                {% if game.is_publisher_boycotted %}
+                    {# Simplified message - no specific name shown here #}
+                    <p class="mb-1"><strong>{% translate "Publisher Boycotted:" %}</strong></p>
+                    <p class="small mb-0">{{ game.get_publisher_boycott_reason|default:_("The publisher of this game is currently subject to a boycott.")|linebreaksbr }}</p>
+                {% endif %}
+            </div>
             {% endif %}
+            {# --- END: Boycott Alert --- #}
 
-            {# Developer Boycott #}
-            {% if game.is_developer_boycotted %}
-                {# Simplified message - no specific name shown here #}
-                <p class="mb-1"><strong>{% translate "Developer Boycotted:" %}</strong></p>
-                <p class="small {% if game.is_publisher_boycotted or game.is_boycotted %}mb-2{% else %}mb-0{% endif %}">{{ game.get_developer_boycott_reason|default:_("The developer of this game is currently subject to a boycott.")|linebreaksbr }}</p>
-            {% endif %}
-
-            {# Publisher Boycott #}
-            {% if game.is_publisher_boycotted %}
-                {# Simplified message - no specific name shown here #}
-                <p class="mb-1"><strong>{% translate "Publisher Boycotted:" %}</strong></p>
-                <p class="small mb-0">{{ game.get_publisher_boycott_reason|default:_("The publisher of this game is currently subject to a boycott.")|linebreaksbr }}</p>
-            {% endif %}
-        </div>
-        {% endif %}
-        {# --- END: Boycott Alert --- #}
-
-        {# Rest of the column (meta, platforms, store links) remains the same #}
+        {# --- Meta Info Table --- #}
         <div class="detail-meta-table">
              {% if game.developer %} <div class="meta-row"> <span class="meta-label">{% translate "Developer" %}</span> <span class="meta-value">{% if game.developer_slug %}<a href="{% url 'ratings:games_by_developer' developer_slug=game.developer_slug %}">{{ game.developer }}</a>{% else %}{{ game.developer }}{% endif %}</span> </div> {% endif %}
              {% if game.publisher %} <div class="meta-row"> <span class="meta-label">{% translate "Publisher" %}</span> <span class="meta-value">{% if game.publisher_slug %}<a href="{% url 'ratings:games_by_publisher' publisher_slug=game.publisher_slug %}">{{ game.publisher }}</a>{% else %}{{ game.publisher }}{% endif %}</span> </div> {% endif %}
              {% if game.release_date %} <div class="meta-row"> <span class="meta-label">{% translate "Released" %}</span> <span class="meta-value">{{ game.release_date|date:"Y" }}</span> </div> {% endif %}
+             {# --- NEW: Display IARC Rating --- #}
+             {% if game.iarc_rating %}
+             <div class="meta-row">
+                 <span class="meta-value iarc-rating iarc-{{ game.iarc_rating|slice:":-1" }}">
+                     <img src="{% static 'img/iarc/' %}{{ game.iarc_rating|slice:":-1" }}.svg" alt="{{ game.get_iarc_rating_display }}" width="60" class="me-1">
+                     <div>{{ game.get_iarc_rating_display }}</div>
+                 </span>
+             </div>
+             {% endif %}
+             {# --- END: IARC Rating --- #}
         </div>
-        {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios or game.available_quest %}
-            <div class="detail-platform-section mb-3">
-                <h6 class="detail-platform-title mt-5">{% translate "Available On" %}</h6>
-                <div class="platform-icons-container">
-                    {% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}
-                    {% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}
-                    {% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}
-                    {% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>{% endif %}
-                    {% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}
-                    {% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}
-                    {% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}
-                </div>
-            </div>
-            {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}{% if game.rating_tier.tier_code != 'KFR' and game.rating_tier.tier_code != 'HRM' %}
-                <div class="store-links-section mt-5">
-                    <h6 class="store-links-title">{% translate "Where to Buy" %}</h6>
-                    {% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}
-                    {% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}
-                    {% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}
-                    {% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}
-                </div>
-            {% endif %}
-        {% endif %}
-    {% endif %}
+        {# --- END Meta Info Table --- #}
     </div>
+        <div class="bg-element p-4 rounded border mb-3">
+            {# --- Platforms Section --- #}
+            {% if game.available_pc or game.available_ps5 or game.available_ps4 or game.available_xbox_series or game.available_xbox_one or game.available_switch or game.available_android or game.available_ios or game.available_quest %}
+                <div class="detail-platform-section">
+                    <h6 class="detail-platform-title">{% translate "Available On" %}</h6>
+                    <div class="platform-icons-container">
+                        {% if game.available_pc %}<span class="platform-icon platform-pc" title="{% translate 'PC' %}"><i class="fa-brands fa-windows"></i></span>{% endif %}
+                        {% if game.available_ps5 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 5' %}"><i class="fa-brands fa-playstation"></i></span>{% elif game.available_ps4 %}<span class="platform-icon platform-ps" title="{% translate 'PlayStation 4' %}"><i class="fa-brands fa-playstation"></i></span>{% endif %}
+                        {% if game.available_xbox_series %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox Series X|S' %}"><i class="fa-brands fa-xbox"></i></span>{% elif game.available_xbox_one %}<span class="platform-icon platform-xbox" title="{% translate 'Xbox One' %}"><i class="fa-brands fa-xbox"></i></span>{% endif %}
+                        {% if game.available_switch %}<span class="platform-icon platform-switch" title="{% translate 'Nintendo Switch' %}"><img src="{% static 'img/nintendo-switch.svg' %}" alt="{% translate 'Nintendo Switch' %}"></span>{% endif %}
+                        {% if game.available_android %}<span class="platform-icon platform-mobile" title="{% translate 'Android' %}"><i class="fa-brands fa-android"></i></span>{% endif %}
+                        {% if game.available_ios %}<span class="platform-icon platform-mobile" title="{% translate 'iOS' %}"><i class="fa-brands fa-apple"></i></span>{% endif %}
+                        {% if game.available_quest %}<span class="platform-icon platform-mobile" title="{% translate 'Meta Quest' %}"><i class="fa-brands fa-meta"></i></span>{% endif %}
+                    </div>
+                </div>
+                {# --- Store Links Section --- #}
+                {% if game.steam_link or game.epic_link or game.gog_link or game.other_store_link %}{% if game.rating_tier.tier_code != 'KFR' and game.rating_tier.tier_code != 'HRM' %}
+                    <div class="store-links-section mt-4">
+                        <h6 class="store-links-title">{% translate "Where to Buy" %}</h6>
+                        {% if game.steam_link %}<a href="{{ game.steam_link }}" class="store-link steam" target="_blank" rel="noopener noreferrer">{% translate "Steam" %}</a>{% endif %}
+                        {% if game.epic_link %}<a href="{{ game.epic_link }}" class="store-link epic" target="_blank" rel="noopener noreferrer">{% translate "Epic Games" %}</a>{% endif %}
+                        {% if game.gog_link %}<a href="{{ game.gog_link }}" class="store-link gog" target="_blank" rel="noopener noreferrer">{% translate "GOG" %}</a>{% endif %}
+                        {% if game.other_store_link %}<a href="{{ game.other_store_link }}" class="store-link other" target="_blank" rel="noopener noreferrer">{% translate "Other" %}</a>{% endif %}
+                    </div>
+                {% endif %}
+                {% endif %} {# End Store Links condition #}
+            {% endif %} {# End Platforms condition #}
+        </div>
+    </div> {# End Column 1 #}
 
-    {# --- Columns 2 & 3 (Rating Badge, Summary, Descriptors) - No changes needed here --- #}
+    {# --- Columns 2 & 3 (Rating Badge, Summary, Descriptors) --- #}
     <div class="col-md-4">
         <div class="mb-3">
-            {% include 'ratings/includes/rating_badge_graphic.html' with game=game %}
-            <span class="rating-tier-description text-secondary small">{{ game.rating_tier.description }}</span>
-            <div class="sharing-buttons mb-3">
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on Facebook' %}"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://x.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ game.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on X' %}"><i class="fab fa-x-twitter"></i></a>
-                <a href="https://wa.me/?text={{ game.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary" title="{% translate 'Share on WhatsApp' %}"><i class="fab fa-whatsapp"></i></a>
-                <button id="copy-link-btn" class="btn btn-sm btn-outline-secondary" title="{% translate 'Copy link' %}"><i class="fas fa-link"></i></button>
-                <span id="copy-link-success" class="text-success small ms-2" style="display: none;">{% translate 'Link copied!' %}</span>
+            <div class="bg-element p-4 rounded border mb-3">
+                {% include 'ratings/includes/rating_badge_graphic.html' with game=game %}
+                <span class="rating-tier-description text-secondary small">{{ game.rating_tier.description }}</span>
+                <div class="sharing-buttons">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on Facebook' %}"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://x.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ game.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary share-popup" title="{% translate 'Share on X' %}"><i class="fab fa-x-twitter"></i></a>
+                    <a href="https://wa.me/?text={{ game.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary" title="{% translate 'Share on WhatsApp' %}"><i class="fab fa-whatsapp"></i></a>
+                    <button id="copy-link-btn" class="btn btn-sm btn-outline-secondary" title="{% translate 'Copy link' %}"><i class="fas fa-link"></i></button>
+                    <span id="copy-link-success" class="text-success small ms-2" style="display: none;">{% translate 'Link copied!' %}</span>
+                </div>
             </div>
-            <div class="quick-summary mt-2">
-                <h4 class="section-title">{% translate "Rating Summary" %}</h4>
-                <div class="quick-summary-content">
-                    {% if game.summary %}<p>{{ game.summary|linebreaksbr }}</p>{% else %}<p class="text-secondary">{% translate "No summary available." %}</p>{% endif %}
+            <div class="bg-element p-4 rounded border">
+                <div class="quick-summary mt-2">
+                    <h4 class="section-title">{% translate "Rating Summary" %}</h4>
+                    <div class="quick-summary-content">
+                        {% if game.summary %}<p>{{ game.summary|linebreaksbr }}</p>{% else %}<p class="text-secondary">{% translate "No summary available." %}</p>{% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="content-descriptors">
+        <div class="content-descriptors bg-element p-4 rounded border">
             <h4 class="section-title mb-0">{% translate "Content Risks" %}</h4>
              <div class="row">
                  {% for cat_prefix, concerns in grouped_mgc_concerns.items %}
@@ -150,10 +171,10 @@
     {# --- End Column 2 & 3 --- #}
 </div>
 
-{# --- Comments Section (No changes needed) --- #}
-<div class="row"><div class="col-12"><section class="comments-section pt-4 mt-4 border-top" id="comments-section"><h4 class="section-title mb-4">{% translate "Discussion Comments" %}</h4>{% for comment in all_comments %}{% if comment.approved or user.is_staff %}<div class="comment mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %} {% if not comment.approved %}comment-unapproved{% endif %}"><div class="comment-header d-flex justify-content-between align-items-center flex-wrap"><div><span class="comment-author fw-bold">{{ comment.user.username }}</span><small class="comment-date text-secondary ms-2">{{ comment.created_date|timesince }} {% translate "ago" %}</small>{% if not comment.approved and user.is_staff %}<span class="badge bg-warning text-dark ms-2">{% translate "Pending Approval" %}</span>{% endif %}{% if comment.moderator_attention_needed and user.is_staff %}<span class="badge bg-danger ms-2" title="{% blocktranslate count flag_count=comment.flag_count %}{{ flag_count }} flag{% plural %}{{ flag_count }} flags{% endblocktranslate %}"><i class="fa-solid fa-flag me-1"></i> {% translate "Needs Review" %}</span>{% elif comment.moderator_attention_needed %}<span class="badge bg-secondary ms-2" title="{% translate 'Flagged for review' %}"><i class="fa-solid fa-flag"></i></span>{% endif %}</div><div class="comment-actions mt-1 mt-sm-0">{% if user.is_authenticated and user != comment.user %}{% if user in comment.flagged_by.all %}<span class="text-secondary small me-2"><i class="fa-solid fa-flag"></i> {% translate "Flagged" %}</span>{% else %}<form action="{% url 'ratings:flag_comment' comment.id %}" method="post" style="display: inline;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-warning comment-action-btn" title="{% translate 'Flag this comment for review' %}"><i class="fa-regular fa-flag"></i></button></form>{% endif %}{% endif %}{% if user.is_staff %}<form action="{% url 'ratings:delete_comment' comment.id %}" method="post" style="display: inline;" onsubmit="return confirm('{% translate "Are you sure you want to delete this comment?" %}');">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger comment-action-btn" title="{% translate 'Delete this comment' %}"><i class="fa-regular fa-trash-can"></i></button></form>{% endif %}</div></div><div class="comment-body mt-2 {% if not comment.approved and not user.is_staff %}d-none{% endif %}">{{ comment.content|linebreaksbr }}</div></div>{% endif %}{% empty %} <p class="text-secondary">{% translate "No comments yet. Be the first to comment!" %}</p>{% endfor %}{% if user.is_authenticated %}<div class="comment-form-container mt-4 pt-4 border-top" id="comment-form"><h5 class="mb-3">{% translate "Add Your Comment" %}</h5>{% if messages %}{% for message in messages %}{% if 'comment_error' in message.tags %}<div class="alert alert-danger" role="alert">{{ message }}</div>{% elif 'comment_success' in message.tags %}<div class="alert alert-success" role="alert">{{ message }}</div>{% elif 'comment_warning' in message.tags %}<div class="alert alert-warning" role="alert">{{ message }}</div>{% endif %}{% endfor %}{% endif %}<form method="post" action="{{ request.path }}#comment-form">{% csrf_token %}<div class="mb-3">{% render_field comment_form.content class+="form-control" rows="3" placeholder=comment_form.content.field.widget.attrs.placeholder %}{% if comment_form.content.errors %}<div class="form-text text-danger">{{ comment_form.content.errors|striptags }}</div>{% endif %}</div><div class="mb-3">{% render_field comment_form.captcha %}{% if comment_form.captcha.errors %}<div class="form-text text-danger">{{ comment_form.captcha.errors|striptags }}</div>{% endif %}</div><button type="submit" name="submit_comment" class="btn btn-primary btn-sm" title="{% translate 'Submit Comment' %}"><span class="material-symbols-outlined" style="vertical-align: middle;">send</span></button></form></div>{% else %} <p class="mt-4 pt-4 border-top">{% url 'login' as login_url %}{% blocktranslate %}Please <a href="{{ login_url }}?next={{ request.path }}#comment-form" class="text-primary">login</a> to post a comment.{% endblocktranslate %}</p>{% endif %}</section></div></div>
+{# --- Comments Section --- #}
+<div class="row"><div class="col-12"><section class="comments-section pt-4 mt-4 border-top" id="comments-section"><h4 class="section-title mb-4">{% translate "Discussion Comments" %}</h4>{% for comment in all_comments %}{% if comment.approved or user.is_staff %}<div class="comment mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %} {% if not comment.approved %}comment-unapproved{% endif %}"><div class="comment-header d-flex justify-content-between align-items-center flex-wrap"><div><span class="comment-author fw-bold">{{ comment.user.username }}</span><small class="comment-date text-secondary ms-2">{{ comment.created_date|timesince }} {% translate "ago" %}</small>{% if not comment.approved and user.is_staff %}<span class="badge bg-warning text-dark ms-2">{% translate "Pending Approval" %}</span>{% endif %}{% if comment.moderator_attention_needed and user.is_staff %}<span class="badge bg-danger ms-2" title="{% blocktranslate count flag_count=comment.flag_count %}{{ flag_count }} flag{% plural %}{{ flag_count }} flags{% endblocktranslate %}"><i class="fa-solid fa-flag me-1"></i> {% translate "Needs Review" %}</span>{% elif comment.moderator_attention_needed %}<span class="badge bg-secondary ms-2" title="{% translate 'Flagged for review' %}"><i class="fa-solid fa-flag"></i></span>{% endif %}</div><div class="comment-actions mt-1 mt-sm-0">{% if user.is_authenticated and user != comment.user %}{% if user in comment.flagged_by.all %}<span class="text-secondary small me-2"><i class="fa-solid fa-flag"></i> {% translate "Flagged" %}</span>{% else %}<form action="{% url 'ratings:flag_comment' comment.id %}" method="post" style="display: inline;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-warning comment-action-btn" title="{% translate 'Flag this comment for review' %}"><i class="fa-regular fa-flag"></i></button></form>{% endif %}{% endif %}{% if user.is_staff %}<form action="{% url 'ratings:delete_comment' comment.id %}" method="post" style="display: inline;" onsubmit="return confirm('{% translate "Are you sure you want to delete this comment?" %}');">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger comment-action-btn" title="{% translate 'Delete this comment' %}"><i class="fa-regular fa-trash-can"></i></button></form>{% endif %}</div></div><div class="comment-body mt-2 {% if not comment.approved and not user.is_staff %}d-none{% endif %}">{{ comment.content|linebreaksbr }}</div></div>{% endif %}{% empty %} <p class="text-secondary">{% translate "No comments yet. Be the first to comment!" %}</p>{% endfor %}{% if user.is_authenticated %}<div class="comment-form-container mt-4 pt-4 border-top" id="comment-form"><h5 class="mb-3">{% translate "Add Your Comment" %}</h5>{% if messages %}{% for message in messages %}{% if 'comment_error' in message.tags %}<div class="alert alert-danger" role="alert">{{ message }}</div>{% elif 'comment_success' in message.tags %}<div class="alert alert-success" role="alert">{{ message }}</div>{% elif 'comment_warning' in message.tags %}<div class="alert alert-warning" role="alert">{{ message }}</div>{% endif %}{% endfor %}{% endif %}<form method="post" action="{{ request.path }}#comment-form">{% csrf_token %}<div class="mb-3">{% render_field comment_form.content class+="form-control" rows="3" placeholder=comment_form.content.field.widget.attrs.placeholder %}{% if comment_form.content.errors %}<div class="form-text text-danger">{{ comment_form.content.errors|striptags }}</div>{% endif %}</div><div class="mb-3">{% render_field comment_form.captcha %}<!-- Google reCAPTCHA widget will appear here --></div>{% if comment_form.captcha.errors %}<div class="form-text text-danger">{{ comment_form.captcha.errors|striptags }}</div>{% endif %}<button type="submit" name="submit_comment" class="btn btn-primary btn-sm" title="{% translate 'Submit Comment' %}"><span class="material-symbols-outlined" style="vertical-align: middle;">send</span></button></form></div>{% else %} <p class="mt-4 pt-4 border-top">{% url 'login' as login_url %}{% blocktranslate %}Please <a href="{{ login_url }}?next={{ request.path }}#comment-form" class="text-primary">login</a> to post a comment.{% endblocktranslate %}</p>{% endif %}</section></div></div>
 
-{# --- Suggestion Modal (No changes needed here) --- #}
+{# --- Suggestion Modal --- #}
 <div class="modal fade" id="suggestionModal" tabindex="-1" aria-labelledby="suggestionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -206,6 +227,7 @@
                     </div>
                      <div class="mb-3">
                         {% render_field suggestion_form.captcha %}
+                        <!-- Google reCAPTCHA widget will appear here -->
                         {% if suggestion_form.captcha.errors %}<div class="form-text text-danger small mt-1">{{ suggestion_form.captcha.errors|striptags }}</div>{% endif %}
                     </div>
                  </div>
@@ -222,7 +244,7 @@
 </div>
 {# --- END: Suggestion Modal --- #}
 
-{# Back Link (No change) #}
+{# Back Link #}
 <div>
     <a href="{% url 'ratings:game_list' %}" class="back-link mt-4">
         <span class="material-symbols-outlined" style="vertical-align: middle;">arrow_back</span>
@@ -232,7 +254,7 @@
 {% endblock %}
 
 {% block extra_css %}
-{# CSS (No change) #}
+{# CSS #}
 <style>
 .comment-actions .comment-action-btn { padding: 0.1rem 0.4rem; font-size: 0.8rem; margin-left: 5px; /* LTR */ }
 html[dir="rtl"] .comment-actions .comment-action-btn { margin-left: 0; margin-right: 5px; /* RTL */ }
@@ -253,7 +275,7 @@ html[dir="rtl"] .sharing-buttons .btn { margin-right: 0; margin-left: 0.25rem; }
 #suggestionModal .form-label-sm { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600; }
 #suggestionModal .small-icon { font-size: 1em; vertical-align: -2px; }
 #suggestionModal .form-select-sm { height: calc(1.5em + 0.5rem + 2px); padding-top: 0.25rem; padding-bottom: 0.25rem; }
-.content-descriptors .section-title, .quick-summary .section-title, .user-suggestions-section .section-title, .comments-section .section-title { margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border-lighter); }
+.content-descriptors .section-title, .quick-summary .section-title, .user-suggestions-section .section-title, .comments-section .section-title, .guide-for-parents .section-title, .alternative-games .section-title { margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border-lighter); }
 .quick-summary-content p { margin-bottom: 0.75rem; }
 .quick-summary-content p:last-child { margin-bottom: 0; }
 .descriptor-severity .severity-label { font-size: 0.7rem; }
@@ -300,11 +322,20 @@ body.light-mode .boycott-alert hr { border-top-color: rgba(255, 255, 255, 0.2); 
 .D-L { color: var(--rating-halal) }
 .D-M { color: var(--rating-halal) }
 .D-S { color: var(--rating-mashbouh) }
+.iarc-rating img { vertical-align: -3px; } /* Align IARC icon */
+.guide-for-parents .guide-content { line-height: 1.7; }
+.alternative-games .game-card { height: auto !important; } /* Override h-100 for alternatives */
+.alternative-games .card-body { padding: 0.75rem; }
+.alternative-games .card-title { font-size: 0.9rem; }
+.alternative-games .platform-icons-container { margin-bottom: 0.5rem; }
+.alternative-games .platform-icon { font-size: 0.9rem; }
+.alternative-games .game-rating-badge { margin-bottom: -5px; }
+html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top right; margin-left: 0; margin-right: -5%; }
 </style>
 {% endblock %}
 
 {% block extra_js %}
-{# JS (No change) #}
+{# JS #}
 <script>
     // Copy Link Button
     document.getElementById('copy-link-btn')?.addEventListener('click', function() { navigator.clipboard.writeText(window.location.href).then(() => { const successMsg = document.getElementById('copy-link-success'); if (successMsg) { successMsg.style.display = 'inline'; setTimeout(() => { successMsg.style.display = 'none'; }, 2500); } }).catch(err => { console.error('Failed to copy link: ', err); alert('{% translate "Failed to copy link." %}'); }); });

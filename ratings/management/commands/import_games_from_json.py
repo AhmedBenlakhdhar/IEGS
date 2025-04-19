@@ -40,6 +40,7 @@ class Command(BaseCommand):
         updated_count = 0
         skipped_count = 0
         errors = 0
+        # REMOVED alternative_links dictionary
 
         for game_data_item in game_data_list:
             if not isinstance(game_data_item, dict):
@@ -54,12 +55,14 @@ class Command(BaseCommand):
                 continue
 
             defaults = {}
-            # --- Populate Defaults (Careful with types and missing keys) ---
+            # --- Populate Defaults ---
             defaults['developer'] = game_data_item.get('developer', '')
             defaults['publisher'] = game_data_item.get('publisher', '')
             defaults['summary'] = game_data_item.get('summary', '')
             defaults['developer_slug'] = slugify(defaults['developer'])
             defaults['publisher_slug'] = slugify(defaults['publisher'])
+            defaults['iarc_rating'] = game_data_item.get('iarc_rating', '')
+            # REMOVED guide_for_parents from defaults
 
             # Availability flags
             for field in ['pc', 'ps5', 'ps4', 'xbox_series', 'xbox_one', 'switch', 'android', 'ios', 'quest']:
@@ -73,12 +76,10 @@ class Command(BaseCommand):
             release_date_str = game_data_item.get('release_date')
             if release_date_str:
                 try:
-                    # Ensure the date string matches 'YYYY-MM-DD' format
                     defaults['release_date'] = datetime.date.fromisoformat(release_date_str)
                 except ValueError:
                     self.stderr.write(self.style.ERROR(f"Invalid date format for '{title}': '{release_date_str}'. Expected YYYY-MM-DD. Skipping date."))
                     defaults['release_date'] = None
-                    errors += 1 # Count as an error or just skip? Let's count it.
             else:
                 defaults['release_date'] = None
 
@@ -86,18 +87,17 @@ class Command(BaseCommand):
             valid_severities = dict(Game.SEVERITY_CHOICES).keys()
             for field_name in Game.ALL_DESCRIPTOR_FIELDS_IN_ORDER:
                 severity_value = game_data_item.get(field_name, 'N')
-                # Validate severity code
                 defaults[field_name] = severity_value if severity_value in valid_severities else 'N'
                 if severity_value not in valid_severities:
                      self.stderr.write(self.style.WARNING(f"Invalid severity '{severity_value}' for '{field_name}' in game '{title}'. Defaulting to 'N'."))
 
-
-            # --- Database Operation ---
+            # --- Database Operation (Phase 1: Create/Update) ---
             try:
                 game, created = Game.objects.update_or_create(
                     title=title,
                     defaults=defaults
                 )
+                # REMOVED storing alternative game links
 
                 game.save() # Explicitly call save to trigger tier/flag calculation
                 game.refresh_from_db()
@@ -117,6 +117,8 @@ class Command(BaseCommand):
                  self.stderr.write(self.style.ERROR(f"General error processing '{title}': {e}\n{traceback.format_exc()}"))
                  errors += 1
 
+        # REMOVED Phase 2: Link Alternative Games
+
         # --- Final Summary ---
         if errors > 0 or skipped_count > 0:
              self.stdout.write(self.style.WARNING(f"Finished game import with {errors} errors and {skipped_count} skipped entries."))
@@ -124,6 +126,6 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Finished game import successfully."))
 
         self.stdout.write(
-            f"Summary: Created={created_count}, Updated/Existing={updated_count}, "
-            f"Skipped={skipped_count}, Errors={errors}, Total Items in JSON={len(game_data_list)}"
+            f"Summary: Created={created_count}, Updated/Existing={updated_count}, Skipped={skipped_count}, "
+            f"Errors={errors}, Total Items in JSON={len(game_data_list)}"
         )

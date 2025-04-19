@@ -1,0 +1,74 @@
+{# templates/ratings/support_us.html - NEW FILE #}
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="page-header mb-5">
+  <h1>{{ page_title }}</h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+
+        <section class="mb-5 p-4 rounded bg-element shadow-sm">
+            <h2 class="h4 mb-3 pb-2 border-bottom">{% translate "Why Your Support Matters" %}</h2>
+            <p class="text-secondary">
+                {% blocktranslate %}Muslim Game Classification (MGC) is dedicated to providing clear, Shariah-based guidance on video games to help our community make informed choices. Maintaining and expanding this resource requires time, effort, and resources for research, analysis, development, and hosting.{% endblocktranslate %}
+            </p>
+            <p class="text-secondary">
+                {% blocktranslate %}Your support allows us to continue rating more games, improving the website, creating insightful content, and ultimately serving the Muslim community better in navigating the digital entertainment landscape.{% endblocktranslate %}
+            </p>
+        </section>
+
+        <section class="mb-5 p-4 rounded bg-element shadow-sm">
+            <h2 class="h4 mb-3 pb-2 border-bottom">{% translate "How You Can Help" %}</h2>
+
+            {# Option 1: Donation (Example - Add your platform link) #}
+            <div class="mb-4">
+                <h3 class="h5 fw-bold text-primary"><span class="material-symbols-outlined me-2 small-icon">payments</span>{% translate "Make a Donation" %}</h3>
+                <p class="text-secondary">{% blocktranslate %}Direct financial contributions are greatly appreciated and help cover operational costs. Consider supporting us through platforms like Patreon or Ko-fi (links coming soon!).{% endblocktranslate %}</p>
+                {# Example Placeholder Links - Replace with actual links when available #}
+                <p>
+                    <a href="#" class="btn btn-outline-warning btn-sm disabled" aria-disabled="true"> {% comment %}{{ patreon_link }}{% endcomment %}
+                        <i class="fab fa-patreon me-1"></i> {% translate "Support on Patreon (Coming Soon)" %}
+                    </a>
+                    {# <a href="#" class="btn btn-outline-info btn-sm disabled" aria-disabled="true"> <i class="fas fa-coffee me-1"></i> Support on Ko-fi (Coming Soon) </a> #}
+                </p>
+                 <p class="small text-muted"><em>{% translate "Note: Donation links are placeholders for now." %}</em></p>
+            </div>
+
+             {# Option 2: Spread the Word #}
+            <div class="mb-4">
+                <h3 class="h5 fw-bold text-primary"><span class="material-symbols-outlined me-2 small-icon">share</span>{% translate "Spread the Word" %}</h3>
+                <p class="text-secondary">{% blocktranslate %}Share MGC with your family, friends, and community. Post links on social media, mention us in relevant discussions, and help others benefit from this resource.{% endblocktranslate %}</p>
+            </div>
+
+            {# Option 3: Feedback & Suggestions #}
+            <div>
+                <h3 class="h5 fw-bold text-primary"><span class="material-symbols-outlined me-2 small-icon">rate_review</span>{% translate "Provide Feedback & Suggestions" %}</h3>
+                <p class="text-secondary">
+                    {% url 'ratings:contact' as contact_url %}
+                    {% url 'ratings:game_list' as game_list_url %}
+                    {% blocktranslate %}Your feedback helps us improve. Use the 'Submit Suggestion' feature on game pages or our <a href="{{ contact_url }}">Contact Form</a> to share your thoughts, report inaccuracies, or suggest new games for review.{% endblocktranslate %}
+                </p>
+            </div>
+        </section>
+
+        <section class="text-center p-4 rounded bg-element-lighter shadow-sm">
+             <h2 class="h4 mb-3">{% translate "JazakAllah Khairan" %}</h2>
+             <p class="text-secondary">{% blocktranslate %}We sincerely thank you for considering supporting the Muslim Game Classification project. May Allah reward you for your intention and contribution.{% endblocktranslate %}</p>
+        </section>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .small-icon { font-size: 1.1em; vertical-align: -2px; }
+    .bg-element-lighter { background-color: var(--bg-element-lighter) !important; }
+</style>
+{% endblock %}

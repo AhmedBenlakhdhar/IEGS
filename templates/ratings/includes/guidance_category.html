@@ -2,24 +2,14 @@
 {% load i18n %}
 
 {# Expects: category_name, slug, severity_display, severity_class, details, reason, icon_symbol, icon_title #}
+{# NOTE: This template no longer handles details or reason as they are part of guide_for_parents which was removed #}
 
 {# Only render if severity is NOT 'None' #}
 {% if severity_display|slice:":4"|lower != "none" %}
 <div class="col-12">
     <div class="guide-category-block">
         {# --- Header: Always visible for non-'None' categories --- #}
-        <div class="guide-category-header {% if details or reason %}collapsible-header{% endif %}"
-            {% if details or reason %}
-                data-bs-toggle="collapse"
-                data-bs-target="#details-{{ slug }}"
-                aria-expanded="false"
-                aria-controls="details-{{ slug }}"
-                title="{% translate 'Show/Hide Details & Reason' %}"
-                role="button"
-            {% else %}
-                title="{{ severity_display }}" {# Show severity on hover if not expandable #}
-            {% endif %}
-            >
+        <div class="guide-category-header" title="{{ severity_display }}">
             <div class="d-flex align-items-center"> {# Group icon and title #}
                 {# --- Display Icon next to Title --- #}
                 {% if icon_symbol %}
@@ -29,36 +19,13 @@
             </div>
             <div class="severity-display d-flex align-items-center">
                 <span class="d-flex align-items-center">
-                    <span class="severity-text ms-2">{{ severity_display }}</span>
+                    <span class="severity-text me-2">{{ severity_display }}</span>
                     <span class="severity-circle {{ severity_class }}" title="{% translate 'Severity Rating' %}"></span>
                 </span>
-                {# --- Only show toggle arrow if details/reason exist --- #}
-                {% if details or reason %}
-                    <span class="material-symbols-outlined toggle-indicator ms-2">expand_more</span>
-                {% endif %}
+                {# REMOVED Toggle indicator as details/reason are gone #}
             </div>
         </div>
     </div>
-
-    {# --- Details/Reason: Only rendered if details/reason exist --- #}
-    {% if details or reason %}
-    <div class="collapse" id="details-{{ slug }}">
-        <div class="guide-category-details">
-            {% if details %}
-                {{ details|linebreaksbr }}
-            {% endif %}
-            {% if reason %}
-                <div class="category-reason-inline">
-                    {% if details %}<hr class="reason-separator">{% endif %}
-                    <p class="reason-label">{% translate "Reasoning/Reference:" %}</p>
-                    <p class="reason-text">{{ reason|linebreaksbr }}</p>
-                </div>
-            {% endif %}
-            {% if not details and not reason %}
-                 <p class="text-secondary fst-italic m-0">{% translate "No specific details provided for this level." %}</p>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
+    {# REMOVED Details/Reason section #}
 </div>
 {% endif %} {# End outer if severity != 'None' #}

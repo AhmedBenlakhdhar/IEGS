@@ -89,12 +89,28 @@ class BoycottedEntity(models.Model):
 
 # --- Game ---
 class Game(models.Model):
+    # --- IARC Rating Choices ---
+    IARC_RATINGS = [
+        ('', _('Not Rated')),
+        ('3+', _('IARC 3+')),
+        ('7+', _('IARC 7+')),
+        ('12+', _('IARC 12+')),
+        ('16+', _('IARC 16+')),
+        ('18+', _('IARC 18+')),
+    ]
+
     title = models.CharField(max_length=200, verbose_name=_('Title'))
     slug = models.SlugField(max_length=220, unique=True, blank=True, help_text=_("Unique URL-friendly name. Leave blank to auto-generate from title."))
     developer = models.CharField(max_length=100, blank=True, verbose_name=_('Developer'))
     publisher = models.CharField(max_length=100, blank=True, verbose_name=_('Publisher'))
     release_date = models.DateField(blank=True, null=True, verbose_name=_('Release Date'))
     summary = models.TextField(blank=True, help_text=_("Game overview description and overall rating reasoning (used in lists and detail view)."), verbose_name=_('Summary & Rating Rationale'))
+    iarc_rating = models.CharField(
+        _("IARC Rating"), max_length=5, choices=IARC_RATINGS, default='', blank=True,
+        help_text=_("Official International Age Rating Coalition rating, if available.")
+    )
+    # REMOVED guide_for_parents field
+    # REMOVED alternative_games field
     developer_slug = models.SlugField(max_length=110, blank=True, help_text=_("Auto-generated slug for developer filtering."))
     publisher_slug = models.SlugField(max_length=110, blank=True, help_text=_("Auto-generated slug for publisher filtering."))
     available_pc = models.BooleanField(_("Available on PC"), default=False)
@@ -266,6 +282,9 @@ class Game(models.Model):
 
     def get_severity_display_name(self, severity_code):
         return dict(self.SEVERITY_CHOICES).get(severity_code, '?')
+
+    def get_iarc_rating_display(self):
+        return dict(self.IARC_RATINGS).get(self.iarc_rating, _('Not Rated'))
 
     # --- Boycott Properties ---
     @property

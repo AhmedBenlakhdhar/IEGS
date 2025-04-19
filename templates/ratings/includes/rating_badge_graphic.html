@@ -12,10 +12,68 @@
     </div>
     <div class="col-8 rating-risks">
         <div class="rating-risks-text-content" style="overflow: hidden; line-height: 1.1;">
-            <div>{% with severity=game.risk_summary_texts.A %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Risks to Faith"          %}</div>
-            <div>{% with severity=game.risk_summary_texts.B %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Prohibition Exposure"    %}</div>
-            <div>{% with severity=game.risk_summary_texts.C %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Normalization Risks"     %}</div>
-            <div>{% with severity=game.risk_summary_texts.D %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Player Risks"            %}</div>
+
+          <div>
+              {% get_current_language as LANGUAGE_CODE %}
+              {% with severity=game.risk_summary_texts.A risk_name="Risks to Faith" %}
+                  {% if severity == 'None' %}
+                      No {% translate risk_name %}
+                  {% else %}
+                      {% if LANGUAGE_CODE == 'ar' %}
+                          {% translate risk_name %} {{ severity }}ة
+                      {% else %}
+                          {{ severity }} {% translate risk_name %}
+                      {% endif %}
+                  {% endif %}
+              {% endwith %}
+          </div>
+          
+          <div>
+              {% get_current_language as LANGUAGE_CODE %} {# Repeat for clarity, or set once outside if possible #}
+              {% with severity=game.risk_summary_texts.B risk_name="Prohibition Exposure" %}
+                  {% if severity == 'None' %}
+                      No {% translate risk_name %}
+                  {% else %}
+                      {% if LANGUAGE_CODE == 'ar' %}
+                          {% translate risk_name %} {{ severity }}
+                      {% else %}
+                          {{ severity }} {% translate risk_name %}
+                      {% endif %}
+                  {% endif %}
+              {% endwith %}
+          </div>
+          
+          <div>
+              {% get_current_language as LANGUAGE_CODE %}
+              {% with severity=game.risk_summary_texts.C risk_name="Normalization Risks" %}
+                  {% if severity == 'None' %}
+                      No {% translate risk_name %}
+                  {% else %}
+                      {% if LANGUAGE_CODE == 'ar' %}
+                          {% translate risk_name %} {{ severity }}ة
+                      {% else %}
+                          {{ severity }} {% translate risk_name %}
+                      {% endif %}
+                  {% endif %}
+              {% endwith %}
+          </div>
+          
+          <div>
+              {% get_current_language as LANGUAGE_CODE %}
+              {% with severity=game.risk_summary_texts.D risk_name="Player Risks" %}
+                  {% if severity == 'None' %}
+                      No {% translate risk_name %}
+                  {% else %}
+                      {% if LANGUAGE_CODE == 'ar' %}
+                          {% translate risk_name %} {{ severity }}ة
+                      {% else %}
+                          {{ severity }} {% translate risk_name %}
+                      {% endif %}
+                  {% endif %}
+              {% endwith %}
+          </div>
+        
+
         </div>
       </div>
   </div>

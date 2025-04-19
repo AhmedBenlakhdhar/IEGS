@@ -34,11 +34,12 @@ class CriticReviewAdmin(TranslationAdmin):
 # --- GameAdmin ---
 @admin.register(Game)
 class GameAdmin(TranslationAdmin):
-    list_display = ('title', 'get_final_rating_tier_display', 'developer', 'publisher', 'date_updated', 'display_boycott_status')
-    list_filter = ('rating_tier', 'developer', 'publisher', 'is_boycotted')
+    list_display = ('title', 'get_final_rating_tier_display', 'iarc_rating', 'developer', 'publisher', 'date_updated', 'display_boycott_status')
+    list_filter = ('rating_tier', 'iarc_rating', 'developer', 'publisher', 'is_boycotted')
     search_fields = ('title', 'developer', 'publisher', 'summary', 'boycott_reason')
     prepopulated_fields = {'slug': ('title',)}
-    filter_horizontal = ('critic_reviews',)
+    filter_horizontal = ('critic_reviews', 'flags',) # REMOVED alternative_games
+    # REMOVED autocomplete_fields = ['alternative_games']
     date_hierarchy = 'date_added'
     ordering = ('-date_updated',)
     readonly_fields = (
@@ -48,10 +49,13 @@ class GameAdmin(TranslationAdmin):
     )
     fieldsets = (
         (_('Core Information'), {'fields': ('title', 'slug', ('developer', 'developer_slug'), ('publisher', 'publisher_slug'), 'release_date', 'summary')}),
+        (_('Ratings'), {'fields': ('iarc_rating',)}),
         (_('Boycott Status'), {'fields': ('is_boycotted', 'boycott_reason', 'display_developer_boycott_status', 'display_publisher_boycott_status')}),
         (_('Platform Availability'), {'classes': ('collapse',),'fields': (('available_pc', 'available_ps5', 'available_ps4'), ('available_xbox_series', 'available_xbox_one', 'available_switch'), ('available_android', 'available_ios', 'available_quest'))}),
         (_('Store Links'), {'classes': ('collapse',),'fields': ('steam_link', 'epic_link', 'gog_link', 'other_store_link')}),
-        (_('MGC Rating & Content'), {'fields': ('get_final_rating_tier_display', 'get_assigned_flags_display',)}),
+        (_('MGC Rating & Content'), {'fields': ('get_final_rating_tier_display', 'flags', 'get_assigned_flags_display',)}),
+        # REMOVED Parental Guidance section
+        # REMOVED Game Alternatives section
         (_('Critic Reviews'), {'classes': ('collapse',),'fields': ('critic_reviews',)}),
         (_('A. Risks to Faith'), {'classes': ('collapse', 'wide'),'description': _("Severity Mapping: Mild -> Doubtful, Moderate -> Haram, Severe -> Kufr/Shirk"),'fields': ( 'distorting_islam_severity', 'promoting_kufr_severity', 'assuming_divinity_severity', 'tampering_ghaib_severity', 'deviant_ideologies_severity',)}),
         (_('B. Prohibition Exposure'), {'classes': ('collapse', 'wide'),'description': _("Severity Mapping: Mild -> Permissible, Moderate -> Doubtful, Severe -> Haram"),'fields': ( 'gambling_severity', 'lying_severity', 'indecency_severity', 'music_instruments_severity', 'time_waste_severity',)}),
@@ -93,7 +97,9 @@ class GameAdmin(TranslationAdmin):
         return _('Not Boycotted')
 
     def save_model(self, request, obj, form, change):
+        # Recalculate tier and flags on save (as severity fields might have changed)
         super().save_model(request, obj, form, change)
+        obj.save() # Trigger the model's save method again
 
 
 # --- GameCommentAdmin ---

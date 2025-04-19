@@ -90,7 +90,8 @@
                <form method="post" action="{{ request.path }}#comment-form">
                    {% csrf_token %}
                    <div class="mb-3">{% render_field comment_form.content class+="form-control" rows="3" placeholder=comment_form.content.field.widget.attrs.placeholder %}{% if comment_form.content.errors %}<div class="form-text text-danger">{{ comment_form.content.errors|striptags }}</div>{% endif %}</div>
-                   <div class="mb-3">{% render_field comment_form.captcha %}{% if comment_form.captcha.errors %}<div class="form-text text-danger">{{ comment_form.captcha.errors|striptags }}</div>{% endif %}</div>
+                   <div class="mb-3">{% render_field comment_form.captcha %}<!-- Google reCAPTCHA widget will appear here --></div>
+                   {% if comment_form.captcha.errors %}<div class="form-text text-danger">{{ comment_form.captcha.errors|striptags }}</div>{% endif %}
                    {# Submit Comment Button: Icon #}<button type="submit" name="submit_comment" class="btn btn-primary btn-sm" title="{% translate 'Submit Comment' %}"><span class="material-symbols-outlined" style="vertical-align: middle;">send</span></button>
                </form>
            </div>
@@ -99,7 +100,7 @@
        {% endif %}
   </section>
   {# --- END: Comments Section --- #}
-  
+
   <div>
     {# Back Link: Icon #}
     <a href="{% url 'articles:article_list' %}" class="back-link mt-4">

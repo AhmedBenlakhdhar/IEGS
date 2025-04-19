@@ -19,6 +19,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from urllib.parse import unquote
+from django.views.generic import TemplateView # Added for Support Page
 
 
 # Helper function
@@ -105,6 +106,7 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     selected_flag_symbol = request.GET.get('flag', '')
     sort_by = request.GET.get('sort', '-date_updated')
     selected_platform_code = request.GET.get('platform', '') # UPDATED: Get single platform code
+    selected_iarc = request.GET.get('iarc', '') # NEW IARC filter
 
     # --- Apply filters ---
     if search_query:
@@ -127,6 +129,13 @@ def game_list(request, developer_slug=None, publisher_slug=None):
         if flag:
             filter_description_parts.append(gettext("with flag <strong>%(flag)s</strong>") % {'flag': flag.description})
             games_queryset = games_queryset.filter(flags__symbol=selected_flag_symbol).distinct()
+
+    # NEW: Apply IARC filter
+    if selected_iarc:
+        iarc_display = dict(Game.IARC_RATINGS).get(selected_iarc)
+        if iarc_display:
+            filter_description_parts.append(gettext("rated <strong>%(iarc)s</strong>") % {'iarc': iarc_display})
+            games_queryset = games_queryset.filter(iarc_rating=selected_iarc).distinct()
 
     # Platform Filtering (UPDATED for single select)
     platform_map = {
@@ -151,7 +160,7 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     # --- Sorting ---
     valid_sort_options = [
         'title', '-title', '-release_date', 'release_date',
-        '-date_updated', 'date_updated'
+        '-date_updated', 'date_updated', 'iarc_rating', '-iarc_rating' # Added IARC sort
     ]
     sort_param = sort_by if sort_by in valid_sort_options else '-date_updated'
     games_queryset = games_queryset.order_by(sort_param)
@@ -177,24 +186,20 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     platform_list_for_template = [
         {'code': code, 'name': name} for code, name in platform_display_names.items()
     ]
+    iarc_rating_choices = Game.IARC_RATINGS # Get IARC choices for filter dropdown
 
     # Construct final filter description string
     filter_description = None
     if len(filter_description_parts) > 0:
-        # Join parts with ", " but handle the first element (dev/pub) differently if present
         if developer_slug or publisher_slug:
-            # Assumes the first part is dev/pub info
              base_desc = filter_description_parts[0]
              additional_filters = ", ".join(filter_description_parts[1:])
              if additional_filters:
-                  # Ensure base_desc ends with a space before adding 'and'
-                  if not base_desc.endswith(" "):
-                       base_desc += " "
+                  if not base_desc.endswith(" "): base_desc += " "
                   filter_description = f"{base_desc}{gettext('and')} {additional_filters}."
              else:
                   filter_description = base_desc
         else:
-            # Only generic filters applied
             filter_description = gettext("Showing games ") + ", ".join(filter_description_parts) + "."
 
     # Prepare selected_platforms as a list with one item for the template check (if selected)
@@ -213,6 +218,8 @@ def game_list(request, developer_slug=None, publisher_slug=None):
         'selected_platforms': selected_platforms_list, # Pass list with 0 or 1 item for template check
         'selected_platform': selected_platform_code, # Pass single code if needed elsewhere
         'platform_list_for_template': platform_list_for_template,
+        'iarc_rating_choices': iarc_rating_choices, # NEW: Add IARC choices
+        'selected_iarc': selected_iarc, # NEW: Pass selected IARC
         # Pass slugs back for form action URL construction in template
         'developer_slug': developer_slug,
         'publisher_slug': publisher_slug,
@@ -225,6 +232,7 @@ def game_detail(request, game_slug):
     game = get_object_or_404(
         Game.objects.select_related('rating_tier').prefetch_related(
             'critic_reviews', 'flags', 'comments__user', 'comments__flagged_by',
+            # REMOVED 'alternative_games', 'alternative_games__rating_tier',
         ), slug=game_slug
     )
     all_comments = game.comments.all()
@@ -314,6 +322,8 @@ def game_detail(request, game_slug):
                 max_severity_code = current_severity
         highest_severities[cat_prefix] = max_severity_code
 
+    # REMOVED alternative_games preparation
+
     context = {
         'game': game,
         'all_comments': all_comments,
@@ -325,6 +335,9 @@ def game_detail(request, game_slug):
         'highest_severities': highest_severities,
         'severity_choices_dict': dict(Game.SEVERITY_CHOICES),
         'all_flags_info': all_flags_info,
+        # REMOVED 'alternative_games' from context
+        # REMOVED 'show_alternatives' from context
+        # REMOVED 'show_parent_guide' from context
     }
     return render(request, 'ratings/game_detail.html', context)
 
@@ -370,10 +383,8 @@ def user_profile_edit(request):
             else:
                  messages.error(request, _('Please correct the errors in the password change form.'), extra_tags='password_error')
         else:
-            # Handle unexpected POST data if necessary
             user_form = UserUpdateForm(instance=request.user)
             password_form = PasswordChangeForm(request.user)
-            # messages.warning(request, _('Unknown form submission.')) # Optional warning
     else:
         user_form = UserUpdateForm(instance=request.user)
         password_form = PasswordChangeForm(request.user)
@@ -430,8 +441,6 @@ def methodology_view(request):
 
     if not methodology_page:
         messages.warning(request, _("Methodology page content is not available yet."))
-        # Optionally, provide default values or raise 404 if critical
-        # raise Http404(_("Methodology page not found."))
 
     context = {
         'methodology_page': methodology_page,
@@ -446,7 +455,6 @@ def why_mgc_view(request):
 
     if not why_mgc_page:
         messages.warning(request, _("Content for 'Why MGC?' is not available yet."))
-        # Optionally, provide default values or raise 404
 
     context = {
         'why_mgc_page': why_mgc_page,
@@ -466,12 +474,8 @@ def contact_view(request):
         message_template = _("I would like to request a review for the game: %(game_title)s\n\nPlease add any details or reasons for the request here:\n\n")
         game_title_display = _("[Please enter game title]")
         if requested_game_title_raw:
-            # Decode URL encoding
-            try:
-                game_title_display = unquote(requested_game_title_raw)
-            except Exception: # Catch potential decoding errors
-                 game_title_display = _("[Could not decode game title]")
-
+            try: game_title_display = unquote(requested_game_title_raw)
+            except Exception: game_title_display = _("[Could not decode game title]")
         initial_data['message'] = message_template % {'game_title': game_title_display}
 
     if request.method == 'POST':
@@ -497,32 +501,20 @@ def contact_view(request):
             )
 
             try:
-                 # Ensure recipient list is correctly retrieved
                  recipient_list = [admin_email for admin_name, admin_email in settings.ADMINS] if hasattr(settings, 'ADMINS') and settings.ADMINS else []
-
                  if not recipient_list:
                       print("WARNING: ADMINS setting is empty or not configured. Contact form email cannot be sent.")
                       if not settings.DEBUG:
-                          # In production, if ADMINS is empty, we should fail gracefully
                           messages.error(request, _('Sorry, the site is not configured to send messages currently. Please try again later.'))
-                          # Don't proceed to success page if mail wasn't sent
                           return render(request, 'ratings/contact.html', {'form': form})
-
                  if settings.DEBUG and not recipient_list:
-                      # Print to console in DEBUG if no ADMINS are set
                       print(f"--- Contact Form Email (DEBUG: No ADMINS) ---\nSubject: {email_subject}\n{email_message}\n---------------------------------------------------------")
-                      # Simulate success in DEBUG even if not sent
                       messages.success(request, _('[DEBUG] Thank you for your message! (Email not sent - ADMINS not set)'))
                       return redirect('ratings:contact_success')
                  elif recipient_list:
-                     # Send email if recipients exist
-                     send_mail(
-                         email_subject, email_message, settings.DEFAULT_FROM_EMAIL,
-                         recipient_list, fail_silently=False
-                     )
+                     send_mail(email_subject, email_message, settings.DEFAULT_FROM_EMAIL, recipient_list, fail_silently=False)
                      messages.success(request, _('Thank you for your message! We will get back to you soon.'))
                      return redirect('ratings:contact_success')
-
             except Exception as e:
                 messages.error(request, _('Sorry, there was an error sending your message. Please try again later.'))
                 print(f"Contact form send mail error: {e}")
@@ -546,26 +538,32 @@ def contact_success_view(request):
 def delete_suggestion(request, suggestion_id):
     suggestion = get_object_or_404(Suggestion.objects.select_related('game', 'user'), pk=suggestion_id)
 
-    # Determine redirect URL (admin or game detail)
     if request.user.is_staff:
-        # Staff can delete from anywhere, try to redirect back smartly
         referer = request.META.get('HTTP_REFERER')
         admin_url = reverse('admin:ratings_suggestion_changelist')
-        # Redirect to admin if coming from admin, otherwise try game detail or fallback to admin
         if referer and admin_url in referer:
              redirect_url = admin_url
         else:
              redirect_url = suggestion.game.get_absolute_url() + '#user-suggestions' if suggestion.game else admin_url
     else:
-        # Non-staff can only delete their own from game detail page
         if suggestion.user != request.user:
              messages.error(request, _("You do not have permission to delete this suggestion."))
-             # Redirect to game detail page if possible, otherwise home
              return redirect(suggestion.game.get_absolute_url() + '#user-suggestions' if suggestion.game else reverse('home'))
-        # If they own it, redirect back to game detail page
         redirect_url = suggestion.game.get_absolute_url() + '#user-suggestions' if suggestion.game else reverse('home')
-
 
     suggestion.delete()
     messages.success(request, _("Suggestion deleted successfully."))
     return redirect(redirect_url)
+
+# --- Support Page View ---
+class SupportUsView(TemplateView):
+    template_name = 'ratings/support_us.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _("Support MGC")
+        # Add any other context needed for the support page (e.g., Patreon link)
+        # context['patreon_link'] = "https://www.patreon.com/your_mgc_page" # Example
+        return context
+
+support_us_view = SupportUsView.as_view()

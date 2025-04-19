@@ -47,7 +47,7 @@
           <div class="article-item">
               <h4><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h4>
               <p class="article-meta">
-                  {% blocktranslate %}Published on {{ article.published_date|date:"F j, Y" }}{% endblocktranslate %}
+                  {% translate "Published on" %}: {{ article.published_date|date:"F j, Y" }}
                   {% if article.author_name %} {% blocktranslate %}by {{ article.author_name }}{% endblocktranslate %}{% endif %}
                   {% if article.categories.exists %} | {% translate "In:" %} {% for cat in article.categories.all %}<a href="{{ cat.get_absolute_url }}" class="text-secondary">{{ cat.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
               </p>

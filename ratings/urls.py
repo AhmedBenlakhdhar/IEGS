@@ -14,6 +14,7 @@ urlpatterns = [
     path('why-mgc/', views.why_mgc_view, name='why_mgc'),
     path('contact/', views.contact_view, name='contact'),
     path('contact/success/', views.contact_success_view, name='contact_success'),
+    path('support/', views.support_us_view, name='support_us'), # NEW: Support page URL
 
     # User Profile URL
     path('profile/', views.user_profile_edit, name='profile_edit'),
