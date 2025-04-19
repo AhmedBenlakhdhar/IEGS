@@ -514,37 +514,37 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='game',
             name='music_instruments_details',
-            field=models.TextField(blank=True, verbose_name='8. Music/Instruments Details'),
+            field=models.TextField(blank=True, verbose_name='8. Music Details'),
         ),
         migrations.AddField(
             model_name='game',
             name='music_instruments_details_ar',
-            field=models.TextField(blank=True, null=True, verbose_name='8. Music/Instruments Details'),
+            field=models.TextField(blank=True, null=True, verbose_name='8. Music Details'),
         ),
         migrations.AddField(
             model_name='game',
             name='music_instruments_details_en',
-            field=models.TextField(blank=True, null=True, verbose_name='8. Music/Instruments Details'),
+            field=models.TextField(blank=True, null=True, verbose_name='8. Music Details'),
         ),
         migrations.AddField(
             model_name='game',
             name='music_instruments_reason',
-            field=models.TextField(blank=True, verbose_name='8. Music/Instruments Reason'),
+            field=models.TextField(blank=True, verbose_name='8. Music Reason'),
         ),
         migrations.AddField(
             model_name='game',
             name='music_instruments_reason_ar',
-            field=models.TextField(blank=True, null=True, verbose_name='8. Music/Instruments Reason'),
+            field=models.TextField(blank=True, null=True, verbose_name='8. Music Reason'),
         ),
         migrations.AddField(
             model_name='game',
             name='music_instruments_reason_en',
-            field=models.TextField(blank=True, null=True, verbose_name='8. Music/Instruments Reason'),
+            field=models.TextField(blank=True, null=True, verbose_name='8. Music Reason'),
         ),
         migrations.AddField(
             model_name='game',
             name='music_instruments_severity',
-            field=models.CharField(choices=[('N', 'None'), ('L', 'Low'), ('M', 'Medium'), ('H', 'High'), ('P', 'Severe')], default='N', max_length=1, verbose_name='8. Music/Instruments Severity'),
+            field=models.CharField(choices=[('N', 'None'), ('L', 'Low'), ('M', 'Medium'), ('H', 'High'), ('P', 'Severe')], default='N', max_length=1, verbose_name='8. Music Severity'),
         ),
         migrations.AddField(
             model_name='game',

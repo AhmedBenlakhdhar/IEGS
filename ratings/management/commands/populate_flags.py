@@ -20,7 +20,7 @@ FLAG_DATA = [
     {"symbol": "casino", "description": 'Gambling'},
     {"symbol": "front_hand", "description": 'Lying'},
     {"symbol": "visibility_off", "description": 'Indecency'},
-    {"symbol": "music_off", "description": 'Music/Instruments'},
+    {"symbol": "music_off", "description": 'Music'},
     {"symbol": "hourglass_top", "description": 'Time Waste'},
 
     # C. Normalization Risks

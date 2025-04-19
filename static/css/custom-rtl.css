@@ -44,7 +44,6 @@ body.rtl .filter-sort-form .text-end { text-align: left !important; } /* Fix fil
 body.rtl .page-header::after {
     left: auto; /* Remove left positioning */
     right: 0; /* Position on the right */
-     clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%); /* Flip clip-path */
 }
 body.rtl .detail-meta::after {
     left: auto;

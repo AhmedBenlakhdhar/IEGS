@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='flag',
-            options={'ordering': ['description'], 'verbose_name': 'Content Descriptor', 'verbose_name_plural': 'Content Descriptors'},
+            options={'ordering': ['description'], 'verbose_name': 'Content Descriptor', 'verbose_name_plural': 'Content Risks'},
         ),
         migrations.RemoveField(
             model_name='game',

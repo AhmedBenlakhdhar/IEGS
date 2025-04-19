@@ -22,7 +22,7 @@ class FlagAdmin(TranslationAdmin):
     search_fields = ('symbol', 'description')
     ordering = ('description',)
     verbose_name = _('Content Descriptor')
-    verbose_name_plural = _('Content Descriptors')
+    verbose_name_plural = _('Content Risks')
 
 # --- CriticReviewAdmin ---
 @admin.register(CriticReview)

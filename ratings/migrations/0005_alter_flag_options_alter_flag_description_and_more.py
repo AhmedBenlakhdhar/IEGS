@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='game',
             name='music_instruments_severity',
-            field=models.CharField(choices=[('N', 'None'), ('L', 'Mild'), ('M', 'Moderate'), ('S', 'Severe')], default='N', max_length=1, verbose_name='8. Music/Instruments Severity'),
+            field=models.CharField(choices=[('N', 'None'), ('L', 'Mild'), ('M', 'Moderate'), ('S', 'Severe')], default='N', max_length=1, verbose_name='8. Music Severity'),
         ),
         migrations.AlterField(
             model_name='game',

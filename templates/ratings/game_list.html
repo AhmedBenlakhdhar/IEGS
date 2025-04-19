@@ -1,4 +1,4 @@
-{# templates/ratings/game_list.html - UPDATED empty block #}
+{# templates/ratings/game_list.html - UPDATED for Single Form Submission #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -6,159 +6,202 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-<div class="row">
-    {# --- Sidebar for Filters --- #}
-    <div class="col-lg-3 col-md-4 order-md-2 mb-4">
-        <form method="GET" action="{% if developer_slug %}{% url 'ratings:games_by_developer' developer_slug=developer_slug %}{% elif publisher_slug %}{% url 'ratings:games_by_publisher' publisher_slug=publisher_slug %}{% else %}{% url 'ratings:game_list' %}{% endif %}" class="filter-sort-form card bg-element">
-            <div class="card-header">
-                <h5 class="mb-0">{% translate "Refine Search" %}</h5>
-            </div>
-            <div class="card-body">
-                 {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
 
-                {# Tier Filter (Keep text) #}
-                <div class="mb-3">
-                  <label for="tierFilter" class="form-label form-label-sm">{% translate "Rating Tier" %}</label>
-                  <select class="form-select form-select-sm" id="tierFilter" name="tier">
-                    <option value="" {% if not selected_tier %}selected{% endif %}>{% translate "All Tiers" %}</option>
-                    {% for tier in all_tiers %}
-                      <option value="{{ tier.tier_code }}" {% if selected_tier == tier.tier_code %}selected{% endif %}>{{ tier.display_name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
+{# --- Combined Filter and Search Form Area --- #}
+<form method="GET" action="{% if developer_slug %}{% url 'ratings:games_by_developer' developer_slug=developer_slug %}{% elif publisher_slug %}{% url 'ratings:games_by_publisher' publisher_slug=publisher_slug %}{% else %}{% url 'ratings:game_list' %}{% endif %}" class="filter-search-form card bg-element mb-4 p-3">
+    {# This single form wraps both filters and search #}
 
-                {# Flag Filter (Keep text) #}
-                <div class="mb-3">
-                    <label for="flagFilter" class="form-label form-label-sm">{% translate "Content Flags" %}</label>
-                    <select class="form-select form-select-sm" id="flagFilter" name="flag">
-                        <option value="" {% if not selected_flag %}selected{% endif %}>{% translate "Any Flags" %}</option>
-                        {% for flag in all_flags %}
-                            <option value="{{ flag.symbol }}" {% if selected_flag == flag.symbol %}selected{% endif %}>{{ flag.description }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+    {# --- Filter Controls Row --- #}
+    <div class="row g-3 align-items-end mb-3"> {# Added mb-3 for space before search #}
 
-                 {# Platforms (Keep text) #}
-                 <div class="mb-3">
-                    <label class="form-label form-label-sm">{% translate "Platforms" %}</label>
-                    <div class="filter-platform-list">
-                        {% for platform_item in platform_list_for_template %}
-                        <div class="form-check mb-1">
-                            <input class="form-check-input" type="checkbox" name="platform" value="{{ platform_item.code }}" id="platform_{{ platform_item.code }}" {% if platform_item.code in selected_platforms %}checked{% endif %}>
-                            <label class="form-check-label small" for="platform_{{ platform_item.code }}">{{ platform_item.name }}</label>
-                        </div>
-                        {% endfor %}
-                    </div>
-                 </div>
-
-                {# Sort By (Keep text) #}
-                <div class="mb-0">
-                  <label for="sortFilter" class="form-label form-label-sm">{% translate "Sort By" %}</label>
-                  <select class="form-select form-select-sm" id="sortFilter" name="sort">
-                    <option value="-date_updated" {% if sort_by == '-date_updated' %}selected{% endif %}>{% translate "Date Added (Newest)" %}</option> {# Default to date_updated #}
-                    <option value="date_updated" {% if sort_by == 'date_updated' %}selected{% endif %}>{% translate "Date Added (Oldest)" %}</option>
-                    <option value="title" {% if sort_by == 'title' %}selected{% endif %}>{% translate "Title (A-Z)" %}</option>
-                    <option value="-title" {% if sort_by == '-title' %}selected{% endif %}>{% translate "Title (Z-A)" %}</option>
-                    <option value="-release_date" {% if sort_by == '-release_date' %}selected{% endif %}>{% translate "Release Date (Newest)" %}</option>
-                    <option value="release_date" {% if sort_by == 'release_date' %}selected{% endif %}>{% translate "Release Date (Oldest)" %}</option>
-                  </select>
-                </div>
-            </div>
-            <div class="card-footer text-end"> {# Apply Button: Icon #}
-                 <button type="submit" class="btn btn-sm btn-primary filter-apply-btn" title="{% translate 'Apply Filters' %}">
-                     <span class="material-symbols-outlined" style="vertical-align: middle;">filter_alt</span> {% translate 'Apply Filters' %}
-                 </button>
-            </div>
-        </form>
-    </div>
-    {# --- End Sidebar --- #}
-
-    {# --- Main Content Area --- #}
-    <div class="col-lg-9 col-md-8 order-md-1">
-        {# --- Page Header with Search --- #}
-        <div class="page-header d-block d-md-flex justify-content-between align-items-center mb-3">
-            <h1 class="mb-2 mb-md-0">{{ page_title }}</h1>
-            <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form ms-md-auto" style="max-width: 300px;">
-                <input class="form-control me-2" type="search" placeholder="{% translate 'Search Title/Dev...' %}" aria-label="{% translate 'Search' %}" name="q" value="{{ search_query|default:'' }}">
-                {# Search Button: Icon #}
-                <button class="btn btn-outline-secondary flex-shrink-0 search-button" type="submit" title="{% translate 'Search' %}">
-                     <span class="material-symbols-outlined" style="vertical-align: middle;">search</span>
-                </button>
-            </form>
-        </div>
-
-        {% if filter_description %}
-            <div class="alert alert-info small d-flex justify-content-between align-items-center" role="alert">
-                <span>{{ filter_description|safe }}</span>
-                {# Clear Filter Link: Icon #}
-                <a href="{% url 'ratings:game_list' %}" class="btn btn-sm btn-outline-secondary ms-3" title="{% translate 'Clear Filter' %}">
-                    <span class="material-symbols-outlined" style="vertical-align: middle;">close</span>
-                </a>
-            </div>
-        {% endif %}
-
-        {# --- Game Grid --- #}
-        <div class="row">
-            {% for game in games_page %}
-            <div class="col-12 col-lg-6 mb-4">
-                {% include 'ratings/includes/game_card_snippet.html' with game=game %}
-            </div>
-            {% empty %}
-            <div class="col-12 text-center text-secondary mt-4">
-                <p>{% translate "No games found matching your criteria." %}</p>
-            </div>
+        {# Tier Filter #}
+        <div class="col-md-3 col-sm-6">
+          <label for="tierFilter" class="form-label form-label-sm d-block">{% translate "Rating Tier" %}</label>
+          <select class="form-select form-select-sm" id="tierFilter" name="tier">
+            <option value="" {% if not selected_tier %}selected{% endif %}>{% translate "All Tiers" %}</option>
+            {% for tier in all_tiers %}
+              <option value="{{ tier.tier_code }}" {% if selected_tier == tier.tier_code %}selected{% endif %}>{{ tier.display_name }}</option>
             {% endfor %}
+          </select>
         </div>
-        {# --- START: Request Review Prompt --- #}
-        <p class="mt-3 text-center">
-            {% translate "Didn't find the game you were looking for?" %}
-            {# Construct the contact URL with pre-filled parameters #}
-            <a href="{% url 'ratings:contact' %}?subject=GAME_REVIEW_REQUEST{% if search_query %}&game_title={{ search_query|urlencode }}{% endif %}" class="link-primary">
-                {% translate "Request a Review" %}
-            </a>
-        </p>
-        {# --- END: Request Review Prompt --- #}
 
-        {# --- Pagination (with Icons) --- #}
-        {% if games_page.has_other_pages %}
-            <nav aria-label="{% translate 'Game list navigation' %}" class="mt-5">
-              <ul class="pagination justify-content-center">
-                {% if games_page.has_previous %}
-                  <li class="page-item"><a class="page-link" href="?page=1{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'First page' %}"><span class="material-symbols-outlined">first_page</span></a></li>
-                  <li class="page-item"><a class="page-link" href="?page={{ games_page.previous_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Previous page' %}"><span class="material-symbols-outlined">chevron_left</span></a></li>
-                {% else %}
-                  <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">first_page</span></span></li>
-                  <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">chevron_left</span></span></li>
-                {% endif %}
-                <li class="page-item disabled"><span class="page-link">{% blocktranslate %}Page {{ games_page.number }} of {{ games_page.paginator.num_pages }}{% endblocktranslate %}</span></li>
-                {% if games_page.has_next %}
-                  <li class="page-item"><a class="page-link" href="?page={{ games_page.next_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Next page' %}"><span class="material-symbols-outlined">chevron_right</span></a></li>
-                  <li class="page-item"><a class="page-link" href="?page={{ games_page.paginator.num_pages }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Last page' %}"><span class="material-symbols-outlined">last_page</span></a></li>
-                {% else %}
-                  <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">chevron_right</span></span></li>
-                  <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">last_page</span></span></li>
-                {% endif %}
-              </ul>
-            </nav>
-        {% endif %}
-        {# --- END: Pagination --- #}
+        {# Flag Filter #}
+        <div class="col-md-3 col-sm-6">
+            <label for="flagFilter" class="form-label form-label-sm d-block">{% translate "Content Flags" %}</label>
+            <select class="form-select form-select-sm" id="flagFilter" name="flag">
+                <option value="" {% if not selected_flag %}selected{% endif %}>{% translate "Any Flags" %}</option>
+                {% for flag in all_flags %}
+                    <option value="{{ flag.symbol }}" {% if selected_flag == flag.symbol %}selected{% endif %}>{{ flag.description }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+         {# Platform Filter (Single Select Dropdown) #}
+         <div class="col-md-3 col-sm-6"> {# Adjusted width #}
+            <label for="platformFilter" class="form-label form-label-sm d-block">{% translate "Platform" %}</label> {# Changed label, added for attribute #}
+            <select class="form-select form-select-sm" id="platformFilter" name="platform"> {# Changed ID and Name #}
+                <option value="" {% if not selected_platforms %}selected{% endif %}>{% translate "All Platforms" %}</option>
+                {% for platform_item in platform_list_for_template %}
+                    {# Note: selected_platforms is now a list, check if the *first* item matches #}
+                    {# Or better, pass single selected_platform code from view if applicable #}
+                    <option value="{{ platform_item.code }}" {% if platform_item.code in selected_platforms %}selected{% endif %}>
+                        {{ platform_item.name }}
+                    </option>
+                {% endfor %}
+            </select>
+         </div>
+
+        {# Sort By Filter #}
+        <div class="col-md-3 col-sm-6">
+          <label for="sortFilter" class="form-label form-label-sm d-block">{% translate "Sort By" %}</label>
+          <select class="form-select form-select-sm" id="sortFilter" name="sort">
+            <option value="-date_updated" {% if sort_by == '-date_updated' %}selected{% endif %}>{% translate "Date Added (Newest)" %}</option>
+            <option value="date_updated" {% if sort_by == 'date_updated' %}selected{% endif %}>{% translate "Date Added (Oldest)" %}</option>
+            <option value="title" {% if sort_by == 'title' %}selected{% endif %}>{% translate "Title (A-Z)" %}</option>
+            <option value="-title" {% if sort_by == '-title' %}selected{% endif %}>{% translate "Title (Z-A)" %}</option>
+            <option value="-release_date" {% if sort_by == '-release_date' %}selected{% endif %}>{% translate "Release Date (Newest)" %}</option>
+            <option value="release_date" {% if sort_by == 'release_date' %}selected{% endif %}>{% translate "Release Date (Oldest)" %}</option>
+          </select>
+        </div>
+
+        {# --- Search Input Row --- #}
+        <div class="col-sm-12">
+            <div class="row g-3">
+                <div class="col"> {# Takes remaining width #}
+                    <label for="searchInput" class="visually-hidden">{% translate 'Search' %}</label> {# Hidden label for accessibility #}
+                    <input class="form-control form-control-sm me-2" type="search" placeholder="{% translate 'Search Title/Dev & Apply Filters...' %}" aria-label="{% translate 'Search' %}" name="q" id="searchInput" value="{{ search_query|default:'' }}">
+                </div>
+                <div class="col-auto"> {# Takes only button width #}
+                    <button class="btn btn-sm btn-primary search-submit-button" type="submit" title="{% translate 'Search / Apply Filters' %}">
+                        <span class="material-symbols-outlined">search</span>
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div> {# End Search Input Row #}
+        {# Apply Button REMOVED #}
+
+    </div> {# End Filter Controls Row #}
+
+</form>
+{# --- End Combined Filter and Search Form Area --- #}
+
+
+{# --- Main Content Area --- #}
+<div>
+    {# --- Page Header (Title Only) --- #}
+    <div class="page-header mb-3">
+        <h1 class="mb-0">{{ page_title }}</h1>
     </div>
-    {# --- End Main Content Area --- #}
+
+    {# --- Filter Description and Clear Link --- #}
+    {% if filter_description %}
+        <div class="alert alert-info small d-flex justify-content-between align-items-center mb-3" role="alert">
+            <span>{{ filter_description|safe }}</span>
+            {# Clear Link: Always goes to the base URL, preserving only the search query if it exists #}
+            <a href="{% url 'ratings:game_list' %}{% if search_query %}?q={{ search_query|urlencode }}{% endif %}" class="btn btn-sm btn-outline-secondary ms-3 flex-shrink-0" title="{% translate 'Clear Filters' %}">
+                <span class="material-symbols-outlined">close</span>
+            </a>
+        </div>
+    {% endif %}
+
+    {# --- Game Grid --- #}
+    <div class="row">
+        {% for game in games_page %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            {% include 'ratings/includes/game_card_snippet.html' with game=game %}
+        </div>
+        {% empty %}
+        <div class="col-12 text-center text-secondary mt-4">
+            <p>{% translate "No games found matching your criteria." %}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {# --- END: Game Grid --- #}
+
+    {# --- START: Request Review Prompt --- #}
+    <p class="mt-3 text-center">
+        {% translate "Didn't find the game you were looking for?" %}
+        <a href="{% url 'ratings:contact' %}?subject=GAME_REVIEW_REQUEST{% if search_query %}&game_title={{ search_query|urlencode }}{% endif %}" class="link-primary">
+            {% translate "Request a Review" %}
+        </a>
+    </p>
+    {# --- END: Request Review Prompt --- #}
+
+    {# --- Pagination --- #}
+    {% if games_page.has_other_pages %}
+        <nav aria-label="{% translate 'Game list navigation' %}" class="mt-5">
+          <ul class="pagination justify-content-center">
+            {% if games_page.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page=1{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'First page' %}"><span class="material-symbols-outlined">first_page</span></a></li>
+              <li class="page-item"><a class="page-link" href="?page={{ games_page.previous_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Previous page' %}"><span class="material-symbols-outlined">chevron_left</span></a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">first_page</span></span></li>
+              <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">chevron_left</span></span></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">{% blocktranslate %}Page {{ games_page.number }} of {{ games_page.paginator.num_pages }}{% endblocktranslate %}</span></li>
+            {% if games_page.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ games_page.next_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Next page' %}"><span class="material-symbols-outlined">chevron_right</span></a></li>
+              <li class="page-item"><a class="page-link" href="?page={{ games_page.paginator.num_pages }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Last page' %}"><span class="material-symbols-outlined">last_page</span></a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">chevron_right</span></span></li>
+              <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">last_page</span></span></li>
+            {% endif %}
+          </ul>
+        </nav>
+    {% endif %}
+    {# --- END: Pagination --- #}
 </div>
+{# --- End Main Content Area --- #}
+
 {% endblock %}
 
 {% block extra_css %}
-{# Minor style adjustments for icon buttons #}
 <style>
     .pagination .page-link .material-symbols-outlined {
         font-size: 1.2em;
         vertical-align: -3px;
     }
-    .filter-apply-btn .material-symbols-outlined,
-    .search-form .btn .material-symbols-outlined,
-    .alert .btn .material-symbols-outlined {
-         font-size: 1.3em;
-         vertical-align: -3px;
+
+    /* Combined Filter/Search Form Styles */
+    .filter-search-form {
+        /* Inherits card styles */
     }
+
+    /* Ensure form labels in horizontal layout have consistent bottom margin */
+    .filter-search-form .form-label-sm {
+        margin-bottom: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        display: block !important; /* Ensure it's always block */
+    }
+
+    /* Style the submit button */
+    .search-submit-button {
+        padding: 0.25rem 0.6rem; /* Match sm input height better */
+        line-height: 1.5;
+    }
+    .search-submit-button .material-symbols-outlined {
+         font-size: 1.3em;
+         vertical-align: -3px; /* Adjust alignment */
+    }
+
+    /* Adjust icon in clear filter button */
+     .alert .btn .material-symbols-outlined {
+        font-size: 1.1em;
+        vertical-align: -2px;
+     }
+
+    /* Remove styles related to old platform list and apply button */
+    /* .filter-platform-list { ... } */
+    /* .filter-apply-btn { ... } */
+
+    /* Ensure input fields take appropriate height */
+    .filter-search-form .form-control-sm,
+    .filter-search-form .form-select-sm {
+         height: calc(1.5em + 0.5rem + 2px); /* Standard Bootstrap sm height */
+    }
+
 </style>
 {% endblock %}

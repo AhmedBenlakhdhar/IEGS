@@ -1170,7 +1170,7 @@ FLAG_DATA = [
     {"symbol": "casino", "description": 'Gambling'},
     {"symbol": "front_hand", "description": 'Lying'},
     {"symbol": "visibility_off", "description": 'Indecency'},
-    {"symbol": "music_off", "description": 'Music/Instruments'},
+    {"symbol": "music_off", "description": 'Music'},
     {"symbol": "hourglass_top", "description": 'Time Waste'},
 
     # C. Normalization Risks
@@ -1943,7 +1943,7 @@ class Game(models.Model):
     gambling_severity = models.CharField(_('B1. Gambling Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     lying_severity = models.CharField(_('B2. Lying Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     indecency_severity = models.CharField(_('B3. Indecency Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
-    music_instruments_severity = models.CharField(_('B4. Music/Instruments Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
+    music_instruments_severity = models.CharField(_('B4. Music Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     time_waste_severity = models.CharField(_('B5. Time Waste Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     disdain_arrogance_severity = models.CharField(_('C1. Normalizing Disdain/Arrogance Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     magic_severity = models.CharField(_('C2. Normalizing Magic Severity'), max_length=1, choices=SEVERITY_CHOICES, default='N')

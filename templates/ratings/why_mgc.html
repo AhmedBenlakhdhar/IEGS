@@ -1,72 +1,197 @@
-{# templates/ratings/why_mgc.html - Added "How MGC Differs" section #}
+{# templates/ratings/why_mgc.html#}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block title %}{% blocktranslate %}Games Aren't Built With Muslims in Mind: Rating Through an Islamic Lens{% endblocktranslate %}{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h1>{{ page_title }}</h1>
-</div>
+<div class="container py-5" style="max-width: 900px;">
 
-<div class="why-mgc-content article-content">
-    {% if why_mgc_page and why_mgc_page.content %}
-        {# If content exists in the DB via admin, use that #}
-        {{ why_mgc_page.content|safe }}
-    {% else %}
-        {# Default content based on your provided text #}
-        <p>{% blocktranslate %}In an era where digital entertainment, especially video games, occupies a significant portion of our time and influences our thoughts and actions, the need for guidance rooted in Islamic principles becomes paramount. The Muslim Game Classification (MGC) project was established to address this need, providing a framework for evaluating games based on the Quran, the authentic Sunnah, and the understanding of the righteous predecessors (As-Salaf As-Salih).{% endblocktranslate %}</p>
+    <header class="text-center mb-5">
+        {# Modified Header based on your input #}
+        <h1 class="mb-3">
+            <div class="h1 fw-bold mb-2">{% blocktranslate %}Games Aren't Built<br>With Muslims in Mind{% endblocktranslate %}</div>
+            <div class="h4 text-muted fw-normal">{% blocktranslate %}Providing Clarity Through an Islamic Rating Lens{% endblocktranslate %}</div>
+        </h1>
+    </header>
 
-        <h3>{% translate "The Need for Islamic Guidance in Gaming" %}</h3>
-        <ul>
-            <li><strong>{% translate "Time Allocation" %} (<em>Waqt</em>):</strong> {% blocktranslate %}Islam emphasizes the value of time. Games, particularly those designed to be highly engaging or time-consuming, can potentially lead to neglecting religious obligations (like Salah), family responsibilities, work, or study. MGC assesses the risk of excessive time wastage (<em>Israf</em>).{% endblocktranslate %}</li>
-            <li><strong>{% translate "Content Concerns" %} (<em>Muharramat</em>):</strong> {% blocktranslate %}Many mainstream games contain elements explicitly forbidden (<em>Haram</em>) or discouraged in Islam. This includes:{% endblocktranslate %}
-            <ul>
-                <li><strong>{% translate "Risks to Faith (Aqidah)" %}:</strong> {% blocktranslate %}Promotion or normalization of Shirk (polytheism), Kufr (disbelief), assuming divinity, distorting Islamic teachings, tampering with the unseen (Ghaib), magic (Sihr), or ideologies contradicting Tawhid (e.g., atheism, secularism).{% endblocktranslate %}</li>
-                <li><strong>{% translate "Prohibition Exposure" %}:</strong> {% blocktranslate %}Depictions or simulation of 'Awrah (nudity), Fahisha (obscenity/profanity), Zina/Liwat (unlawful sexual acts), impermissible relationships (including LGBTQ+ themes), consuming Khamr (intoxicants), engaging in Maysir/Qimar (gambling), using impermissible musical instruments (Ma'azif), or engaging in Kadhib (lying).{% endblocktranslate %}</li>
-                <li><strong>{% translate "Normalization Risks" %}:</strong> {% blocktranslate %}Glorification or casual presentation of unjustified violence/crime, arrogance (Kibr), profanity, intoxicants, or magic.{% endblocktranslate %}</li>
-                 <li><strong>{% translate "Player Risks" %}:</strong> {% blocktranslate %}Exposure to excessive horror/fear, themes promoting despair (Qunut), predatory spending mechanics (Israf), harmful online interactions (Fitnah), or problematic user-generated content.{% endblocktranslate %}</li>
-            </ul>
-            </li>
-            <li><strong>{% translate "Normalization & Desensitization" %}:</strong> {% blocktranslate %}Repeated exposure to Haram content, even in a virtual setting, can desensitize individuals and normalize sinful behavior, weakening one's adherence to Islamic values (<em>Akhlaq</em>). MGC specifically assesses the normalization aspect.{% endblocktranslate %}</li>
-        </ul>
+    <hr class="mb-5">
 
-        <h3>{% translate "MGC's Objective" %}</h3>
-        <p>{% blocktranslate %}MGC aims to provide Muslims with clear, consistent, and Shariah-compliant information about video games. My goal is not merely to label games as "Halal" or "Haram" but to offer a detailed breakdown of potential concerns, allowing individuals and parents to:{% endblocktranslate %}</p>
-        <ul>
-            <li><strong>{% translate "Make Informed Choices" %}:</strong> {% blocktranslate %}Select games that align with their Islamic values and avoid those containing major violations.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Understand Potential Risks" %}:</strong> {% blocktranslate %}Be aware of specific issues within a game, even if deemed generally 'Acceptable' or 'Doubtful', allowing for caution.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Facilitate Discussion" %}:</strong> {% blocktranslate %}Provide a basis for discussion within families and communities about navigating digital entertainment responsibly.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Promote Alternatives" %}:</strong> {% blocktranslate %}Encourage the development and consumption of games with positive or permissible themes.{% endblocktranslate %}</li>
-        </ul>
+    <div class="why-mgc-content">
+        {% if why_mgc_page and why_mgc_page.content %}
+            {# If content exists in the DB via admin, use that #}
+            <section class="shadow-sm mb-5"> {# Added card class back #}
+                <div class="card-body p-4">
+                    {{ why_mgc_page.content|safe }}
+                </div>
+            </section>
+        {% else %}
+            {# Default content with card structure #}
 
-        {# --- NEW SECTION: How MGC Differs --- #}
-        <h3 class="mt-5">{% translate "How MGC Differs from Other Rating Systems" %}</h3>
-        <p>{% blocktranslate %}While various game rating systems exist globally (like ESRB, PEGI), and some may operate within Muslim-majority regions, MGC offers a unique perspective specifically tailored to Shariah compliance:{% endblocktranslate %}</p>
-        <ul>
-            <li><strong>Focus on Islamic Principles:</strong> {% blocktranslate %}Standard rating systems primarily focus on age-appropriateness based on levels of violence, sexual content, language, etc. They do not evaluate content based on core Islamic tenets (Aqidah), specific prohibitions (Haram actions like Shirk, consuming Khamr, Maysir), the concept of 'Awrah, the ruling on musical instruments, or the sin of wasting time (Israf). A game rated "Teen" by ESRB could still contain significant elements of Kufr or promote Haram lifestyles according to MGC criteria.{% endblocktranslate %}</li>
-            <li><strong>Emphasis on Tawhid & Aqidah:</strong> {% blocktranslate %}MGC places the highest importance on protecting the core creed (Aqidah) of a Muslim. Concerns related to Shirk, Kufr, assuming divinity, or distorting Islam are treated with the utmost severity, often leading directly to a 'Kufr/Shirk' or 'Haram' rating, regardless of other content.{% endblocktranslate %}</li>
-            <li><strong>Beyond Depiction to Normalization:</strong> {% blocktranslate %}MGC doesn't just note the presence of Haram elements but assesses how they are presented. It specifically evaluates the risk of normalizing impermissible actions, beliefs, or lifestyles, even if the player doesn't directly participate in them.{% endblocktranslate %}</li>
-            <li><strong>Adherence to Quran, Sunnah, Salaf:</strong> {% blocktranslate %}While other systems, even those in Muslim regions, might incorporate cultural factors or less stringent interpretations, MGC strives to adhere strictly to the Quran, the authentic Sunnah, and the understanding of the righteous predecessors (Salaf as-Salih) in its assessments and methodology.{% endblocktranslate %}</li>
-            <li><strong>Specific Islamic Concerns:</strong> {% blocktranslate %}Issues like the impermissibility of most musical instruments (Ma'azif), specific forms of indecency (Tabarruj, Ikhtilat), and the spiritual danger of wasting time (Israf/Lagw) are explicitly considered within the MGC framework, unlike secular systems.{% endblocktranslate %}</li>
-        </ul>
-        <p>{% blocktranslate %}Therefore, MGC serves as a necessary supplementary guide for Muslims seeking to ensure their entertainment choices do not compromise their faith and values, offering a level of detail and a perspective not found in standard industry or purely cultural rating systems.{% endblocktranslate %}</p>
-        {# --- END NEW SECTION --- #}
+            {# Introduction Card #}
+            <section class="shadow-sm mb-5"> {# Added card class back #}
+                <div class="card-body p-4">
+                    <p class="text-center text-muted mb-0">{% blocktranslate %}In an era where digital entertainment significantly influences our time and thoughts, most video games are developed without considering Islamic values. This necessitates clear guidance rooted in the Quran and Sunnah. The Muslim Game Classification (MGC) addresses this need.{% endblocktranslate %}</p>
+                </div>
+            </section>
+
+            {# Need Section Card #}
+            <section class="shadow-sm mb-5"> {# Added card class back #}
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4 pb-3 border-bottom">{% translate "The Need for Islamic Guidance in Gaming" %}</h2>
+                    <p class="text-muted mb-4">{% blocktranslate %}Navigating the digital landscape presents unique challenges for practicing Muslims. Key areas of concern include:{% endblocktranslate %}</p>
+
+                    <div class="mb-4">
+                        <h3 class="h5 fw-bold mb-2">{% translate "Guarding Time & Priorities" %}</h3>
+                        <p class="text-muted">{% blocktranslate %}Islam emphasizes time as a trust. Games designed for excessive engagement can lead to neglecting religious duties, family, work, and study (<em>Israf/Tadyi' al-Waqt</em>).{% endblocktranslate %}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="h5 fw-bold mb-2">{% translate "Protecting Belief & Values" %}</h3>
+                        <p class="text-muted">{% blocktranslate %}Constant exposure to un-Islamic themes can desensitize individuals, normalize prohibited actions, and subtly shift one's worldview away from core Islamic principles (<em>Aqidah</em>) and manners (<em>Akhlaq</em>).{% endblocktranslate %}</p>
+                    </div>
+
+                    <div> {# Removed mb-4 from this last div within the card #}
+                        <h3 class="h5 fw-bold mb-3">{% translate "Identifying Problematic Content" %} (<em>Al-Munkarat</em>)</h3>
+                        <p class="text-muted mb-3">{% blocktranslate %}Mainstream games frequently incorporate elements explicitly forbidden (<em>Haram</em>) or discouraged in Islam, including:{% endblocktranslate %}</p>
+                        <ul class="list-unstyled ms-3">
+                            <li class="mb-2"><strong class="text-dark">{% translate "Threats to Faith (Aqidah):" %}</strong> {% translate "Content promoting or normalizing Shirk, Kufr, assuming divinity, distorting Islam, or magic (Sihr)." %}</li>
+                            <li class="mb-2"><strong class="text-dark">{% translate "Exposure to Prohibitions:" %}</strong> {% translate "Depictions violating 'Awrah, impermissible music (Ma'azif), intoxicants (Khamr), gambling (Maysir), or unlawful relationships." %}</li>
+                            <li class="mb-2"><strong class="text-dark">{% translate "Normalization of Wrongdoing:" %}</strong> {% translate "Casual presentation or glorification of unjustified violence, crime, or arrogance (Kibr)." %}</li>
+                            <li class="mb-2"><strong class="text-dark">{% translate "Risks to Player Well-being:" %}</strong> {% translate "Themes inducing despair (Qunut), predatory spending mechanics (Israf), or harmful online interactions (Fitnah)." %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            {# Objective Section Card - With Icons #}
+            <section class="shadow-sm mb-5 bg-light"> {# Added card class back #}
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4 pb-3 border-bottom">{% translate "MGC's Objective: Providing Clarity" %}</h2>
+                    <p class="text-center text-muted mb-4">{% blocktranslate %}MGC aims to provide clear, consistent, Shariah-compliant information, enabling Muslims to:{% endblocktranslate %}</p>
+
+                    <div class="row text-center g-4"> {# Use g-4 for gutter spacing #}
+
+                        {# Objective 1 #}
+                        <div class="col-md-6 col-lg-3">
+                             <div class="p-3"> {# Optional inner padding if needed #}
+                                <i class="fas fa-check-circle fa-2x text-primary mb-2"></i> {# Icon Added back #}
+                                <h4 class="h6 fw-bold mb-1">{% translate "Informed Choice" %}</h4>
+                                <p class="small text-muted mb-0">{% blocktranslate %}Make informed decisions aligned with Islamic values.{% endblocktranslate %}</p>
+                            </div>
+                        </div>
+
+                        {# Objective 2 #}
+                         <div class="col-md-6 col-lg-3">
+                             <div class="p-3">
+                                <i class="fas fa-search-plus fa-2x text-primary mb-2"></i> {# Icon Added back #}
+                                <h4 class="h6 fw-bold mb-1">{% translate "Identify Risks" %}</h4>
+                                <p class="small text-muted mb-0">{% blocktranslate %}Recognize specific concerns, even in generally acceptable games.{% endblocktranslate %}</p>
+                            </div>
+                        </div>
+
+                        {# Objective 3 #}
+                         <div class="col-md-6 col-lg-3">
+                            <div class="p-3">
+                                <i class="fas fa-comments fa-2x text-primary mb-2"></i> {# Icon Added back #}
+                                <h4 class="h6 fw-bold mb-1">{% translate "Enable Dialogue" %}</h4>
+                                <p class="small text-muted mb-0">{% blocktranslate %}Facilitate constructive dialogue within families and communities.{% endblocktranslate %}</p>
+                            </div>
+                        </div>
+
+                        {# Objective 4 #}
+                         <div class="col-md-6 col-lg-3">
+                             <div class="p-3">
+                                <i class="fas fa-lightbulb fa-2x text-primary mb-2"></i> {# Icon Added back #}
+                                <h4 class="h6 fw-bold mb-1">{% translate "Promote Alternatives" %}</h4>
+                                <p class="small text-muted mb-0">{% blocktranslate %}Encourage the demand for positive, permissible alternatives.{% endblocktranslate %}</p>
+                            </div>
+                        </div>
+
+                    </div> {# End row #}
+                </div> {# End card-body #}
+            </section> {# End card #}
 
 
-        {% url 'ratings:methodology' as methodology_url %}
-        <p>{% blocktranslate %}I strive to apply Islamic principles objectively using the methodology outlined <a href="{{ methodology_url }}">here</a>. I recognize that <em>ijtihad</em> is involved, and individual piety (<em>Taqwa</em>) remains crucial. MGC is a tool to aid discernment, not replace personal responsibility before Allah.{% endblocktranslate %}</p>
-    {% endif %}
+            {# Comparison Section - Table within a Card structure #}
+            <section class="shadow-sm mb-5"> {# Added card class back #}
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4 pb-3 border-bottom">{% translate "MGC vs. Standard Age Ratings" %}</h2>
+                    <p class="text-center text-muted mb-4">{% blocktranslate %}Standard systems (ESRB, PEGI) focus on age-appropriateness based on societal norms. MGC offers a distinct, necessary layer of analysis based on Islamic principles, as highlighted below:{% endblocktranslate %}</p>
 
-    {# Contact Prompt (Remains the same) #}
-    {% url 'ratings:contact' as contact_url %}
-    <p class="mt-4 pt-3 border-top text-secondary small">
-        {% blocktranslate %}Have more questions about the purpose or goals of MGC? Please feel free to <a href="{{ contact_url }}">contact us</a>.{% endblocktranslate %}
-    </p>
+                    <div class="table-responsive rounded"> {# Removed shadow as card has it #}
+                        <table class="table table-bordered table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" style="width: 20%;">{% translate "Aspect" %}</th>
+                                    <th scope="col" class="text-center">
+                                        {% translate "MGC (Islamic Lens)" %}
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        {% translate "Standard Ratings (Age Lens)" %}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">{% translate "Focus" %}</th>
+                                    <td>{% blocktranslate %}Permissibility (Halal/Haram) according to Islamic law.{% endblocktranslate %}</td>
+                                    <td>{% blocktranslate %}Age-appropriateness based on societal norms.{% endblocktranslate %}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">{% translate "Foundation" %}</th>
+                                    <td>{% blocktranslate %}Quran, authentic Sunnah, understanding of the Salaf.{% endblocktranslate %}</td>
+                                    <td>{% blocktranslate %}Evolving societal standards and sensitivities.{% endblocktranslate %}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">{% translate "Priority" %}</th>
+                                    <td>{% blocktranslate %}Protecting core Islamic belief (Aqidah); treats Shirk/Kufr with utmost severity.{% endblocktranslate %}</td>
+                                    <td>{% blocktranslate %}General content intensity (violence, language, sexual content).{% endblocktranslate %}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">{% translate "Scope" %}</th>
+                                    <td>{% blocktranslate %}Evaluates specific Islamic concerns (e.g., 'Awrah, Ma'azif, Maysir, Sihr, Normalization).{% endblocktranslate %}</td>
+                                    <td>{% blocktranslate %}General societal concerns; often overlooks specific religious principles.{% endblocktranslate %}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> {# End table-responsive #}
 
-</div>
+                    <p class="text-center text-muted fst-italic mt-4 mb-0">{% blocktranslate %}MGC provides an essential layer of scrutiny based on Divine guidance, complementing standard age ratings.{% endblocktranslate %}</p>
+                    </div>
+                </section>
 
-<p><a href="{% url 'home' %}" class="back-link mt-3">{% translate "← Back to Home" %}</a></p>
+            {# Methodology Card #}
+            <section class="shadow-sm mb-5 bg-light"> {# Added card class back #}
+                <div class="card-body p-4 text-center">
+                    {% url 'ratings:methodology' as methodology_url %}
+                    <p class="mb-1">
+                        {% blocktranslate %}Ratings strive for objectivity based on Islamic principles outlined in our <a href="{{ methodology_url }}">Methodology</a>.
+                        {% endblocktranslate %}
+                    </p>
+                    <p class="small text-muted mb-0">{% blocktranslate %}Individual piety (<em>Taqwa</em>) remains paramount. MGC is a tool for discernment, not a replacement for personal accountability.{% endblocktranslate %}</p>
+                </div>
+            </section>
 
+        {% endif %}
+
+        <footer class="mt-5 pt-4 border-top text-center text-secondary small">
+            {% url 'ratings:contact' as contact_url %}
+            <p class="mb-0">
+                <i class="fas fa-envelope me-1"></i>
+                {% blocktranslate %}Questions? <a href="{{ contact_url }}" class="link-secondary">Contact Us</a>.
+                {% endblocktranslate %}
+             </p>
+        </footer>
+
+    </div> {# End why-mgc-content #}
+
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>{% translate "Back to Home" %}
+        </a>
+    </div>
+
+</div> {# End Container #}
 {% endblock %}

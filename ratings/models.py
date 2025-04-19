@@ -33,7 +33,7 @@ class Flag(models.Model):
     class Meta:
         ordering = ['description']
         verbose_name = _('Content Descriptor')
-        verbose_name_plural = _('Content Descriptors')
+        verbose_name_plural = _('Content Risks')
 
     def __str__(self):
         return str(self.description)
@@ -122,7 +122,7 @@ class Game(models.Model):
     gambling_severity = models.CharField(_('B1. Gambling'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     lying_severity = models.CharField(_('B2. Lying'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     indecency_severity = models.CharField(_('B3. Indecency'), max_length=1, choices=SEVERITY_CHOICES, default='N')
-    music_instruments_severity = models.CharField(_('B4. Music/Instruments'), max_length=1, choices=SEVERITY_CHOICES, default='N')
+    music_instruments_severity = models.CharField(_('B4. Music'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     time_waste_severity = models.CharField(_('B5. Time Waste'), max_length=1, choices=SEVERITY_CHOICES, default='N')
     # C. Normalization Risks
     disdain_arrogance_severity = models.CharField(_('C1. Disdain/Arrogance'), max_length=1, choices=SEVERITY_CHOICES, default='N')

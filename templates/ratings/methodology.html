@@ -1,4 +1,4 @@
-{# templates/ratings/methodology.html - Corrected Contact Prompt #}
+{# templates/ratings/methodology.html - Simplified Appearance #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -6,115 +6,231 @@
 {% block title %}{% translate "MGC Rating Methodology" %}{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h1>{% translate "MGC Rating Methodology" %}</h1>
-</div>
+<div class="container py-5" style="max-width: 900px;">
 
-<div class="methodology-content article-content">
-    {% if methodology_page and methodology_page.content %}
-        {{ methodology_page.content|safe }}
-    {% else %}
-        {# Default content #}
-        <h2>{% translate "1. Introduction & Purpose" %}</h2>
-        <p>{% blocktranslate %}The Muslim Game Classification (MGC) system provides structured guidance for Muslims seeking to evaluate video games according to Islamic principles. Its primary purpose is to enable users to make informed decisions about game engagement, aligning their choices with the teachings of the Quran, the authentic Sunnah (Prophetic tradition), and the understanding of the As-Salaf As-Salih (Pious Predecessors).{% endblocktranslate %}</p>
-        <p>{% blocktranslate %}This document outlines the methodology used by MGC assessors to analyze games and assign ratings, ensuring consistency, transparency, and adherence to core Islamic values.{% endblocktranslate %}</p>
+    <header class="text-center mb-5">
+        {# Modified Header based on your input #}
+        <h1 class="mb-3">
+            <div class="h1 fw-bold mb-2">{% blocktranslate %}MGC Rating Methodology{% endblocktranslate %}</div>
+            <div class="h4 text-muted fw-normal">{% blocktranslate %}Understanding How Games Are Assessed Through an Islamic Lens{% endblocktranslate %}</div>
+        </h1>
+    </header>
 
-        {# ... (Sections 2-7 remain the same) ... #}
-        <h2>{% translate "2. Core Principles" %}</h2>
-        <ul>
-            <li><strong>{% translate "Foundation" %}:</strong> {% blocktranslate %}All assessments are grounded in the Quran and the authentic Sunnah, interpreted according to the understanding and consensus of the As-Salaf As-Salih. Where matters require <em>ijtihad</em> (scholarly reasoning), established principles of Fiqh (Islamic jurisprudence), such as <em>Maqasid al-Shari'ah</em> (Objectives of Islamic Law) and <em>Sadd al-Dhara'i</em> (Blocking the Means to Evil), are applied.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Objectivity & Consistency" %}:</strong> {% blocktranslate %}Assessors strive for objective analysis based on demonstrable game content and mechanics, applying the criteria consistently across all titles.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Scope" %}:</strong> {% blocktranslate %}The primary focus is the game's content, themes, mechanics, player actions, potential passive exposure, and potential impact (including normalization of values). Player behavior is generally outside the scope, unless directly necessitated or heavily incentivized by the game design.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Caution & Avoiding Doubt" %}:</strong> {% blocktranslate %}In cases of ambiguity or differing scholarly opinions on specific interpretations, a cautious approach is favored, often reflected in a 'Doubtful' rating or detailed notes.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Transparency" %}:</strong> {% blocktranslate %}The methodology aims for clarity. Justifications for ratings, especially the severity levels assigned to specific concerns and the resulting overall tier, are documented and made accessible.{% endblocktranslate %}</li>
-        </ul>
+    <hr class="mb-5">
 
-        <h2>{% translate "3. The MGC Rating Process" %}</h2>
-        <ol>
-            <li><strong>{% translate "Game Selection & Initial Review" %}:</strong> {% blocktranslate %}Games are chosen based on factors like popularity, community requests, or potential Islamic relevance. An initial playthrough and research identify key themes and potential areas requiring detailed analysis.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Detailed Content Analysis" %}:</strong> {% blocktranslate %}The game is systematically evaluated against the <strong>20 Specific Content Concerns</strong> (Section 4), grouped into four main axes.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Severity Assignment" %}:</strong> {% blocktranslate %}For each of the 20 concerns, a <strong>Severity Level</strong> (None, Mild, Moderate, Severe - see Section 5) is assigned. This assignment considers the presence, intensity, frequency, avoidability, player role, and nature (e.g., depiction vs. simulation vs. normalization) of the problematic content within that specific category.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Overall Tier Calculation" %}:</strong> {% blocktranslate %}Based *only* on the assigned severity levels across the 20 concerns, the <strong>Overall MGC Rating Tier</strong> (Acceptable, Doubtful, Haram, Kufr/Shirk) is <em>automatically calculated</em> according to the strict logic defined in Section 6.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Flag Assignment" %}:</strong> {% blocktranslate %}Relevant <strong>Content Flags</strong> (icons representing each concern) are *automatically assigned* to the game if the corresponding concern's severity level is Mild, Moderate, or Severe. These serve as a quick visual summary on the game detail page.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Rationale & Documentation" %}:</strong> {% blocktranslate %}The overall reasoning for the final tier (based on the severity analysis) is summarized in the <em>Summary & Rating Rationale</em> field.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Review & Publication" %}:</strong> {% blocktranslate %}Ratings undergo internal review for consistency and accuracy before being published. Ratings may be updated following significant game changes or new evidence.{% endblocktranslate %}</li>
-        </ol>
+    <div class="methodology-content article-content">
+        {% if methodology_page and methodology_page.content %}
+            {# If content exists in the DB via admin, use that #}
+            <section class="shadow-sm mb-5">
+                <div class="card-body p-4">
+                    {{ methodology_page.content|safe }}
+                </div>
+            </section>
+        {% else %}
+            {# Default content with simplified card structure #}
 
-        <h2>{% translate "4. Specific Content Concerns (Breakdown Categories)" %}</h2>
-        <p>{% translate "Each game is analyzed across these 20 specific concerns, grouped as follows:" %}</p>
-        <h3>{% translate "A. Risks to Faith" %}</h3>
-        <ul>
-            <li><strong>{% translate "A1. Distorting Islam" %}</strong> ({% translate "distorting_islam_severity" %})</li>
-            <li><strong>{% translate "A2. Promoting Kufr/Shirk" %}</strong> ({% translate "promoting_kufr_severity" %})</li>
-            <li><strong>{% translate "A3. Assuming Divinity" %}</strong> ({% translate "assuming_divinity_severity" %})</li>
-            <li><strong>{% translate "A4. Tampering Ghaib" %}</strong> ({% translate "tampering_ghaib_severity" %})</li>
-            <li><strong>{% translate "A5. Deviant Ideologies" %}</strong> ({% translate "deviant_ideologies_severity" %})</li>
-        </ul>
-        <h3>{% translate "B. Prohibition Exposure" %}</h3>
-        <ul>
-            <li><strong>{% translate "B1. Gambling" %}</strong> ({% translate "gambling_severity" %})</li>
-            <li><strong>{% translate "B2. Lying" %}</strong> ({% translate "lying_severity" %})</li>
-            <li><strong>{% translate "B3. Indecency" %}</strong> ({% translate "indecency_severity" %})</li>
-            <li><strong>{% translate "B4. Music/Instruments" %}</strong> ({% translate "music_instruments_severity" %})</li>
-            <li><strong>{% translate "B5. Time Waste" %}</strong> ({% translate "time_waste_severity" %})</li>
-        </ul>
-        <h3>{% translate "C. Normalization Risks" %}</h3>
-        <ul>
-            <li><strong>{% translate "C1. Disdain/Arrogance" %}</strong> ({% translate "disdain_arrogance_severity" %})</li>
-            <li><strong>{% translate "C2. Magic" %}</strong> ({% translate "magic_severity" %})</li>
-            <li><strong>{% translate "C3. Intoxicants" %}</strong> ({% translate "intoxicants_severity" %})</li>
-            <li><strong>{% translate "C4. Crime/Violence" %}</strong> ({% translate "crime_violence_severity" %})</li>
-            <li><strong>{% translate "C5. Profanity" %}</strong> ({% translate "profanity_severity" %})</li>
-        </ul>
-        <h3>{% translate "D. Player Risks" %}</h3>
-        <ul>
-            <li><strong>{% translate "D1. Horror/Fear" %}</strong> ({% translate "horror_fear_severity" %})</li>
-            <li><strong>{% translate "D2. Despair" %}</strong> ({% translate "despair_severity" %})</li>
-            <li><strong>{% translate "D3. Spending" %}</strong> ({% translate "spending_severity" %})</li>
-            <li><strong>{% translate "D4. Online Interactions" %}</strong> ({% translate "online_interactions_severity" %})</li>
-            <li><strong>{% translate "D5. User Content" %}</strong> ({% translate "user_content_severity" %})</li>
-        </ul>
+            {# 1. Introduction & Purpose Card #}
+            <section class="shadow-sm mb-5">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 pb-3 border-bottom">
+                        {% translate "1. Introduction & Purpose" %}
+                    </h2>
+                    <p class="text-muted">{% blocktranslate %}The Muslim Game Classification (MGC) system provides structured guidance for Muslims seeking to evaluate video games according to Islamic principles. Its primary purpose is to enable users to make informed decisions about game engagement, aligning their choices with the teachings of the Quran, the authentic Sunnah (Prophetic tradition), and the understanding of the As-Salaf As-Salih (Pious Predecessors).{% endblocktranslate %}</p>
+                    <p class="text-muted mb-0">{% blocktranslate %}This document outlines the methodology used by MGC assessors to analyze games and assign ratings, ensuring consistency, transparency, and adherence to core Islamic values.{% endblocktranslate %}</p>
+                </div>
+            </section>
 
-        <h2>{% translate "5. Severity Level Definitions" %}</h2>
-        <p>{% translate "For each specific concern, a severity level is assigned:" %}</p>
-        <dl>
-            <dt><strong>{% translate "None" %}</strong> (N)</dt>
-            <dd>{% translate "No significant concerns identified." %}</dd>
-            <dt><strong>{% translate "Mild" %}</strong> (L)</dt>
-            <dd>{% translate "Minor issues present, often optional, avoidable, or not normalized. Minimal risk." %}</dd>
-            <dt><strong>{% translate "Moderate" %}</strong> (M)</dt>
-            <dd>{% translate "Noticeable concerns requiring player vigilance. May involve optional problematic elements, neutral normalization, or unavoidable minor issues." %}</dd>
-            <dt><strong>{% translate "Severe" %}</strong> (S)</dt>
-            <dd>{% translate "Major concerns that are often required, unavoidable, pervasive, central, or positively promoted/normalized. High risk. Includes direct simulation/promotion of major sins or Kufr/Shirk." %}</dd>
-        </dl>
+            {# 2. Core Principles Card #}
+            <section class="shadow-sm mb-5">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 pb-3 border-bottom">
+                        {% translate "2. Core Principles" %}
+                    </h2>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <strong class="text-dark d-block mb-1">{% translate "Foundation" %}:</strong>
+                            <span class="text-muted">{% blocktranslate %}All assessments are grounded in the Quran and the authentic Sunnah, interpreted according to the understanding and consensus of the As-Salaf As-Salih. Where matters require <em>ijtihad</em> (scholarly reasoning), established principles of Fiqh are applied.{% endblocktranslate %}</span>
+                        </li>
+                        <li class="mb-3">
+                            <strong class="text-dark d-block mb-1">{% translate "Objectivity & Consistency" %}:</strong>
+                            <span class="text-muted">{% blocktranslate %}Assessors strive for objective analysis based on demonstrable game content and mechanics, applying the criteria consistently across all titles.{% endblocktranslate %}</span>
+                        </li>
+                        <li class="mb-3">
+                            <strong class="text-dark d-block mb-1">{% translate "Scope" %}:</strong>
+                            <span class="text-muted">{% blocktranslate %}The primary focus is the game's content, themes, mechanics, player actions, and potential impact (including normalization). Player behavior is generally outside the scope unless necessitated by game design.{% endblocktranslate %}</span>
+                        </li>
+                        <li class="mb-3">
+                            <strong class="text-dark d-block mb-1">{% translate "Caution & Avoiding Doubt" %}:</strong>
+                            <span class="text-muted">{% blocktranslate %}In cases of ambiguity or differing scholarly opinions, a cautious approach is favored, often reflected in a 'Doubtful' rating or detailed notes.{% endblocktranslate %}</span>
+                        </li>
+                        <li class="mb-0">
+                            <strong class="text-dark d-block mb-1">{% translate "Transparency" %}:</strong>
+                            <span class="text-muted">{% blocktranslate %}The methodology aims for clarity. Justifications for ratings and severity levels are documented and made accessible.{% endblocktranslate %}</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
 
-        <h2>{% translate "6. Overall MGC Rating Tier Calculation Logic" %}</h2>
-        <p>{% translate "The final tier is <strong>calculated automatically</strong> based on the highest severity level found across all descriptors, according to their category mappings:" %}</p>
-        <ol>
-            <li><strong>{% translate "Rule 1 (KUFR/SHIRK)" %}:</strong> {% blocktranslate %}If <strong>any</strong> descriptor in 'Risks to Faith' (Category A) is rated <strong>Severe</strong>, the Overall Rating is <strong>KUFR/SHIRK</strong>.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Rule 2 (HARAM)" %}:</strong> {% blocktranslate %}Else, if <strong>any</strong> descriptor in 'Risks to Faith' (Category A) is rated <strong>Moderate</strong> OR <strong>any</strong> descriptor in 'Prohibition Exposure' (Category B) is rated <strong>Severe</strong>, the Overall Rating is <strong>HARAM</strong>.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Rule 3 (DOUBTFUL)" %}:</strong> {% blocktranslate %}Else, if <strong>any</strong> descriptor in 'Risks to Faith' (Category A) is rated <strong>Mild</strong> OR <strong>any</strong> descriptor in 'Prohibition Exposure' (Category B) is rated <strong>Moderate</strong> OR <strong>any</strong> descriptor in 'Normalization Risks' (Category C) is rated <strong>Moderate</strong> or <strong>Severe</strong> OR <strong>any</strong> descriptor in 'Player Risks' (Category D) is rated <strong>Severe</strong>, the Overall Rating is <strong>DOUBTFUL</strong>.{% endblocktranslate %}</li>
-            <li><strong>{% translate "Rule 4 (ACCEPTABLE)" %}:</strong> {% blocktranslate %}If none of the above conditions (Rules 1, 2, 3) are met, the Overall Rating is <strong>ACCEPTABLE</strong>.{% endblocktranslate %}</li>
-        </ol>
+            {# 3. The MGC Rating Process Card #}
+            <section class="shadow-sm mb-5">
+                <div class="card-body p-4">
+                     <h2 class="mb-4 pb-3 border-bottom">
+                        {% translate "3. The MGC Rating Process" %}
+                    </h2>
+                    <ol class="list-group list-group-numbered">
+                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Initial Review" %}:</strong> {% blocktranslate %}Games are selected, played, and researched to identify key themes and potential areas for analysis.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Content Analysis" %}:</strong> {% blocktranslate %}Systematic evaluation against the <b>20 Specific Content Concerns</b> (Section 4).{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Severity Assignment" %}:</strong> {% blocktranslate %}Assigning a <b>Severity Level</b> (None, Mild, Moderate, Severe - see Section 5) to each of the 20 concerns based on presence, intensity, avoidability, etc.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Tier Calculation" %}:</strong> {% blocktranslate %}The <b>Overall MGC Rating Tier</b> (Acceptable, Doubtful, Haram, Kufr/Shirk) is <em>automatically calculated</em> based on the logic in Section 6.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Flag Assignment" %}:</strong> {% blocktranslate %}Relevant <b>Content Flags</b> (icons) are <em>automatically assigned</em> if a concern's severity is Mild, Moderate, or Severe.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Rationale & Documentation" %}:</strong> {% blocktranslate %}The reasoning for the final tier is summarized.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Review & Publication" %}:</strong> {% blocktranslate %}Internal review before publishing; ratings may be updated.{% endblocktranslate %}</li>
+                    </ol>
+                </div>
+            </section>
 
-        <h2>{% translate "7. Supporting Elements" %}</h2>
-        <dl>
-            <dt>{% translate "Content Flags" %}:</dt>
-            <dd>{% translate "Visual icons automatically assigned for each concern rated Mild, Moderate, or Severe." %}</dd>
-            <dt>{% translate "Summary & Rating Rationale" %}:</dt>
-            <dd>{% translate "A text summary explaining the game overview and the main reasons for the final calculated Overall Rating Tier." %}</dd>
-        </dl>
+            {# 4. Specific Content Concerns Card #}
+            <section class="shadow-sm mb-5">
+                 <div class="card-body p-4">
+                     <h2 class="mb-4 pb-3 border-bottom">
+                        {% translate "4. Specific Content Concerns (Breakdown Categories)" %}
+                    </h2>
+                    <p class="text-muted mb-4">{% translate "Each game is analyzed across these 20 specific concerns, grouped as follows:" %}</p>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                             <h3 class="h6 fw-bold">{% translate "A. Risks to Faith" %}</h3>
+                             <ul class="list-unstyled ms-3 small text-muted">
+                                <li>A1. {% translate "Distorting Islam" %}</li>
+                                <li>A2. {% translate "Promoting Kufr/Shirk" %}</li>
+                                <li>A3. {% translate "Assuming Divinity" %}</li>
+                                <li>A4. {% translate "Tampering Ghaib" %}</li>
+                                <li>A5. {% translate "Deviant Ideologies" %}</li>
+                            </ul>
+                        </div>
+                         <div class="col-md-6 mb-3">
+                             <h3 class="h6 fw-bold">{% translate "B. Prohibition Exposure" %}</h3>
+                             <ul class="list-unstyled ms-3 small text-muted">
+                                <li>B1. {% translate "Gambling" %}</li>
+                                <li>B2. {% translate "Lying" %}</li>
+                                <li>B3. {% translate "Indecency" %}</li>
+                                <li>B4. {% translate "Music" %}</li>
+                                <li>B5. {% translate "Time Waste" %}</li>
+                            </ul>
+                        </div>
+                         <div class="col-md-6 mb-3">
+                            <h3 class="h6 fw-bold">{% translate "C. Normalization Risks" %}</h3>
+                             <ul class="list-unstyled ms-3 small text-muted">
+                                <li>C1. {% translate "Disdain/Arrogance" %}</li>
+                                <li>C2. {% translate "Magic" %}</li>
+                                <li>C3. {% translate "Intoxicants" %}</li>
+                                <li>C4. {% translate "Crime/Violence" %}</li>
+                                <li>C5. {% translate "Profanity" %}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h3 class="h6 fw-bold">{% translate "D. Player Risks" %}</h3>
+                             <ul class="list-unstyled ms-3 small text-muted">
+                                <li>D1. {% translate "Horror/Fear" %}</li>
+                                <li>D2. {% translate "Despair" %}</li>
+                                <li>D3. {% translate "Spending" %}</li>
+                                <li>D4. {% translate "Online Interactions" %}</li>
+                                <li>D5. {% translate "User Content" %}</li>
+                            </ul>
+                        </div>
+                    </div>
+                 </div>
+            </section>
 
-        <h2>{% translate "8. Disclaimer" %}</h2>
-        <p>{% blocktranslate %}MGC ratings are provided as guidance based on <em>ijtihad</em> following the stated methodology. They are not legally binding fatwas (religious edicts) and do not represent the sole correct Islamic viewpoint on every nuanced issue. Variation in scholarly opinion exists on some matters. Users are ultimately responsible for their choices and are encouraged to exercise personal Taqwa (God-consciousness) and consult with knowledgeable individuals if in doubt. MGC aims to assist, not replace, individual responsibility before Allah. Ratings may be updated based on game changes or new evidence.{% endblocktranslate %}</p>
-    {% endif %}
+            {# 5. Severity Level Definitions Card #}
+            <section class="shadow-sm mb-5">
+                <div class="card-body p-4">
+                     <h2 class="mb-4 pb-3 border-bottom">
+                        {% translate "5. Severity Level Definitions" %}
+                    </h2>
+                    <p class="text-muted mb-3">{% translate "For each specific concern, a severity level is assigned:" %}</p>
+                    <dl>
+                        <dt class="fw-bold">{% translate "None" %}</dt>
+                        <dd class="text-muted ps-3 mb-2">{% translate "No significant concerns identified." %}</dd>
+                        <dt class="fw-bold"><span class="severity-circle severity-l mx-2"></span>{% translate "Mild" %}</dt>
+                        <dd class="text-muted ps-3 mb-2">{% translate "Minor issues present, often optional, avoidable, or not normalized. Minimal risk." %}</dd>
+                        <dt class="fw-bold"><span class="severity-circle severity-m mx-2"></span>{% translate "Moderate" %}</dt>
+                        <dd class="text-muted ps-3 mb-2">{% translate "Noticeable concerns requiring player vigilance. May involve optional problematic elements, neutral normalization, or unavoidable minor issues." %}</dd>
+                        <dt class="fw-bold"><span class="severity-circle severity-s mx-2"></span>{% translate "Severe" %}</dt>
+                        <dd class="text-muted ps-3 mb-0">{% translate "Major concerns that are often required, unavoidable, pervasive, central, or positively promoted/normalized. High risk. Includes direct simulation/promotion of major sins or Kufr/Shirk." %}</dd>
+                    </dl>
+                </div>
+            </section>
 
-    {# --- CORRECTED CONTACT PROMPT --- #}
-    {% url 'ratings:contact' as contact_url %} {# Calculate URL outside blocktranslate #}
-    <p class="mt-4 pt-3 border-top text-secondary small">
-        {% blocktranslate %}Questions about the rating methodology or a specific assessment? Please <a href="{{ contact_url }}">get in touch</a>.{% endblocktranslate %}
-    </p>
-    {# --- END CONTACT PROMPT --- #}
+            {# 6. Overall MGC Rating Tier Calculation Logic Card #}
+            <section class="shadow-sm mb-5">
+                 <div class="card-body p-4">
+                    <h2 class="mb-4 pb-3 border-bottom">
+                        {% translate "6. Overall MGC Rating Tier Calculation Logic" %}
+                    </h2>
+                    <p class="text-muted mb-3">{% translate "The final tier is <b>calculated automatically</b> based on the highest severity level found across all descriptors, according to their category mappings:" %}</p>
+                    <ol class="list-group list-group-numbered">
+                        <li class="list-group-item border-0 ps-3">
+                            <strong>{% translate "Rule 1 (KUFR/SHIRK)" %}:</strong>
+                            <span class="text-muted">{% blocktranslate %}If <b>any</b> A-Category ('Risks to Faith') descriptor is <b>Severe</b>.{% endblocktranslate %}</span>
+                        </li>
+                         <li class="list-group-item border-0 ps-3">
+                            <strong>{% translate "Rule 2 (HARAM)" %}:</strong>
+                            <span class="text-muted">{% blocktranslate %}Else, if <b>any</b> A-Category is <b>Moderate</b> OR <b>any</b> B-Category ('Prohibition Exposure') is <b>Severe</b>.{% endblocktranslate %}</span>
+                        </li>
+                         <li class="list-group-item border-0 ps-3">
+                            <strong>{% translate "Rule 3 (DOUBTFUL)" %}:</strong>
+                             <span class="text-muted">{% blocktranslate %}Else, if <b>any</b> A-Category is <b>Mild</b> OR <b>any</b> B-Category is <b>Moderate</b> OR <b>any</b> C-Category ('Normalization Risks') is <b>Moderate/Severe</b> OR <b>any</b> D-Category ('Player Risks') is <b>Severe</b>.{% endblocktranslate %}</span>
+                        </li>
+                         <li class="list-group-item border-0 ps-3">
+                            <strong>{% translate "Rule 4 (ACCEPTABLE)" %}:</strong>
+                             <span class="text-muted">{% blocktranslate %}If none of the above rules are met.{% endblocktranslate %}</span>
+                        </li>
+                    </ol>
+                 </div>
+            </section>
 
-</div>
+            {# 7. Supporting Elements Card #}
+            <section class="shadow-sm mb-5">
+                 <div class="card-body p-4">
+                     <h2 class="mb-4 pb-3 border-bottom">
+                        {% translate "7. Supporting Elements" %}
+                    </h2>
+                     <dl>
+                        <dt class="fw-bold">{% translate "Content Flags" %}:</dt>
+                        <dd class="text-muted ps-3 mb-2">{% translate "Visual icons automatically assigned for each concern rated Mild, Moderate, or Severe." %}</dd>
+                        <dt class="fw-bold">{% translate "Summary & Rating Rationale" %}:</dt>
+                        <dd class="text-muted ps-3 mb-0">{% translate "A text summary explaining the game overview and the main reasons for the final calculated Overall Rating Tier." %}</dd>
+                    </dl>
+                 </div>
+            </section>
+
+            {# 8. Disclaimer Card #}
+            <section class="shadow-sm mb-5 bg-light">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 pb-3 border-bottom">
+                        {% translate "8. Disclaimer" %}
+                    </h2>
+                    <p class="text-muted small">{% blocktranslate %}MGC ratings are provided as guidance based on <em>ijtihad</em> following the stated methodology. They are not legally binding fatwas (religious edicts) and do not represent the sole correct Islamic viewpoint on every nuanced issue. Variation in scholarly opinion exists on some matters. Users are ultimately responsible for their choices and are encouraged to exercise personal Taqwa (God-consciousness) and consult with knowledgeable individuals if in doubt. MGC aims to assist, not replace, individual responsibility before Allah. Ratings may be updated based on game changes or new evidence.{% endblocktranslate %}</p>
+                </div>
+            </section>
+
+        {% endif %}
+
+        <footer class="mt-5 pt-4 border-top text-center text-secondary small">
+            {% url 'ratings:contact' as contact_url %}
+            <p class="mb-0">
+                {% blocktranslate %}Questions about the methodology? <a href="{{ contact_url }}" class="link-secondary">Contact Us</a>.
+                {% endblocktranslate %}
+             </p>
+        </footer>
+
+    </div> {# End methodology-content #}
+
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">
+            {% translate "Back to Home" %}
+        </a>
+    </div>
+
+</div> {# End Container #}
 {% endblock %}

@@ -8,34 +8,37 @@
 {% block content %}
 
   {# --- 1. Hero Section (No changes) --- #}
-  <section class="homepage-hero text-center py-5 mb-4">
-      <h1 class="logo mb-5">
-        <div class="d-sm-none mt-4 pt-2"></div>
-        <img src="{% static 'img/mgc_logo.svg' %}" alt="{% translate 'MGC Logo' %}" height="81">
-        <br class="d-sm-none">
-        {% if request.LANGUAGE_CODE == 'ar' %}
-        <div class="logo-text-ar text-center text-sm-end">تصنيف<br>الألعاب<br>للمسلمين</div>
-        {% else %}
-        <div class="logo-text-en text-center text-sm-start">Muslim<br>Game<br>Classification</div>
-        {% endif %}
-      </h1>
-      <h2 class="fw-bold pt-5 pt-sm-0 mb-3">{% translate "Informed Gaming Choices for Muslims" %}</h2>
-      <p class="lead col-lg-8 mx-auto text-secondary mb-4">
-          {% translate "MGC provides clear, Shariah-based ratings and detailed analysis to help you navigate the world of video games according to Islamic values." %}
-      </p>
-      <div class="row justify-content-center mb-4">
-          <div class="col-md-8 col-lg-6">
-              <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form">
-                  <input class="form-control form-control-lg me-2" type="search" placeholder="{% translate 'Search for a game...' %}" aria-label="{% translate 'Search Games' %}" name="q">
-                  <button class="btn btn-primary btn-lg" type="submit">{% translate "Search" %}</button>
-              </form>
-          </div>
-      </div>
-      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-          <a href="{% url 'ratings:game_list' %}" class="btn btn-outline-secondary px-4">{% translate "Browse All Ratings" %}</a>
-          <a href="{% url 'ratings:why_mgc' %}" class="btn btn-outline-secondary px-4">{% translate "Learn More (Why MGC?)" %}</a>
-      </div>
-  </section>
+    <section class="homepage-hero py-5 shadow-sm"> {# Outer section will be forced full-width #}
+        <div class="dark-transparent-bg"></div>
+        <div class="container text-center py-5 my-5"> {# Inner container still centers the actual content #}
+            <h1 class="logo mb-5">
+            <div class="d-sm-none mt-4 pt-2"></div>
+            <img src="{% static 'img/mgc_logo.svg' %}" alt="{% translate 'MGC Logo' %}" height="81">
+            <br class="d-sm-none">
+            {% if request.LANGUAGE_CODE == 'ar' %}
+            <div class="logo-text-ar text-center text-sm-end">تصنيف<br>الألعاب<br>للمسلمين</div>
+            {% else %}
+            <div class="logo-text-en text-center text-sm-start">Muslim<br>Game<br>Classification</div>
+            {% endif %}
+            </h1>
+            <h2 class="fw-bold pt-5 pt-sm-0 mb-3 text-white">{% translate "Informed Gaming Choices for Muslims" %}</h2>
+            <p class="lead col-lg-8 mx-auto text-secondary mb-4 text-white">
+                {% translate "MGC provides clear, Shariah-based ratings and detailed analysis to help you navigate the world of video games according to Islamic values." %}
+            </p>
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-8 col-lg-6">
+                    <form method="GET" action="{% url 'ratings:game_list' %}" class="d-flex search-form">
+                        <input class="form-control form-control-lg me-2" type="search" placeholder="{% translate 'Search for a game...' %}" aria-label="{% translate 'Search Games' %}" name="q">
+                        <button class="btn btn-primary btn-lg" type="submit">{% translate "Search" %}</button>
+                    </form>
+                </div>
+            </div>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="{% url 'ratings:game_list' %}" class="btn btn-secondary px-4 text-white">{% translate "Browse All Ratings" %}</a>
+                <a href="{% url 'ratings:why_mgc' %}" class="btn btn-secondary px-4 text-white">{% translate "Learn More (Why MGC?)" %}</a>
+            </div>
+        </div> {# End of inner .container #}
+    </section>
 
 
   {# --- 2. Understanding Our Ratings Section --- #}
@@ -63,7 +66,7 @@
   </section>
 
   {# --- 3. How MGC Works Section (No changes needed here) --- #}
-  <section id="how-it-works" class="py-5 bg-element rounded mb-5">
+  <section id="how-it-works" class="py-5 bg-element rounded mb-5 shadow-sm">
        <div class="container">
            <h2 class="section-title text-center mb-4">{% translate "How MGC Works" %}</h2>
            <div class="row g-4 text-center">

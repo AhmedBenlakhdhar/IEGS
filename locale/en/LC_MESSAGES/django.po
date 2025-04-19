@@ -415,7 +415,7 @@ msgid "Nudity & Lewd Scenes"
 msgstr ""
 
 #: .\ratings\management\commands\populate_flags.py:21
-msgid "Forbidden Music/Instruments"
+msgid "Forbidden Music"
 msgstr ""
 
 #: .\ratings\management\commands\populate_flags.py:22
@@ -724,7 +724,7 @@ msgid "7. Nudity/Lewdness Severity"
 msgstr ""
 
 #: .\ratings\models.py:104
-msgid "8. Music/Instruments Severity"
+msgid "8. Music Severity"
 msgstr ""
 
 #: .\ratings\models.py:105

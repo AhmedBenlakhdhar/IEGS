@@ -2,6 +2,7 @@
 from django.shortcuts import render, get_object_or_404, redirect, Http404
 from django.urls import reverse, reverse_lazy
 from articles.models import Article
+# REMOVED 'Platform' from this import line
 from .models import Game, RatingTier, Flag, GameComment, MethodologyPage, WhyMGCPage, Suggestion
 from django.db.models import Q, Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -80,28 +81,34 @@ def homepage(request):
 def game_list(request, developer_slug=None, publisher_slug=None):
     games_queryset = Game.objects.select_related('rating_tier').prefetch_related('flags').all()
     page_title = _("Game Ratings")
-    filter_description = None
+    filter_description_parts = [] # Use a list to build description
 
+    # Base filter for developer/publisher
     if developer_slug:
-        first_game = Game.objects.filter(developer_slug=developer_slug).first()
-        dev_name = first_game.developer if first_game else developer_slug
+        # Fetch developer name safely
+        first_game = Game.objects.filter(developer_slug=developer_slug).values('developer').first()
+        dev_name = first_game['developer'] if first_game else developer_slug
         page_title = gettext("Games by %(developer_name)s") % {'developer_name': dev_name}
-        filter_description = gettext("Showing games developed by <strong>%(developer_name)s</strong>.") % {'developer_name': dev_name}
+        filter_description_parts.append(gettext("Developed by <strong>%(developer_name)s</strong>") % {'developer_name': dev_name})
         games_queryset = games_queryset.filter(developer_slug=developer_slug)
     elif publisher_slug:
-        first_game = Game.objects.filter(publisher_slug=publisher_slug).first()
-        pub_name = first_game.publisher if first_game else publisher_slug
+        # Fetch publisher name safely
+        first_game = Game.objects.filter(publisher_slug=publisher_slug).values('publisher').first()
+        pub_name = first_game['publisher'] if first_game else publisher_slug
         page_title = gettext("Games by %(publisher_name)s") % {'publisher_name': pub_name}
-        filter_description = gettext("Showing games published by <strong>%(publisher_name)s</strong>.") % {'publisher_name': pub_name}
+        filter_description_parts.append(gettext("Published by <strong>%(publisher_name)s</strong>") % {'publisher_name': pub_name})
         games_queryset = games_queryset.filter(publisher_slug=publisher_slug)
 
-    search_query = request.GET.get('q', '')
+    # --- Get filter parameters ---
+    search_query = request.GET.get('q', '').strip() # Trim whitespace
     selected_tier_code = request.GET.get('tier', '')
     selected_flag_symbol = request.GET.get('flag', '')
     sort_by = request.GET.get('sort', '-date_updated')
-    selected_platforms = request.GET.getlist('platform')
+    selected_platform_code = request.GET.get('platform', '') # UPDATED: Get single platform code
 
+    # --- Apply filters ---
     if search_query:
+        filter_description_parts.append(gettext("matching search '<strong>%(query)s</strong>'") % {'query': search_query})
         games_queryset = games_queryset.filter(
             Q(title__icontains=search_query) |
             Q(developer__icontains=search_query) |
@@ -109,26 +116,39 @@ def game_list(request, developer_slug=None, publisher_slug=None):
             Q(summary__icontains=search_query)
         ).distinct()
 
-    if selected_tier_code and selected_tier_code != 'all':
-        games_queryset = games_queryset.filter(rating_tier__tier_code=selected_tier_code).distinct()
+    if selected_tier_code:
+        tier = RatingTier.objects.filter(tier_code=selected_tier_code).first()
+        if tier:
+            filter_description_parts.append(gettext("in tier <strong>%(tier)s</strong>") % {'tier': tier.display_name})
+            games_queryset = games_queryset.filter(rating_tier__tier_code=selected_tier_code).distinct()
 
     if selected_flag_symbol:
-        games_queryset = games_queryset.filter(flags__symbol=selected_flag_symbol).distinct()
+        flag = Flag.objects.filter(symbol=selected_flag_symbol).first()
+        if flag:
+            filter_description_parts.append(gettext("with flag <strong>%(flag)s</strong>") % {'flag': flag.description})
+            games_queryset = games_queryset.filter(flags__symbol=selected_flag_symbol).distinct()
 
-    platform_filters = Q()
-    if selected_platforms:
-        platform_map = {
-            'pc': 'available_pc', 'ps5': 'available_ps5', 'ps4': 'available_ps4',
-            'xbx': 'available_xbox_series', 'xb1': 'available_xbox_one', 'nsw': 'available_switch',
-            'and': 'available_android', 'ios': 'available_ios', 'qst': 'available_quest'
-        }
-        for plat_code in selected_platforms:
-            field_name = platform_map.get(plat_code)
-            if field_name:
-                platform_filters |= Q(**{field_name: True})
-        if platform_filters:
-            games_queryset = games_queryset.filter(platform_filters).distinct()
+    # Platform Filtering (UPDATED for single select)
+    platform_map = {
+        'pc': 'available_pc', 'ps5': 'available_ps5', 'ps4': 'available_ps4',
+        'xbx': 'available_xbox_series', 'xb1': 'available_xbox_one', 'nsw': 'available_switch',
+        'and': 'available_android', 'ios': 'available_ios', 'qst': 'available_quest'
+    }
+    platform_display_names = { # For filter description
+        'pc': 'PC', 'ps5': 'PS5', 'ps4': 'PS4',
+        'xbx': 'Xbox Series', 'xb1': 'Xbox One', 'nsw': 'Switch',
+        'and': 'Android', 'ios': 'iOS', 'qst': 'Quest',
+    }
 
+    if selected_platform_code:
+        field_name = platform_map.get(selected_platform_code)
+        if field_name:
+            games_queryset = games_queryset.filter(**{field_name: True}).distinct()
+            platform_name = platform_display_names.get(selected_platform_code, selected_platform_code)
+            filter_description_parts.append(gettext("available on <strong>%(platform)s</strong>") % {'platform': platform_name})
+
+
+    # --- Sorting ---
     valid_sort_options = [
         'title', '-title', '-release_date', 'release_date',
         '-date_updated', 'date_updated'
@@ -136,7 +156,8 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     sort_param = sort_by if sort_by in valid_sort_options else '-date_updated'
     games_queryset = games_queryset.order_by(sort_param)
 
-    paginator = Paginator(games_queryset, 12)
+    # --- Pagination ---
+    paginator = Paginator(games_queryset, 12) # Adjust page size if needed
     page_number = request.GET.get('page')
     try:
         games_page = paginator.page(page_number)
@@ -145,28 +166,56 @@ def game_list(request, developer_slug=None, publisher_slug=None):
     except EmptyPage:
         games_page = paginator.page(paginator.num_pages)
 
+    # --- Calculate Risk Summary for displayed games ---
     for game in games_page.object_list:
         game.risk_summary_texts = calculate_risk_summary_for_game(game)
 
+    # --- Prepare Context ---
     all_tiers = RatingTier.objects.all()
     all_flags = Flag.objects.all().order_by('description')
+    # This list is now just for populating the dropdown options
     platform_list_for_template = [
-        {'code': 'pc', 'name': 'PC'}, {'code': 'ps5', 'name': 'PS5'}, {'code': 'ps4', 'name': 'PS4'},
-        {'code': 'xbx', 'name': 'Xbox Series'}, {'code': 'xb1', 'name': 'Xbox One'}, {'code': 'nsw', 'name': 'Switch'},
-        {'code': 'and', 'name': 'Android'}, {'code': 'ios', 'name': 'iOS'}, {'code': 'qst', 'name': 'Quest'},
+        {'code': code, 'name': name} for code, name in platform_display_names.items()
     ]
+
+    # Construct final filter description string
+    filter_description = None
+    if len(filter_description_parts) > 0:
+        # Join parts with ", " but handle the first element (dev/pub) differently if present
+        if developer_slug or publisher_slug:
+            # Assumes the first part is dev/pub info
+             base_desc = filter_description_parts[0]
+             additional_filters = ", ".join(filter_description_parts[1:])
+             if additional_filters:
+                  # Ensure base_desc ends with a space before adding 'and'
+                  if not base_desc.endswith(" "):
+                       base_desc += " "
+                  filter_description = f"{base_desc}{gettext('and')} {additional_filters}."
+             else:
+                  filter_description = base_desc
+        else:
+            # Only generic filters applied
+            filter_description = gettext("Showing games ") + ", ".join(filter_description_parts) + "."
+
+    # Prepare selected_platforms as a list with one item for the template check (if selected)
+    selected_platforms_list = [selected_platform_code] if selected_platform_code else []
+
     context = {
         'games_page': games_page,
         'page_title': page_title,
-        'filter_description': filter_description,
+        'filter_description': filter_description, # Pass the constructed string
         'all_tiers': all_tiers,
         'all_flags': all_flags,
         'search_query': search_query,
         'selected_tier': selected_tier_code,
         'selected_flag': selected_flag_symbol,
         'sort_by': sort_by,
-        'selected_platforms': selected_platforms,
+        'selected_platforms': selected_platforms_list, # Pass list with 0 or 1 item for template check
+        'selected_platform': selected_platform_code, # Pass single code if needed elsewhere
         'platform_list_for_template': platform_list_for_template,
+        # Pass slugs back for form action URL construction in template
+        'developer_slug': developer_slug,
+        'publisher_slug': publisher_slug,
     }
     return render(request, 'ratings/game_list.html', context)
 
@@ -195,7 +244,7 @@ def game_detail(request, game_slug):
                     new_comment = comment_form.save(commit=False)
                     new_comment.game = game
                     new_comment.user = request.user
-                    new_comment.approved = True
+                    new_comment.approved = True # Or based on your moderation policy
                     new_comment.save()
                     messages.success(request, _('Your comment has been posted.'), extra_tags='comment_success')
                     return redirect(game.get_absolute_url() + '#comments-section')
@@ -205,6 +254,7 @@ def game_detail(request, game_slug):
             suggestion_form = SuggestionForm(request.POST)
             if suggestion_form.is_valid():
                 suggestion = suggestion_form.save(commit=False)
+                suggestion.game = game # Ensure game is associated
                 if request.user.is_authenticated:
                     suggestion.user = request.user
                 suggestion.save()
@@ -271,7 +321,7 @@ def game_detail(request, game_slug):
         'suggestion_form': suggestion_form,
         'grouped_mgc_concerns': grouped_mgc_concerns,
         'category_names': category_names,
-        'risk_summary_texts': risk_summary_texts, # Already attached to game, but passing separately is fine
+        'risk_summary_texts': risk_summary_texts,
         'highest_severities': highest_severities,
         'severity_choices_dict': dict(Game.SEVERITY_CHOICES),
         'all_flags_info': all_flags_info,
@@ -286,7 +336,9 @@ def signup(request):
             user = form.save()
             login(request, user)
             messages.success(request, _("Registration successful! You are now logged in."))
-            return redirect('home')
+            # Redirect to 'next' parameter if exists, otherwise home
+            next_url = request.GET.get('next', reverse('home'))
+            return redirect(next_url)
         else:
             messages.error(request, _("Please correct the errors below, including the CAPTCHA."), extra_tags='form_error')
     else:
@@ -300,7 +352,7 @@ def user_profile_edit(request):
     if request.method == 'POST':
         if 'update_profile' in request.POST:
             user_form = UserUpdateForm(request.POST, instance=request.user)
-            password_form = PasswordChangeForm(request.user)
+            password_form = PasswordChangeForm(request.user) # Initialize blank for context
             if user_form.is_valid():
                 user_form.save()
                 messages.success(request, _('Your profile details were successfully updated.'), extra_tags='profile_success')
@@ -309,7 +361,7 @@ def user_profile_edit(request):
                  messages.error(request, _('Please correct the errors in the profile details form.'), extra_tags='profile_error')
         elif 'change_password' in request.POST:
             password_form = PasswordChangeForm(request.user, request.POST)
-            user_form = UserUpdateForm(instance=request.user)
+            user_form = UserUpdateForm(instance=request.user) # Initialize with instance data
             if password_form.is_valid():
                 user = password_form.save()
                 update_session_auth_hash(request, user)
@@ -318,9 +370,10 @@ def user_profile_edit(request):
             else:
                  messages.error(request, _('Please correct the errors in the password change form.'), extra_tags='password_error')
         else:
+            # Handle unexpected POST data if necessary
             user_form = UserUpdateForm(instance=request.user)
             password_form = PasswordChangeForm(request.user)
-            messages.warning(request, _('Unknown form submission.'))
+            # messages.warning(request, _('Unknown form submission.')) # Optional warning
     else:
         user_form = UserUpdateForm(instance=request.user)
         password_form = PasswordChangeForm(request.user)
@@ -338,9 +391,11 @@ def user_profile_edit(request):
 def delete_comment(request, comment_id):
     comment = get_object_or_404(GameComment.objects.select_related('game'), pk=comment_id)
     game_url = comment.game.get_absolute_url() + '#comments-section'
-    if not request.user.is_staff:
+    # Allow deletion by comment owner OR staff
+    if comment.user != request.user and not request.user.is_staff:
         messages.error(request, _("You do not have permission to delete this comment."))
         return redirect(game_url)
+
     comment_content = comment.content[:30]
     comment.delete()
     messages.success(request, _("Comment '%(comment_snippet)s...' deleted successfully.") % {'comment_snippet': comment_content})
@@ -354,17 +409,14 @@ def flag_comment(request, comment_id):
     comment = get_object_or_404(GameComment.objects.select_related('game', 'user'), pk=comment_id)
     game_url = comment.game.get_absolute_url() + '#comments-section'
 
-    # Check if user is trying to flag their own comment
     if comment.user == request.user:
         messages.warning(request, _("You cannot flag your own comment."))
         return redirect(game_url)
 
-    # Check if user already flagged this comment
     if comment.flagged_by.filter(pk=request.user.pk).exists():
         messages.info(request, _("You have already flagged this comment."))
         return redirect(game_url)
 
-    # Add the flag and mark for attention
     comment.flagged_by.add(request.user)
     comment.moderator_attention_needed = True
     comment.save()
@@ -374,16 +426,12 @@ def flag_comment(request, comment_id):
 
 # --- Methodology View ---
 def methodology_view(request):
-    methodology_page = None
-    try:
-        methodology_page = MethodologyPage.objects.first()
-    except Exception as e:
-        messages.error(request, _("An error occurred while loading the methodology page."))
-        print(f"Error fetching MethodologyPage: {e}")
-        methodology_page = None
+    methodology_page = MethodologyPage.objects.first()
 
     if not methodology_page:
         messages.warning(request, _("Methodology page content is not available yet."))
+        # Optionally, provide default values or raise 404 if critical
+        # raise Http404(_("Methodology page not found."))
 
     context = {
         'methodology_page': methodology_page,
@@ -394,15 +442,11 @@ def methodology_view(request):
 
 # --- Why MGC View ---
 def why_mgc_view(request):
-    why_mgc_page = None
-    try:
-        why_mgc_page = WhyMGCPage.objects.first()
-    except Exception as e:
-        messages.error(request, _("An error occurred while loading the page content."))
-        print(f"Error fetching WhyMGCPage: {e}")
+    why_mgc_page = WhyMGCPage.objects.first()
 
     if not why_mgc_page:
         messages.warning(request, _("Content for 'Why MGC?' is not available yet."))
+        # Optionally, provide default values or raise 404
 
     context = {
         'why_mgc_page': why_mgc_page,
@@ -422,7 +466,12 @@ def contact_view(request):
         message_template = _("I would like to request a review for the game: %(game_title)s\n\nPlease add any details or reasons for the request here:\n\n")
         game_title_display = _("[Please enter game title]")
         if requested_game_title_raw:
-            game_title_display = unquote(requested_game_title_raw)
+            # Decode URL encoding
+            try:
+                game_title_display = unquote(requested_game_title_raw)
+            except Exception: # Catch potential decoding errors
+                 game_title_display = _("[Could not decode game title]")
+
         initial_data['message'] = message_template % {'game_title': game_title_display}
 
     if request.method == 'POST':
@@ -430,8 +479,8 @@ def contact_view(request):
         if form.is_valid():
             name = form.cleaned_data['name']
             from_email = form.cleaned_data['email']
-            country_obj = form.cleaned_data.get('country')
-            country_display = country_obj.name if country_obj else _('N/A')
+            country_obj = form.cleaned_data.get('country') # Optional field
+            country_display = country_obj.name if country_obj else _('Not Provided')
             subject_code = form.cleaned_data['subject']
             subject_display = dict(form.fields['subject'].choices).get(subject_code, subject_code)
             message_body = form.cleaned_data['message']
@@ -448,21 +497,32 @@ def contact_view(request):
             )
 
             try:
-                 recipient_list = [admin_email for admin_name, admin_email in settings.ADMINS] if hasattr(settings, 'ADMINS') else []
-                 if not recipient_list and not settings.DEBUG:
-                      print("WARNING: ADMINS setting is not configured. Contact form email not sent.")
+                 # Ensure recipient list is correctly retrieved
+                 recipient_list = [admin_email for admin_name, admin_email in settings.ADMINS] if hasattr(settings, 'ADMINS') and settings.ADMINS else []
 
-                 if recipient_list:
+                 if not recipient_list:
+                      print("WARNING: ADMINS setting is empty or not configured. Contact form email cannot be sent.")
+                      if not settings.DEBUG:
+                          # In production, if ADMINS is empty, we should fail gracefully
+                          messages.error(request, _('Sorry, the site is not configured to send messages currently. Please try again later.'))
+                          # Don't proceed to success page if mail wasn't sent
+                          return render(request, 'ratings/contact.html', {'form': form})
+
+                 if settings.DEBUG and not recipient_list:
+                      # Print to console in DEBUG if no ADMINS are set
+                      print(f"--- Contact Form Email (DEBUG: No ADMINS) ---\nSubject: {email_subject}\n{email_message}\n---------------------------------------------------------")
+                      # Simulate success in DEBUG even if not sent
+                      messages.success(request, _('[DEBUG] Thank you for your message! (Email not sent - ADMINS not set)'))
+                      return redirect('ratings:contact_success')
+                 elif recipient_list:
+                     # Send email if recipients exist
                      send_mail(
                          email_subject, email_message, settings.DEFAULT_FROM_EMAIL,
                          recipient_list, fail_silently=False
                      )
-                 else:
-                      if settings.DEBUG:
-                          print(f"--- Contact Form Email (DEBUG: No ADMINS) ---\nSubject: {email_subject}\n{email_message}\n---------------------------------------------------------")
+                     messages.success(request, _('Thank you for your message! We will get back to you soon.'))
+                     return redirect('ratings:contact_success')
 
-                 messages.success(request, _('Thank you for your message! We will get back to you soon.'))
-                 return redirect('ratings:contact_success')
             except Exception as e:
                 messages.error(request, _('Sorry, there was an error sending your message. Please try again later.'))
                 print(f"Contact form send mail error: {e}")
@@ -484,12 +544,27 @@ def contact_success_view(request):
 @login_required
 @require_POST
 def delete_suggestion(request, suggestion_id):
-    suggestion = get_object_or_404(Suggestion.objects.select_related('game'), pk=suggestion_id)
-    redirect_url = reverse('admin:ratings_suggestion_changelist') if suggestion.game is None else suggestion.game.get_absolute_url() + '#user-suggestions'
+    suggestion = get_object_or_404(Suggestion.objects.select_related('game', 'user'), pk=suggestion_id)
 
-    if not request.user.is_staff:
-        messages.error(request, _("You do not have permission to delete this suggestion."))
-        return redirect(redirect_url)
+    # Determine redirect URL (admin or game detail)
+    if request.user.is_staff:
+        # Staff can delete from anywhere, try to redirect back smartly
+        referer = request.META.get('HTTP_REFERER')
+        admin_url = reverse('admin:ratings_suggestion_changelist')
+        # Redirect to admin if coming from admin, otherwise try game detail or fallback to admin
+        if referer and admin_url in referer:
+             redirect_url = admin_url
+        else:
+             redirect_url = suggestion.game.get_absolute_url() + '#user-suggestions' if suggestion.game else admin_url
+    else:
+        # Non-staff can only delete their own from game detail page
+        if suggestion.user != request.user:
+             messages.error(request, _("You do not have permission to delete this suggestion."))
+             # Redirect to game detail page if possible, otherwise home
+             return redirect(suggestion.game.get_absolute_url() + '#user-suggestions' if suggestion.game else reverse('home'))
+        # If they own it, redirect back to game detail page
+        redirect_url = suggestion.game.get_absolute_url() + '#user-suggestions' if suggestion.game else reverse('home')
+
 
     suggestion.delete()
     messages.success(request, _("Suggestion deleted successfully."))

@@ -93,7 +93,7 @@
     </div>
     <div class="col-md-4">
         <div class="content-descriptors">
-            <h4 class="section-title mb-0">{% translate "Content Descriptors" %}</h4>
+            <h4 class="section-title mb-0">{% translate "Content Risks" %}</h4>
              <div class="row">
                  {% for cat_prefix, concerns in grouped_mgc_concerns.items %}
                     {% if concerns %}
@@ -103,13 +103,11 @@
                                 {% with category_severity_code=highest_severities|get_item:cat_prefix %}
                                     {% if category_severity_code and category_severity_code != 'N' %}
                                         {% with category_severity_display=severity_choices_dict|get_item:category_severity_code %}
-                                            {% with category_severity_var_name="--severity-"|add:category_severity_code|lower|add:"-color" %}
-                                                <span class="descriptor-severity ms-2" style="min-width: auto;">
-                                                    <span class="severity-label small" style="color: var({{ category_severity_var_name }});">
-                                                        {{ category_severity_display }}
-                                                    </span>
+                                            <span class="descriptor-severity ms-2" style="min-width: auto;">
+                                                <span class="severity-label small {{ cat_prefix }}-{{ category_severity_code }}">
+                                                    {{ category_severity_display }}
                                                 </span>
-                                            {% endwith %}
+                                            </span>
                                         {% endwith %}
                                     {% endif %}
                                 {% endwith %}
@@ -272,7 +270,7 @@ html[dir="rtl"] .meta-label { margin-left: 0.5em; margin-right: 0; }
 .descriptor-icon { flex: 0 0 30px; text-align: center; margin-right: 10px; font-size: 1.3em; color: var(--text-secondary); }
 .descriptor-name { flex-grow: 1; font-size: 0.9rem; color: var(--text-primary); padding-right: 10px; }
 .descriptor-severity { flex-shrink: 0; text-align: right; min-width: 120px; line-height: 1.2; display: flex; align-items: center; justify-content: flex-end; margin-top: 3px; }
-.severity-circle { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.2); position: relative; top: -1px; }
+.severity-circle { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; position: relative; top: -1px; }
 .severity-circle.severity-n { background-color: var(--severity-n-color); }
 .severity-circle.severity-l { background-color: var(--severity-l-color); }
 .severity-circle.severity-m { background-color: var(--severity-m-color); }
@@ -289,6 +287,19 @@ html[dir="rtl"] .severity-circle { margin-left: 0; margin-right: 0; }
 body.light-mode .boycott-alert hr { border-top-color: rgba(255, 255, 255, 0.2); }
 .boycott-alert p.small { font-size: 0.85rem; line-height: 1.5; color: var(--bs-alert-color); }
 .boycott-alert strong { color: inherit; }
+/* Category severities coloring */
+.A-L { color: var(--rating-mashbouh) }
+.A-M { color: var(--rating-haram) }
+.A-S { color: var(--rating-kufr) }
+.B-L { color: var(--rating-halal) }
+.B-M { color: var(--rating-mashbouh) }
+.B-S { color: var(--rating-haram) }
+.C-L { color: var(--rating-halal) }
+.C-M { color: var(--rating-mashbouh) }
+.C-S { color: var(--rating-mashbouh) }
+.D-L { color: var(--rating-halal) }
+.D-M { color: var(--rating-halal) }
+.D-S { color: var(--rating-mashbouh) }
 </style>
 {% endblock %}
 
