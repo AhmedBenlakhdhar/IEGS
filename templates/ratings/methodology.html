@@ -78,13 +78,13 @@
                         {% translate "3. The MGC Rating Process" %}
                     </h2>
                     <ol class="list-group list-group-numbered">
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Initial Review" %}:</strong> {% blocktranslate %}Games are selected, played, and researched to identify key themes and potential areas for analysis.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Content Analysis" %}:</strong> {% blocktranslate %}Systematic evaluation against the <b>20 Specific Content Concerns</b> (Section 4).{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Severity Assignment" %}:</strong> {% blocktranslate %}Assigning a <b>Severity Level</b> (None, Mild, Moderate, Severe - see Section 5) to each of the 20 concerns based on presence, intensity, avoidability, etc.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Tier Calculation" %}:</strong> {% blocktranslate %}The <b>Overall MGC Rating Tier</b> (Acceptable, Doubtful, Haram, Kufr/Shirk) is <em>automatically calculated</em> based on the logic in Section 6.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Flag Assignment" %}:</strong> {% blocktranslate %}Relevant <b>Content Flags</b> (icons) are <em>automatically assigned</em> if a concern's severity is Mild, Moderate, or Severe.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Rationale & Documentation" %}:</strong> {% blocktranslate %}The reasoning for the final tier is summarized.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Review & Publication" %}:</strong> {% blocktranslate %}Internal review before publishing; ratings may be updated.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Initial Review" %}:</b> {% blocktranslate %}Games are selected, played, and researched to identify key themes and potential areas for analysis.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Content Analysis" %}:</b> {% blocktranslate %}Systematic evaluation against the <b>20 Specific Content Concerns</b> (Section 4).{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Severity Assignment" %}:</b> {% blocktranslate %}Assigning a <b>Severity Level</b> (None, Mild, Moderate, Severe - see Section 5) to each of the 20 concerns based on presence, intensity, avoidability, etc.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Tier Calculation" %}:</b> {% blocktranslate %}The <b>Overall MGC Rating Tier</b> (Acceptable, Doubtful, Haram, Kufr/Shirk) is <em>automatically calculated</em> based on the logic in Section 6.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Flag Assignment" %}:</b> {% blocktranslate %}Relevant <b>Content Flags</b> (icons) are <em>automatically assigned</em> if a concern's severity is Mild, Moderate, or Severe.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Rationale & Documentation" %}:</b> {% blocktranslate %}The reasoning for the final tier is summarized.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Review & Publication" %}:</b> {% blocktranslate %}Internal review before publishing; ratings may be updated.{% endblocktranslate %}</li>
                     </ol>
                 </div>
             </section>
@@ -149,7 +149,7 @@
                     </h2>
                     <p class="text-muted mb-3">{% translate "For each specific concern, a severity level is assigned:" %}</p>
                     <dl>
-                        <dt class="fw-bold">{% translate "None" %}</dt>
+                        <dt class="fw-bold"><span class="severity-circle severity-n mx-2"></span>{% translate "None" %}</dt>
                         <dd class="text-muted ps-3 mb-2">{% translate "No significant concerns identified." %}</dd>
                         <dt class="fw-bold"><span class="severity-circle severity-l mx-2"></span>{% translate "Mild" %}</dt>
                         <dd class="text-muted ps-3 mb-2">{% translate "Minor issues present, often optional, avoidable, or not normalized. Minimal risk." %}</dd>
@@ -170,19 +170,19 @@
                     <p class="text-muted mb-3">{% translate "The final tier is <b>calculated automatically</b> based on the highest severity level found across all descriptors, according to their category mappings:" %}</p>
                     <ol class="list-group list-group-numbered">
                         <li class="list-group-item border-0 ps-3">
-                            <strong>{% translate "Rule 1 (KUFR/SHIRK)" %}:</strong>
+                            <b>{% translate "Rule 1 (KUFR/SHIRK)" %}:</b>
                             <span class="text-muted">{% blocktranslate %}If <b>any</b> A-Category ('Risks to Faith') descriptor is <b>Severe</b>.{% endblocktranslate %}</span>
                         </li>
                          <li class="list-group-item border-0 ps-3">
-                            <strong>{% translate "Rule 2 (HARAM)" %}:</strong>
+                            <b>{% translate "Rule 2 (HARAM)" %}:</b>
                             <span class="text-muted">{% blocktranslate %}Else, if <b>any</b> A-Category is <b>Moderate</b> OR <b>any</b> B-Category ('Prohibition Exposure') is <b>Severe</b>.{% endblocktranslate %}</span>
                         </li>
                          <li class="list-group-item border-0 ps-3">
-                            <strong>{% translate "Rule 3 (DOUBTFUL)" %}:</strong>
+                            <b>{% translate "Rule 3 (DOUBTFUL)" %}:</b>
                              <span class="text-muted">{% blocktranslate %}Else, if <b>any</b> A-Category is <b>Mild</b> OR <b>any</b> B-Category is <b>Moderate</b> OR <b>any</b> C-Category ('Normalization Risks') is <b>Moderate/Severe</b> OR <b>any</b> D-Category ('Player Risks') is <b>Severe</b>.{% endblocktranslate %}</span>
                         </li>
                          <li class="list-group-item border-0 ps-3">
-                            <strong>{% translate "Rule 4 (ACCEPTABLE)" %}:</strong>
+                            <b>{% translate "Rule 4 (ACCEPTABLE)" %}:</b>
                              <span class="text-muted">{% blocktranslate %}If none of the above rules are met.{% endblocktranslate %}</span>
                         </li>
                     </ol>
@@ -210,7 +210,7 @@
                     <h2 class="mb-4 pb-3 border-bottom">
                         {% translate "8. Disclaimer" %}
                     </h2>
-                    <p class="text-muted small">{% blocktranslate %}MGC ratings are provided as guidance based on <em>ijtihad</em> following the stated methodology. They are not legally binding fatwas (religious edicts) and do not represent the sole correct Islamic viewpoint on every nuanced issue. Variation in scholarly opinion exists on some matters. Users are ultimately responsible for their choices and are encouraged to exercise personal Taqwa (God-consciousness) and consult with knowledgeable individuals if in doubt. MGC aims to assist, not replace, individual responsibility before Allah. Ratings may be updated based on game changes or new evidence.{% endblocktranslate %}</p>
+                    <p class="text-muted">{% blocktranslate %}MGC ratings are provided as guidance based on <em>ijtihad</em> following the stated methodology. They are not legally binding fatwas (religious edicts) and do not represent the sole correct Islamic viewpoint on every nuanced issue. Variation in scholarly opinion exists on some matters. Users are ultimately responsible for their choices and are encouraged to exercise personal Taqwa (God-consciousness) and consult with knowledgeable individuals if in doubt. MGC aims to assist, not replace, individual responsibility before Allah. Ratings may be updated based on game changes or new evidence.{% endblocktranslate %}</p>
                 </div>
             </section>
 

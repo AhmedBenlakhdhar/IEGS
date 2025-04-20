@@ -16,8 +16,8 @@
           <div>
               {% get_current_language as LANGUAGE_CODE %}
               {% with severity=game.risk_summary_texts.A risk_name="Risks to Faith" %}
-                  {% if severity == 'None' %}
-                      No {% translate risk_name %}
+                  {% if severity == 'No' or severity == 'لا' %}
+                      {{ severity }} {% translate risk_name %}
                   {% else %}
                       {% if LANGUAGE_CODE == 'ar' %}
                           {% translate risk_name %} {{ severity }}ة
@@ -31,8 +31,8 @@
           <div>
               {% get_current_language as LANGUAGE_CODE %} {# Repeat for clarity, or set once outside if possible #}
               {% with severity=game.risk_summary_texts.B risk_name="Prohibition Exposure" %}
-                  {% if severity == 'None' %}
-                      No {% translate risk_name %}
+                  {% if severity == 'No' or severity == 'لا' %}
+                      {{ severity }} {% translate risk_name %}
                   {% else %}
                       {% if LANGUAGE_CODE == 'ar' %}
                           {% translate risk_name %} {{ severity }}
@@ -46,8 +46,8 @@
           <div>
               {% get_current_language as LANGUAGE_CODE %}
               {% with severity=game.risk_summary_texts.C risk_name="Normalization Risks" %}
-                  {% if severity == 'None' %}
-                      No {% translate risk_name %}
+                  {% if severity == 'No' or severity == 'لا' %}
+                      {{ severity }} {% translate risk_name %}
                   {% else %}
                       {% if LANGUAGE_CODE == 'ar' %}
                           {% translate risk_name %} {{ severity }}ة
@@ -61,8 +61,8 @@
           <div>
               {% get_current_language as LANGUAGE_CODE %}
               {% with severity=game.risk_summary_texts.D risk_name="Player Risks" %}
-                  {% if severity == 'None' %}
-                      No {% translate risk_name %}
+                  {% if severity == 'No' or severity == 'لا' %}
+                      {{ severity }} {% translate risk_name %}
                   {% else %}
                       {% if LANGUAGE_CODE == 'ar' %}
                           {% translate risk_name %} {{ severity }}ة

@@ -3164,10 +3164,6 @@ body.rtl .external-link-icon {
     margin-right: 2px; /* Was margin-left */
     margin-left: 0;
 }
-body.rtl .theme-toggle-button {
-    margin-right: 1rem; /* Was margin-left */
-    margin-left: 0;
-}
 
 
 /* Adjust text alignment if needed */
@@ -3409,6 +3405,12 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 1px;
   margin-top: 0;
 }
+
+html[dir="rtl"] 
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: 0px;
+}
+
 h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
 h2 { font-size: 1.6rem; margin-bottom: 1.5rem; }
 h3 { font-size: 1.3rem; }
@@ -3546,6 +3548,7 @@ html[dir="rtl"] .navbar .dropdown-menu.show { left: 0; right: auto; }
 /* Style for headers that are NOT expandable (i.e., severity is None) */
 
 .category-title-text { font-size: 0.8rem; font-weight: var(--font-heading-weight); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+html[dir="rtl"] .category-title-text { letter-spacing: 0; }
 
 /* Severity Display */
 .severity-display { gap: 0.25rem; }
@@ -18696,7 +18699,7 @@ const sharePopups = document.querySelectorAll('.share-popup'); sharePopups.forEa
           <div class="article-item">
               <h4><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h4>
               <p class="article-meta">
-                  {% blocktranslate %}Published on {{ article.published_date|date:"F j, Y" }}{% endblocktranslate %}
+                  {% translate "Published on" %}: {{ article.published_date|date:"F j, Y" }}
                   {% if article.author_name %} {% blocktranslate %}by {{ article.author_name }}{% endblocktranslate %}{% endif %}
                   {% if article.categories.exists %} | {% translate "In:" %} {% for cat in article.categories.all %}<a href="{{ cat.get_absolute_url }}" class="text-secondary">{{ cat.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
               </p>
@@ -18820,7 +18823,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="severity-display d-flex align-items-center">
                 <span class="d-flex align-items-center">
-                    <span class="severity-text ms-2">{{ severity_display }}</span>
+                    <span class="severity-text me-2">{{ severity_display }}</span>
                     <span class="severity-circle {{ severity_class }}" title="{% translate 'Severity Rating' %}"></span>
                 </span>
                 {# REMOVED Toggle indicator as details/reason are gone #}
@@ -18847,10 +18850,68 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div class="col-8 rating-risks">
         <div class="rating-risks-text-content" style="overflow: hidden; line-height: 1.1;">
-            <div>{% with severity=game.risk_summary_texts.A %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Risks to Faith"          %}</div>
-            <div>{% with severity=game.risk_summary_texts.B %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Prohibition Exposure"    %}</div>
-            <div>{% with severity=game.risk_summary_texts.C %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Normalization Risks"     %}</div>
-            <div>{% with severity=game.risk_summary_texts.D %}{% if severity == 'None' %}No{% else %}{{ severity }}{% endif %}{% endwith %} {% translate "Player Risks"            %}</div>
+
+          <div>
+              {% get_current_language as LANGUAGE_CODE %}
+              {% with severity=game.risk_summary_texts.A risk_name="Risks to Faith" %}
+                  {% if severity == 'No' or severity == 'لا' %}
+                      {{ severity }} {% translate risk_name %}
+                  {% else %}
+                      {% if LANGUAGE_CODE == 'ar' %}
+                          {% translate risk_name %} {{ severity }}ة
+                      {% else %}
+                          {{ severity }} {% translate risk_name %}
+                      {% endif %}
+                  {% endif %}
+              {% endwith %}
+          </div>
+          
+          <div>
+              {% get_current_language as LANGUAGE_CODE %} {# Repeat for clarity, or set once outside if possible #}
+              {% with severity=game.risk_summary_texts.B risk_name="Prohibition Exposure" %}
+                  {% if severity == 'No' or severity == 'لا' %}
+                      {{ severity }} {% translate risk_name %}
+                  {% else %}
+                      {% if LANGUAGE_CODE == 'ar' %}
+                          {% translate risk_name %} {{ severity }}
+                      {% else %}
+                          {{ severity }} {% translate risk_name %}
+                      {% endif %}
+                  {% endif %}
+              {% endwith %}
+          </div>
+          
+          <div>
+              {% get_current_language as LANGUAGE_CODE %}
+              {% with severity=game.risk_summary_texts.C risk_name="Normalization Risks" %}
+                  {% if severity == 'No' or severity == 'لا' %}
+                      {{ severity }} {% translate risk_name %}
+                  {% else %}
+                      {% if LANGUAGE_CODE == 'ar' %}
+                          {% translate risk_name %} {{ severity }}ة
+                      {% else %}
+                          {{ severity }} {% translate risk_name %}
+                      {% endif %}
+                  {% endif %}
+              {% endwith %}
+          </div>
+          
+          <div>
+              {% get_current_language as LANGUAGE_CODE %}
+              {% with severity=game.risk_summary_texts.D risk_name="Player Risks" %}
+                  {% if severity == 'No' or severity == 'لا' %}
+                      {{ severity }} {% translate risk_name %}
+                  {% else %}
+                      {% if LANGUAGE_CODE == 'ar' %}
+                          {% translate risk_name %} {{ severity }}ة
+                      {% else %}
+                          {{ severity }} {% translate risk_name %}
+                      {% endif %}
+                  {% endif %}
+              {% endwith %}
+          </div>
+        
+
         </div>
       </div>
   </div>
@@ -18952,7 +19013,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 === FILE: C:\Job\MGC\templates\ratings\contact.html ===
 
-{# templates/ratings/contact.html - Use django-countries Field #}
+{# templates/ratings/contact.html #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -18971,15 +19032,28 @@ document.addEventListener('DOMContentLoaded', function() {
              {% blocktranslate %}Have questions, suggestions, or feedback about MGC? Please use the form below to get in touch. We appreciate your input!{% endblocktranslate %}
          </p>
 
+         {# --- Message Display Block --- #}
          {% if messages %}
             {% for message in messages %}
-                {% if 'form_error' in message.tags or message.level == 40 %}
-                    <div class="alert alert-danger form-error-alert" role="alert">{{ message }}</div>
-                {% elif message.level >= 25 %}
-                     <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">{{ message }}</div>
+                {# --- Add this condition to filter messages --- #}
+                {% if 'contact_form' in message.tags %}
+                    {# Determine alert class based on level/tags #}
+                    {% with level_tag=message.level_tag %}
+                        {% if 'form_error' in message.tags or message.level >= 40 %} {# Error Level or form_error tag #}
+                            <div class="alert alert-danger form-error-alert" role="alert">{{ message }}</div>
+                        {% elif level_tag == 'success' %} {# Success Level #}
+                            <div class="alert alert-success" role="alert">{{ message }}</div>
+                        {% elif level_tag == 'warning' %} {# Warning Level #}
+                             <div class="alert alert-warning" role="alert">{{ message }}</div>
+                        {% else %} {# Info or Debug Level (default) #}
+                            <div class="alert alert-info" role="alert">{{ message }}</div>
+                        {% endif %}
+                    {% endwith %}
                 {% endif %}
+                {# --- End condition --- #}
             {% endfor %}
          {% endif %}
+         {# --- End Message Display Block --- #}
 
         <form method="post" class="bg-element p-4 rounded border">
             {% csrf_token %}
@@ -19127,10 +19201,10 @@ document.addEventListener('DOMContentLoaded', function() {
              {# --- NEW: Display IARC Rating --- #}
              {% if game.iarc_rating %}
              <div class="meta-row">
-                 <span class="meta-value iarc-rating iarc-{{ game.iarc_rating|slice:":-1" }}">
-                     <img src="{% static 'img/iarc/' %}{{ game.iarc_rating|slice:":-1" }}.svg" alt="{{ game.get_iarc_rating_display }}" width="60" class="me-1">
+                 <a class="meta-value iarc-rating iarc-{{ game.iarc_rating|slice:":-1" }}" href="https://www.globalratings.com/ratings-guide.aspx" target="_blank">
+                     <img src="{% static 'img/iarc/' %}{{ game.iarc_rating|slice:":-1" }}.svg" alt="{{ game.get_iarc_rating_display }}" width="62">
                      <div>{{ game.get_iarc_rating_display }}</div>
-                 </span>
+                 </a>
              </div>
              {% endif %}
              {# --- END: IARC Rating --- #}
@@ -19379,7 +19453,6 @@ html[dir="rtl"] .meta-label { margin-left: 0.5em; margin-right: 0; }
 html[dir="rtl"] .descriptor-icon { margin-right: 0; margin-left: 10px; }
 html[dir="rtl"] .descriptor-name { padding-right: 0; padding-left: 10px; text-align: right; }
 html[dir="rtl"] .descriptor-severity { text-align: left; justify-content: flex-start; }
-html[dir="rtl"] .descriptor-severity .severity-label { margin-right: 0; margin-left: 6px; }
 html[dir="rtl"] .severity-circle { margin-left: 0; margin-right: 0; }
 .boycott-badge-card .badge { font-size: 0.7em; padding: 0.3em 0.6em; }
 .boycott-badge-card .material-symbols-outlined { font-size: 1.1em; vertical-align: -2px; }
@@ -19542,7 +19615,7 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                 <div class="col-auto"> {# Takes only button width #}
                     <button class="btn btn-sm btn-primary search-submit-button" type="submit" title="{% translate 'Search / Apply Filters' %}">
                         <span class="material-symbols-outlined">search</span>
-                        Search
+                        {% translate 'Search' %}
                     </button>
                 </div>
             </div>
@@ -19752,13 +19825,13 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                         {% translate "3. The MGC Rating Process" %}
                     </h2>
                     <ol class="list-group list-group-numbered">
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Initial Review" %}:</strong> {% blocktranslate %}Games are selected, played, and researched to identify key themes and potential areas for analysis.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Content Analysis" %}:</strong> {% blocktranslate %}Systematic evaluation against the <b>20 Specific Content Concerns</b> (Section 4).{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Severity Assignment" %}:</strong> {% blocktranslate %}Assigning a <b>Severity Level</b> (None, Mild, Moderate, Severe - see Section 5) to each of the 20 concerns based on presence, intensity, avoidability, etc.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Tier Calculation" %}:</strong> {% blocktranslate %}The <b>Overall MGC Rating Tier</b> (Acceptable, Doubtful, Haram, Kufr/Shirk) is <em>automatically calculated</em> based on the logic in Section 6.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Flag Assignment" %}:</strong> {% blocktranslate %}Relevant <b>Content Flags</b> (icons) are <em>automatically assigned</em> if a concern's severity is Mild, Moderate, or Severe.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Rationale & Documentation" %}:</strong> {% blocktranslate %}The reasoning for the final tier is summarized.{% endblocktranslate %}</li>
-                        <li class="list-group-item border-0 ps-3"><strong>{% translate "Review & Publication" %}:</strong> {% blocktranslate %}Internal review before publishing; ratings may be updated.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Initial Review" %}:</b> {% blocktranslate %}Games are selected, played, and researched to identify key themes and potential areas for analysis.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Content Analysis" %}:</b> {% blocktranslate %}Systematic evaluation against the <b>20 Specific Content Concerns</b> (Section 4).{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Severity Assignment" %}:</b> {% blocktranslate %}Assigning a <b>Severity Level</b> (None, Mild, Moderate, Severe - see Section 5) to each of the 20 concerns based on presence, intensity, avoidability, etc.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Tier Calculation" %}:</b> {% blocktranslate %}The <b>Overall MGC Rating Tier</b> (Acceptable, Doubtful, Haram, Kufr/Shirk) is <em>automatically calculated</em> based on the logic in Section 6.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Flag Assignment" %}:</b> {% blocktranslate %}Relevant <b>Content Flags</b> (icons) are <em>automatically assigned</em> if a concern's severity is Mild, Moderate, or Severe.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Rationale & Documentation" %}:</b> {% blocktranslate %}The reasoning for the final tier is summarized.{% endblocktranslate %}</li>
+                        <li class="list-group-item border-0 ps-3"><b>{% translate "Review & Publication" %}:</b> {% blocktranslate %}Internal review before publishing; ratings may be updated.{% endblocktranslate %}</li>
                     </ol>
                 </div>
             </section>
@@ -19774,41 +19847,41 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                         <div class="col-md-6 mb-3">
                              <h3 class="h6 fw-bold">{% translate "A. Risks to Faith" %}</h3>
                              <ul class="list-unstyled ms-3 small text-muted">
-                                <li>A1. {% translate "Distorting Islam" %}</li>
-                                <li>A2. {% translate "Promoting Kufr/Shirk" %}</li>
-                                <li>A3. {% translate "Assuming Divinity" %}</li>
-                                <li>A4. {% translate "Tampering Ghaib" %}</li>
-                                <li>A5. {% translate "Deviant Ideologies" %}</li>
+                                <li>{% translate "A1" %}. {% translate "Distorting Islam" %}</li>
+                                <li>{% translate "A2" %}. {% translate "Promoting Kufr/Shirk" %}</li>
+                                <li>{% translate "A3" %}. {% translate "Assuming Divinity" %}</li>
+                                <li>{% translate "A4" %}. {% translate "Tampering Ghaib" %}</li>
+                                <li>{% translate "A5" %}. {% translate "Deviant Ideologies" %}</li>
                             </ul>
                         </div>
                          <div class="col-md-6 mb-3">
                              <h3 class="h6 fw-bold">{% translate "B. Prohibition Exposure" %}</h3>
                              <ul class="list-unstyled ms-3 small text-muted">
-                                <li>B1. {% translate "Gambling" %}</li>
-                                <li>B2. {% translate "Lying" %}</li>
-                                <li>B3. {% translate "Indecency" %}</li>
-                                <li>B4. {% translate "Music" %}</li>
-                                <li>B5. {% translate "Time Waste" %}</li>
+                                <li>{% translate "B1" %}. {% translate "Gambling" %}</li>
+                                <li>{% translate "B2" %}. {% translate "Lying" %}</li>
+                                <li>{% translate "B3" %}. {% translate "Indecency" %}</li>
+                                <li>{% translate "B4" %}. {% translate "Music" %}</li>
+                                <li>{% translate "B5" %}. {% translate "Time Waste" %}</li>
                             </ul>
                         </div>
                          <div class="col-md-6 mb-3">
                             <h3 class="h6 fw-bold">{% translate "C. Normalization Risks" %}</h3>
                              <ul class="list-unstyled ms-3 small text-muted">
-                                <li>C1. {% translate "Disdain/Arrogance" %}</li>
-                                <li>C2. {% translate "Magic" %}</li>
-                                <li>C3. {% translate "Intoxicants" %}</li>
-                                <li>C4. {% translate "Crime/Violence" %}</li>
-                                <li>C5. {% translate "Profanity" %}</li>
+                                <li>{% translate "C1" %}. {% translate "Disdain/Arrogance" %}</li>
+                                <li>{% translate "C2" %}. {% translate "Magic" %}</li>
+                                <li>{% translate "C3" %}. {% translate "Intoxicants" %}</li>
+                                <li>{% translate "C4" %}. {% translate "Crime/Violence" %}</li>
+                                <li>{% translate "C5" %}. {% translate "Profanity" %}</li>
                             </ul>
                         </div>
                         <div class="col-md-6 mb-3">
                             <h3 class="h6 fw-bold">{% translate "D. Player Risks" %}</h3>
                              <ul class="list-unstyled ms-3 small text-muted">
-                                <li>D1. {% translate "Horror/Fear" %}</li>
-                                <li>D2. {% translate "Despair" %}</li>
-                                <li>D3. {% translate "Spending" %}</li>
-                                <li>D4. {% translate "Online Interactions" %}</li>
-                                <li>D5. {% translate "User Content" %}</li>
+                                <li>{% translate "D1" %}. {% translate "Horror/Fear" %}</li>
+                                <li>{% translate "D2" %}. {% translate "Despair" %}</li>
+                                <li>{% translate "D3" %}. {% translate "Spending" %}</li>
+                                <li>{% translate "D4" %}. {% translate "Online Interactions" %}</li>
+                                <li>{% translate "D5" %}. {% translate "User Content" %}</li>
                             </ul>
                         </div>
                     </div>
@@ -19823,7 +19896,7 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                     </h2>
                     <p class="text-muted mb-3">{% translate "For each specific concern, a severity level is assigned:" %}</p>
                     <dl>
-                        <dt class="fw-bold">{% translate "None" %}</dt>
+                        <dt class="fw-bold"><span class="severity-circle severity-n mx-2"></span>{% translate "None" %}</dt>
                         <dd class="text-muted ps-3 mb-2">{% translate "No significant concerns identified." %}</dd>
                         <dt class="fw-bold"><span class="severity-circle severity-l mx-2"></span>{% translate "Mild" %}</dt>
                         <dd class="text-muted ps-3 mb-2">{% translate "Minor issues present, often optional, avoidable, or not normalized. Minimal risk." %}</dd>
@@ -19844,19 +19917,19 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                     <p class="text-muted mb-3">{% translate "The final tier is <b>calculated automatically</b> based on the highest severity level found across all descriptors, according to their category mappings:" %}</p>
                     <ol class="list-group list-group-numbered">
                         <li class="list-group-item border-0 ps-3">
-                            <strong>{% translate "Rule 1 (KUFR/SHIRK)" %}:</strong>
+                            <b>{% translate "Rule 1 (KUFR/SHIRK)" %}:</b>
                             <span class="text-muted">{% blocktranslate %}If <b>any</b> A-Category ('Risks to Faith') descriptor is <b>Severe</b>.{% endblocktranslate %}</span>
                         </li>
                          <li class="list-group-item border-0 ps-3">
-                            <strong>{% translate "Rule 2 (HARAM)" %}:</strong>
+                            <b>{% translate "Rule 2 (HARAM)" %}:</b>
                             <span class="text-muted">{% blocktranslate %}Else, if <b>any</b> A-Category is <b>Moderate</b> OR <b>any</b> B-Category ('Prohibition Exposure') is <b>Severe</b>.{% endblocktranslate %}</span>
                         </li>
                          <li class="list-group-item border-0 ps-3">
-                            <strong>{% translate "Rule 3 (DOUBTFUL)" %}:</strong>
+                            <b>{% translate "Rule 3 (DOUBTFUL)" %}:</b>
                              <span class="text-muted">{% blocktranslate %}Else, if <b>any</b> A-Category is <b>Mild</b> OR <b>any</b> B-Category is <b>Moderate</b> OR <b>any</b> C-Category ('Normalization Risks') is <b>Moderate/Severe</b> OR <b>any</b> D-Category ('Player Risks') is <b>Severe</b>.{% endblocktranslate %}</span>
                         </li>
                          <li class="list-group-item border-0 ps-3">
-                            <strong>{% translate "Rule 4 (ACCEPTABLE)" %}:</strong>
+                            <b>{% translate "Rule 4 (ACCEPTABLE)" %}:</b>
                              <span class="text-muted">{% blocktranslate %}If none of the above rules are met.{% endblocktranslate %}</span>
                         </li>
                     </ol>
@@ -19884,7 +19957,7 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                     <h2 class="mb-4 pb-3 border-bottom">
                         {% translate "8. Disclaimer" %}
                     </h2>
-                    <p class="text-muted small">{% blocktranslate %}MGC ratings are provided as guidance based on <em>ijtihad</em> following the stated methodology. They are not legally binding fatwas (religious edicts) and do not represent the sole correct Islamic viewpoint on every nuanced issue. Variation in scholarly opinion exists on some matters. Users are ultimately responsible for their choices and are encouraged to exercise personal Taqwa (God-consciousness) and consult with knowledgeable individuals if in doubt. MGC aims to assist, not replace, individual responsibility before Allah. Ratings may be updated based on game changes or new evidence.{% endblocktranslate %}</p>
+                    <p class="text-muted">{% blocktranslate %}MGC ratings are provided as guidance based on <em>ijtihad</em> following the stated methodology. They are not legally binding fatwas (religious edicts) and do not represent the sole correct Islamic viewpoint on every nuanced issue. Variation in scholarly opinion exists on some matters. Users are ultimately responsible for their choices and are encouraged to exercise personal Taqwa (God-consciousness) and consult with knowledgeable individuals if in doubt. MGC aims to assist, not replace, individual responsibility before Allah. Ratings may be updated based on game changes or new evidence.{% endblocktranslate %}</p>
                 </div>
             </section>
 
@@ -20022,7 +20095,7 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
             {# Introduction Card #}
             <section class="shadow-sm mb-5"> {# Added card class back #}
                 <div class="card-body p-4">
-                    <p class="text-center text-muted mb-0">{% blocktranslate %}In an era where digital entertainment significantly influences our time and thoughts, most video games are developed without considering Islamic values. This necessitates clear guidance rooted in the Quran and Sunnah. The Muslim Game Classification (MGC) addresses this need.{% endblocktranslate %}</p>
+                    <p class="text-muted mb-0">{% blocktranslate %}In an era where digital entertainment significantly influences our time and thoughts, most video games are developed without considering Islamic values. This necessitates clear guidance rooted in the Quran and Sunnah. The Muslim Game Classification (MGC) addresses this need.{% endblocktranslate %}</p>
                 </div>
             </section>
 
@@ -20043,13 +20116,13 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                     </div>
 
                     <div> {# Removed mb-4 from this last div within the card #}
-                        <h3 class="h5 fw-bold mb-3">{% translate "Identifying Problematic Content" %} (<em>Al-Munkarat</em>)</h3>
+                        <h3 class="h5 fw-bold mb-3">{% translate "Identifying Problematic Content" %}</h3>
                         <p class="text-muted mb-3">{% blocktranslate %}Mainstream games frequently incorporate elements explicitly forbidden (<em>Haram</em>) or discouraged in Islam, including:{% endblocktranslate %}</p>
                         <ul class="list-unstyled ms-3">
-                            <li class="mb-2"><strong class="text-dark">{% translate "Threats to Faith (Aqidah):" %}</strong> {% translate "Content promoting or normalizing Shirk, Kufr, assuming divinity, distorting Islam, or magic (Sihr)." %}</li>
-                            <li class="mb-2"><strong class="text-dark">{% translate "Exposure to Prohibitions:" %}</strong> {% translate "Depictions violating 'Awrah, impermissible music (Ma'azif), intoxicants (Khamr), gambling (Maysir), or unlawful relationships." %}</li>
-                            <li class="mb-2"><strong class="text-dark">{% translate "Normalization of Wrongdoing:" %}</strong> {% translate "Casual presentation or glorification of unjustified violence, crime, or arrogance (Kibr)." %}</li>
-                            <li class="mb-2"><strong class="text-dark">{% translate "Risks to Player Well-being:" %}</strong> {% translate "Themes inducing despair (Qunut), predatory spending mechanics (Israf), or harmful online interactions (Fitnah)." %}</li>
+                            <li class="mb-2"><strong>{% translate "Threats to Faith (Aqidah):" %}</strong> {% translate "Content promoting or normalizing Shirk, Kufr, assuming divinity, distorting Islam, or magic (Sihr)." %}</li>
+                            <li class="mb-2"><strong>{% translate "Exposure to Prohibitions:" %}</strong> {% translate "Depictions violating 'Awrah, impermissible music (Ma'azif), intoxicants (Khamr), gambling (Maysir), or unlawful relationships." %}</li>
+                            <li class="mb-2"><strong>{% translate "Normalization of Wrongdoing:" %}</strong> {% translate "Casual presentation or glorification of unjustified violence, crime, or arrogance (Kibr)." %}</li>
+                            <li class="mb-2"><strong>{% translate "Risks to Player Well-being:" %}</strong> {% translate "Themes inducing despair (Qunut), predatory spending mechanics (Israf), or harmful online interactions (Fitnah)." %}</li>
                         </ul>
                     </div>
                 </div>
@@ -20066,7 +20139,7 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                         {# Objective 1 #}
                         <div class="col-md-6 col-lg-3">
                              <div class="p-3"> {# Optional inner padding if needed #}
-                                <i class="fas fa-check-circle fa-2x text-primary mb-2"></i> {# Icon Added back #}
+                                <i class="fas fa-check-circle fa-2x text-secondary mb-3"></i> {# Icon Added back #}
                                 <h4 class="h6 fw-bold mb-1">{% translate "Informed Choice" %}</h4>
                                 <p class="small text-muted mb-0">{% blocktranslate %}Make informed decisions aligned with Islamic values.{% endblocktranslate %}</p>
                             </div>
@@ -20075,7 +20148,7 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                         {# Objective 2 #}
                          <div class="col-md-6 col-lg-3">
                              <div class="p-3">
-                                <i class="fas fa-search-plus fa-2x text-primary mb-2"></i> {# Icon Added back #}
+                                <i class="fas fa-search-plus fa-2x text-secondary mb-3"></i> {# Icon Added back #}
                                 <h4 class="h6 fw-bold mb-1">{% translate "Identify Risks" %}</h4>
                                 <p class="small text-muted mb-0">{% blocktranslate %}Recognize specific concerns, even in generally acceptable games.{% endblocktranslate %}</p>
                             </div>
@@ -20084,7 +20157,7 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                         {# Objective 3 #}
                          <div class="col-md-6 col-lg-3">
                             <div class="p-3">
-                                <i class="fas fa-comments fa-2x text-primary mb-2"></i> {# Icon Added back #}
+                                <i class="fas fa-comments fa-2x text-secondary mb-3"></i> {# Icon Added back #}
                                 <h4 class="h6 fw-bold mb-1">{% translate "Enable Dialogue" %}</h4>
                                 <p class="small text-muted mb-0">{% blocktranslate %}Facilitate constructive dialogue within families and communities.{% endblocktranslate %}</p>
                             </div>
@@ -20093,7 +20166,7 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
                         {# Objective 4 #}
                          <div class="col-md-6 col-lg-3">
                              <div class="p-3">
-                                <i class="fas fa-lightbulb fa-2x text-primary mb-2"></i> {# Icon Added back #}
+                                <i class="fas fa-lightbulb fa-2x text-secondary mb-3"></i> {# Icon Added back #}
                                 <h4 class="h6 fw-bold mb-1">{% translate "Promote Alternatives" %}</h4>
                                 <p class="small text-muted mb-0">{% blocktranslate %}Encourage the demand for positive, permissible alternatives.{% endblocktranslate %}</p>
                             </div>
@@ -20108,10 +20181,10 @@ html[dir="rtl"] .alternative-games .game-rating-badge { transform-origin: top ri
             <section class="shadow-sm mb-5"> {# Added card class back #}
                 <div class="card-body p-4">
                     <h2 class="text-center mb-4 pb-3 border-bottom">{% translate "MGC vs. Standard Age Ratings" %}</h2>
-                    <p class="text-center text-muted mb-4">{% blocktranslate %}Standard systems (ESRB, PEGI) focus on age-appropriateness based on societal norms. MGC offers a distinct, necessary layer of analysis based on Islamic principles, as highlighted below:{% endblocktranslate %}</p>
+                    <p class="text-center text-muted mb-4">{% blocktranslate %}Standard systems (IARC, ESRB, PEGI) focus on age-appropriateness based on societal norms. MGC offers a distinct, necessary layer of analysis based on Islamic principles, as highlighted below:{% endblocktranslate %}</p>
 
                     <div class="table-responsive rounded"> {# Removed shadow as card has it #}
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-striped mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th scope="col" style="width: 20%;">{% translate "Aspect" %}</th>

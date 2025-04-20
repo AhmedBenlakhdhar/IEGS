@@ -693,7 +693,7 @@ msgstr "الحذر وتجنب الشبهات"
 msgid ""
 "In cases of ambiguity or differing scholarly opinions, a cautious approach "
 "is favored, often reflected in a 'Doubtful' rating or detailed notes."
-msgstr "في حالات الغموض أو اختلاف الآراء الفقهية، يُفضل اتباع نهج حذر، غالبًا ما ينعكس في تصنيف 'مشتبه به' أو ملاحظات مفصلة."
+msgstr "في حالات الغموض أو اختلاف الآراء الفقهية، يُفضل اتباع نهج حذر، غالبًا ما ينعكس في تصنيف 'مشبوه' أو ملاحظات مفصلة."
 
 #: .\all_my_code.txt:19741 .\templates\ratings\methodology.html:67
 msgid "Transparency"
@@ -748,7 +748,7 @@ msgstr "حساب الفئة"
 msgid ""
 "The <b>Overall MGC Rating Tier</b> (Acceptable, Doubtful, Haram, Kufr/Shirk) "
 "is <em>automatically calculated</em> based on the logic in Section 6."
-msgstr "يتم <em>حساب فئة تصنيف ت.ا.م الإجمالية</em> (مقبول، مشتبه به، حرام، كفر/شرك) تلقائيًا بناءً على المنطق الوارد في القسم 6."
+msgstr "يتم <em>حساب فئة تصنيف ت.ا.م الإجمالية</em> (مقبول، مشبوه، حرام، كفر/شرك) تلقائيًا بناءً على المنطق الوارد في القسم 6."
 
 #: .\all_my_code.txt:19759 .\templates\ratings\methodology.html:85
 msgid "Flag Assignment"
@@ -817,7 +817,7 @@ msgstr "ب. تعرض للمحرمات"
 
 #: .\all_my_code.txt:19787 .\templates\ratings\methodology.html:113
 msgid "Gambling"
-msgstr "القمار (الميسر)"
+msgstr "القمار"
 
 #: .\all_my_code.txt:19788 .\templates\ratings\methodology.html:114
 msgid "Lying"
@@ -825,11 +825,11 @@ msgstr "الكذب"
 
 #: .\all_my_code.txt:19789 .\templates\ratings\methodology.html:115
 msgid "Indecency"
-msgstr "الفحش (العورات وما شابه)"
+msgstr "الفحش"
 
 #: .\all_my_code.txt:19790 .\templates\ratings\methodology.html:116
 msgid "Music"
-msgstr "الموسيقى (المعازف)"
+msgstr "الموسيقى"
 
 #: .\all_my_code.txt:19791 .\templates\ratings\methodology.html:117
 msgid "Time Waste"
@@ -871,15 +871,15 @@ msgstr "الرعب/الخوف"
 
 #: .\all_my_code.txt:19808 .\templates\ratings\methodology.html:134
 msgid "Despair"
-msgstr "اليأس (القنوط)"
+msgstr "اليأس"
 
 #: .\all_my_code.txt:19809 .\templates\ratings\methodology.html:135
 msgid "Spending"
-msgstr "الإنفاق (الإسراف)"
+msgstr "الإنفاق"
 
 #: .\all_my_code.txt:19810 .\templates\ratings\methodology.html:136
 msgid "Online Interactions"
-msgstr "التفاعلات عبر الإنترنت (الفتنة)"
+msgstr "التفاعلات عبر الإنترنت"
 
 #: .\all_my_code.txt:19811 .\templates\ratings\methodology.html:137
 msgid "User Content"
@@ -969,7 +969,7 @@ msgstr "وإلا، إذا كان <b>أي</b> وصف من الفئة أ <b>متو
 
 #: .\all_my_code.txt:19855 .\templates\ratings\methodology.html:181
 msgid "Rule 3 (DOUBTFUL)"
-msgstr "القاعدة 3 (مشتبه به)"
+msgstr "القاعدة 3 (مشبوه)"
 
 #: .\all_my_code.txt:19856 .\templates\ratings\methodology.html:182
 msgid ""
@@ -1265,10 +1265,10 @@ msgstr "ت.ا.م مقابل التصنيفات العمرية القياسية"
 
 #: .\all_my_code.txt:20112 .\templates\ratings\why_mgc.html:121
 msgid ""
-"Standard systems (ESRB, PEGI) focus on age-appropriateness based on societal "
+"Standard systems (IARC, ESRB, PEGI) focus on age-appropriateness based on societal "
 "norms. MGC offers a distinct, necessary layer of analysis based on Islamic "
 "principles, as highlighted below:"
-msgstr "تركز الأنظمة القياسية (ESRB، PEGI) على مدى الملاءمة العمرية بناءً على المعايير المجتمعية. يقدم ت.ا.م طبقة تحليل مميزة وضرورية تستند إلى المبادئ الإسلامية، كما هو موضح أدناه:"
+msgstr "تركز الأنظمة القياسية (PEGI، ESRB، IARC) على مدى الملاءمة العمرية بناءً على المعايير المجتمعية. يقدم ت.ا.م طبقة تحليل مميزة وضرورية تستند إلى المبادئ الإسلامية، كما هو موضح أدناه:"
 
 #: .\all_my_code.txt:20118 .\templates\ratings\why_mgc.html:127
 msgid "Aspect"
@@ -1557,7 +1557,7 @@ msgstr "2. حساب الفئة"
 msgid ""
 "An overall rating (Acceptable, Doubtful, Haram, Kufr/Shirk) is automatically "
 "determined by defined severity rules."
-msgstr "يتم تحديد التصنيف الإجمالي (مقبول، مشتبه به، حرام، كفر/شرك) تلقائيًا بواسطة قواعد خطورة محددة."
+msgstr "يتم تحديد التصنيف الإجمالي (مقبول، مشبوه، حرام، كفر/شرك) تلقائيًا بواسطة قواعد خطورة محددة."
 
 #: .\all_my_code.txt:20677 .\templates\homepage.html:85
 msgid "3. Informed Choice"
@@ -1585,7 +1585,7 @@ msgstr "حرام"
 #: .\all_my_code.txt:20691 .\ratings\management\commands\populate_tiers.py:11
 #: .\templates\homepage.html:99
 msgid "Doubtful"
-msgstr "مشتبه به"
+msgstr "مشبوه"
 
 #: .\all_my_code.txt:20691 .\ratings\management\commands\populate_tiers.py:10
 #: .\templates\homepage.html:99
@@ -1865,20 +1865,20 @@ msgstr "مراجعات النقاد"
 #: .\ratings\admin.py:60
 msgid ""
 "Severity Mapping: Mild -> Doubtful, Moderate -> Haram, Severe -> Kufr/Shirk"
-msgstr "تخطيط الخطورة: خفيف -> مشتبه به، متوسط -> حرام، شديد -> كفر/شرك"
+msgstr "تخطيط الخطورة: خفيف -> مشبوه، متوسط -> حرام، شديد -> كفر/شرك"
 
 #: .\ratings\admin.py:61
 msgid ""
 "Severity Mapping: Mild -> Permissible, Moderate -> Doubtful, Severe -> Haram"
-msgstr "تخطيط الخطورة: خفيف -> مباح، متوسط -> مشتبه به، شديد -> حرام"
+msgstr "تخطيط الخطورة: خفيف -> مباح، متوسط -> مشبوه، شديد -> حرام"
 
 #: .\ratings\admin.py:62
 msgid "Severity Mapping: Mild -> Permissible, Moderate/Severe -> Doubtful"
-msgstr "تخطيط الخطورة: خفيف -> مباح، متوسط/شديد -> مشتبه به"
+msgstr "تخطيط الخطورة: خفيف -> مباح، متوسط/شديد -> مشبوه"
 
 #: .\ratings\admin.py:63
 msgid "Severity Mapping: Mild/Moderate -> Permissible, Severe -> Doubtful"
-msgstr "تخطيط الخطورة: خفيف/متوسط -> مباح، شديد -> مشتبه به"
+msgstr "تخطيط الخطورة: خفيف/متوسط -> مباح، شديد -> مشبوه"
 
 #: .\ratings\admin.py:66 .\ratings\models.py:125
 msgid "Overall Rating Tier"
@@ -2134,7 +2134,7 @@ msgstr "مباح. يفي بمعايير المقبول بناءً على تفص�
 msgid ""
 "Contains elements requiring caution. Meets criteria for Doubtful based on "
 "severity breakdown."
-msgstr "يحتوي على عناصر تتطلب الحذر. يفي بمعايير المشتبه به بناءً على تفصيل الخطورة."
+msgstr "يحتوي على عناصر تتطلب الحذر. يفي بمعايير المشبوه بناءً على تفصيل الخطورة."
 
 #: .\ratings\management\commands\populate_tiers.py:12
 msgid ""

@@ -267,6 +267,7 @@ html[dir="rtl"] .navbar .dropdown-menu.show { left: 0; right: auto; }
 /* Style for headers that are NOT expandable (i.e., severity is None) */
 
 .category-title-text { font-size: 0.8rem; font-weight: var(--font-heading-weight); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+html[dir="rtl"] .category-title-text { letter-spacing: 0; }
 
 /* Severity Display */
 .severity-display { gap: 0.25rem; }

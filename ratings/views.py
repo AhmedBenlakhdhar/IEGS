@@ -519,7 +519,8 @@ def contact_view(request):
                 messages.error(request, _('Sorry, there was an error sending your message. Please try again later.'))
                 print(f"Contact form send mail error: {e}")
         else:
-             messages.error(request, _('Please correct the errors below, including the CAPTCHA.'), extra_tags='form_error')
+             messages.error(request, _('Please correct the errors noted below.'), extra_tags='contact_form form_error')
+             print(f"Contact form errors: {form.errors.as_json()}")
     else:
         form = ContactForm(initial=initial_data)
 

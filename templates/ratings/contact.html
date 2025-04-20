@@ -1,4 +1,4 @@
-{# templates/ratings/contact.html - Use django-countries Field #}
+{# templates/ratings/contact.html #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -17,15 +17,28 @@
              {% blocktranslate %}Have questions, suggestions, or feedback about MGC? Please use the form below to get in touch. We appreciate your input!{% endblocktranslate %}
          </p>
 
+         {# --- Message Display Block --- #}
          {% if messages %}
             {% for message in messages %}
-                {% if 'form_error' in message.tags or message.level == 40 %}
-                    <div class="alert alert-danger form-error-alert" role="alert">{{ message }}</div>
-                {% elif message.level >= 25 %}
-                     <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">{{ message }}</div>
+                {# --- Add this condition to filter messages --- #}
+                {% if 'contact_form' in message.tags %}
+                    {# Determine alert class based on level/tags #}
+                    {% with level_tag=message.level_tag %}
+                        {% if 'form_error' in message.tags or message.level >= 40 %} {# Error Level or form_error tag #}
+                            <div class="alert alert-danger form-error-alert" role="alert">{{ message }}</div>
+                        {% elif level_tag == 'success' %} {# Success Level #}
+                            <div class="alert alert-success" role="alert">{{ message }}</div>
+                        {% elif level_tag == 'warning' %} {# Warning Level #}
+                             <div class="alert alert-warning" role="alert">{{ message }}</div>
+                        {% else %} {# Info or Debug Level (default) #}
+                            <div class="alert alert-info" role="alert">{{ message }}</div>
+                        {% endif %}
+                    {% endwith %}
                 {% endif %}
+                {# --- End condition --- #}
             {% endfor %}
          {% endif %}
+         {# --- End Message Display Block --- #}
 
         <form method="post" class="bg-element p-4 rounded border">
             {% csrf_token %}

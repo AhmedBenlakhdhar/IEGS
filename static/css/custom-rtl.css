@@ -27,10 +27,6 @@ body.rtl .external-link-icon {
     margin-right: 2px; /* Was margin-left */
     margin-left: 0;
 }
-body.rtl .theme-toggle-button {
-    margin-right: 1rem; /* Was margin-left */
-    margin-left: 0;
-}
 
 
 /* Adjust text alignment if needed */

@@ -48,10 +48,10 @@
              {# --- NEW: Display IARC Rating --- #}
              {% if game.iarc_rating %}
              <div class="meta-row">
-                 <span class="meta-value iarc-rating iarc-{{ game.iarc_rating|slice:":-1" }}">
-                     <img src="{% static 'img/iarc/' %}{{ game.iarc_rating|slice:":-1" }}.svg" alt="{{ game.get_iarc_rating_display }}" width="60" class="me-1">
+                 <a class="meta-value iarc-rating iarc-{{ game.iarc_rating|slice:":-1" }}" href="https://www.globalratings.com/ratings-guide.aspx" target="_blank">
+                     <img src="{% static 'img/iarc/' %}{{ game.iarc_rating|slice:":-1" }}.svg" alt="{{ game.get_iarc_rating_display }}" width="62">
                      <div>{{ game.get_iarc_rating_display }}</div>
-                 </span>
+                 </a>
              </div>
              {% endif %}
              {# --- END: IARC Rating --- #}
@@ -300,7 +300,6 @@ html[dir="rtl"] .meta-label { margin-left: 0.5em; margin-right: 0; }
 html[dir="rtl"] .descriptor-icon { margin-right: 0; margin-left: 10px; }
 html[dir="rtl"] .descriptor-name { padding-right: 0; padding-left: 10px; text-align: right; }
 html[dir="rtl"] .descriptor-severity { text-align: left; justify-content: flex-start; }
-html[dir="rtl"] .descriptor-severity .severity-label { margin-right: 0; margin-left: 6px; }
 html[dir="rtl"] .severity-circle { margin-left: 0; margin-right: 0; }
 .boycott-badge-card .badge { font-size: 0.7em; padding: 0.3em 0.6em; }
 .boycott-badge-card .material-symbols-outlined { font-size: 1.1em; vertical-align: -2px; }
