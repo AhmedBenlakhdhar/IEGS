@@ -68,7 +68,67 @@
           </p>
         {% endfor %}
       </div>
-      {# Add Pagination if needed later #}
+      {# --- START: Pagination --- #}
+      {% if articles_page.has_other_pages %} {# <<< CHANGE: Use articles_page #}
+          <nav aria-label="{% translate 'Article list navigation' %}" class="mt-5">
+            <ul class="pagination justify-content-center">
+
+              {# First Page Link #}
+              {% if articles_page.has_previous %}
+                <li class="page-item">
+                    {# Preserve search query 'q' #}
+                    <a class="page-link" href="?page=1{% if search_query %}&q={{ search_query|urlencode }}{% endif %}" title="{% translate 'First page' %}">
+                        <span class="material-symbols-outlined">first_page</span>
+                    </a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">first_page</span></span></li>
+              {% endif %}
+
+              {# Previous Page Link #}
+              {% if articles_page.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ articles_page.previous_page_number }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}" title="{% translate 'Previous page' %}">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">chevron_left</span></span></li>
+              {% endif %}
+
+              {# Current Page Indicator #}
+              <li class="page-item active" aria-current="page">
+                  <span class="page-link">
+                      {% translate "Page" %} {{ articles_page.number }} {% translate "of" %} {{ articles_page.paginator.num_pages }}
+                  </span>
+              </li>
+
+              {# Next Page Link #}
+              {% if articles_page.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ articles_page.next_page_number }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}" title="{% translate 'Next page' %}">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">chevron_right</span></span></li>
+              {% endif %}
+
+              {# Last Page Link #}
+              {% if articles_page.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ articles_page.paginator.num_pages }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}" title="{% translate 'Last page' %}">
+                        <span class="material-symbols-outlined">last_page</span>
+                    </a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">last_page</span></span></li>
+              {% endif %}
+
+            </ul>
+          </nav>
+      {% endif %}
+      {# --- END: Pagination --- #}
     </div>
     {# --- End Main Content Area --- #}
   </div>

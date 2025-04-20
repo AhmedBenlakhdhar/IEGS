@@ -1,4 +1,4 @@
-{# templates/ratings/methodology.html - Simplified Appearance #}
+{# templates/ratings/methodology.html - v3: Removed Ref Prefixes & Verse Numbers, Improved Alignment #}
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
@@ -9,7 +9,6 @@
 <div class="container py-5" style="max-width: 900px;">
 
     <header class="text-center mb-5">
-        {# Modified Header based on your input #}
         <h1 class="mb-3">
             <div class="h1 fw-bold mb-2">{% blocktranslate %}MGC Rating Methodology{% endblocktranslate %}</div>
             <div class="h4 text-muted fw-normal">{% blocktranslate %}Understanding How Games Are Assessed Through an Islamic Lens{% endblocktranslate %}</div>
@@ -27,7 +26,7 @@
                 </div>
             </section>
         {% else %}
-            {# Default content with simplified card structure #}
+            {# Default content #}
 
             {# 1. Introduction & Purpose Card #}
             <section class="shadow-sm mb-5">
@@ -89,59 +88,515 @@
                 </div>
             </section>
 
-            {# 4. Specific Content Concerns Card #}
+            {# 4. Specific Content Concerns Card - Table Updated #}
             <section class="shadow-sm mb-5">
                  <div class="card-body p-4">
                      <h2 class="mb-4 pb-3 border-bottom">
-                        {% translate "4. Specific Content Concerns (Breakdown Categories)" %}
+                        {% translate "4. Specific Content Concerns & Their Islamic Basis" %}
                     </h2>
-                    <p class="text-muted mb-4">{% translate "Each game is analyzed across these 20 specific concerns, grouped as follows:" %}</p>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                             <h3 class="h6 fw-bold">{% translate "A. Risks to Faith" %}</h3>
-                             <ul class="list-unstyled ms-3 small text-muted">
-                                <li>{% translate "A1" %}. {% translate "Distorting Islam" %}</li>
-                                <li>{% translate "A2" %}. {% translate "Promoting Kufr/Shirk" %}</li>
-                                <li>{% translate "A3" %}. {% translate "Assuming Divinity" %}</li>
-                                <li>{% translate "A4" %}. {% translate "Tampering Ghaib" %}</li>
-                                <li>{% translate "A5" %}. {% translate "Deviant Ideologies" %}</li>
-                            </ul>
-                        </div>
-                         <div class="col-md-6 mb-3">
-                             <h3 class="h6 fw-bold">{% translate "B. Prohibition Exposure" %}</h3>
-                             <ul class="list-unstyled ms-3 small text-muted">
-                                <li>{% translate "B1" %}. {% translate "Gambling" %}</li>
-                                <li>{% translate "B2" %}. {% translate "Lying" %}</li>
-                                <li>{% translate "B3" %}. {% translate "Indecency" %}</li>
-                                <li>{% translate "B4" %}. {% translate "Music" %}</li>
-                                <li>{% translate "B5" %}. {% translate "Time Waste" %}</li>
-                            </ul>
-                        </div>
-                         <div class="col-md-6 mb-3">
-                            <h3 class="h6 fw-bold">{% translate "C. Normalization Risks" %}</h3>
-                             <ul class="list-unstyled ms-3 small text-muted">
-                                <li>{% translate "C1" %}. {% translate "Disdain/Arrogance" %}</li>
-                                <li>{% translate "C2" %}. {% translate "Magic" %}</li>
-                                <li>{% translate "C3" %}. {% translate "Intoxicants" %}</li>
-                                <li>{% translate "C4" %}. {% translate "Crime/Violence" %}</li>
-                                <li>{% translate "C5" %}. {% translate "Profanity" %}</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <h3 class="h6 fw-bold">{% translate "D. Player Risks" %}</h3>
-                             <ul class="list-unstyled ms-3 small text-muted">
-                                <li>{% translate "D1" %}. {% translate "Horror/Fear" %}</li>
-                                <li>{% translate "D2" %}. {% translate "Despair" %}</li>
-                                <li>{% translate "D3" %}. {% translate "Spending" %}</li>
-                                <li>{% translate "D4" %}. {% translate "Online Interactions" %}</li>
-                                <li>{% translate "D5" %}. {% translate "User Content" %}</li>
-                            </ul>
-                        </div>
-                    </div>
+                    <p class="text-muted mb-4">{% translate "Each game is analyzed across these 20 specific concerns, considering the following Islamic principles:" %}</p>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" style="width: 10%;">{% translate "Code" %}</th>
+                                    <th scope="col" style="width: 25%;">{% translate "Concern" %}</th>
+                                    <th scope="col">{% translate "Islamic Basis (Examples)" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {# --- Category A: Risks to Faith --- #}
+                                <tr class="table-group-divider">
+                                    <td colspan="3" class="fw-bold bg-light text-dark">{% translate "A. Risks to Faith" %}</td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "A1" %}</td>
+                                    <td>{% translate "Distorting Islam" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Altering Revelation (Quran 2:79)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿فَوَيْلٌ لِّلَّذِينَ يَكْتُبُونَ الْكِتَابَ بِأَيْدِيهِمْ ثُمَّ يَقُولُونَ هَٰذَا مِنْ عِندِ اللَّهِ لِيَشْتَرُوا بِهِ ثَمَنًا قَلِيلًا ۖ فَوَيْلٌ لَّهُم مِّمَّا كَتَبَتْ أَيْدِيهِمْ وَوَيْلٌ لَّهُم مِّمَّا يَكْسِبُونَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"So woe to those who write the 'scripture' with their own hands, then say, 'This is from Allah,' in order to exchange it for a small price. Woe to them for what their hands have written and woe to them for what they earn."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Lying upon the Prophet (Bukhari 110)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>مَنْ كَذَبَ عَلَىَّ مُتَعَمِّدًا فَلْيَتَبَوَّأْ مَقْعَدَهُ مِنَ النَّارِ</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Whoever tells a lie against me intentionally then surely let him occupy his seat in Hell-Fire." [Narrated by Al-Bukhari]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Mocking Religion (Quran 9:65-66)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿وَلَئِنْ سَأَلْتَهُمْ لَيَقُولُنَّ إِنَّمَا كُنَّا نَخُوضُ وَنَلْعَبُ قُلْ أَبِاللَّهِ وَآيَاتِهِ وَرَسُولِهِ كُنْتُمْ تَسْتَهْزِئُونَ ۝ لَا تَعْتَذِرُوا قَدْ كَفَرْتُمْ بَعْدَ إِيمَانِكُمْ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"And if you ask them, they will surely say, 'We were only conversing and playing.' Say, 'Is it Allah and His verses and His Messenger that you were mocking?' (65) Make no excuse; you have disbelieved after your belief."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Mocking Prayer (Quran 5:58)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿وَإِذَا نَادَيْتُمْ إِلَى الصَّلَاةِ اتَّخَذُوهَا هُزُوًا وَلَعِبًا﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"And when you call to prayer, they take it in ridicule and amusement."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "A2" %}</td>
+                                    <td>{% translate "Promoting Kufr/Shirk" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Severity of Shirk (Quran 4:48)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿إِنَّ اللَّهَ لَا يَغْفِرُ أَن يُشْرَكَ بِهِ وَيَغْفِرُ مَا دُونَ ذَٰلِكَ لِمَن يَشَاءُ ۚ وَمَن يُشْرِكْ بِاللَّهِ فَقَدِ افْتَرَىٰ إِثْمًا عَظِيمًا﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Indeed, Allah does not forgive association with Him [Shirk], but He forgives what is less than that for whom He wills. And he who associates others with Allah has certainly fabricated a tremendous sin."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Exclusivity of Islam (Quran 3:85)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿وَمَن يَبْتَغِ غَيْرَ الْإِسْلَامِ دِينًا فَلَن يُقْبَلَ مِنْهُ وَهُوَ فِي الْآخِرَةِ مِنَ الْخَاسِرِينَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"And whoever desires other than Islam as religion - never will it be accepted from him, and he, in the Hereafter, will be among the losers."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Mocking Religion (Quran 9:65-66)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...قُلْ أَبِاللَّهِ وَآيَاتِهِ وَرَسُولِهِ كُنْتُمْ تَسْتَهْزِئُونَ ۝ لَا تَعْتَذِرُوا قَدْ كَفَرْتُمْ بَعْدَ إِيمَانِكُمْ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...Say, 'Is it Allah and His verses and His Messenger that you were mocking?' (65) Make no excuse; you have disbelieved after your belief."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Mocking Prayer (Quran 5:58)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿وَإِذَا نَادَيْتُمْ إِلَى الصَّلَاةِ اتَّخَذُوهَا هُزُوًا وَلَعِبًا﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"And when you call to prayer, they take it in ridicule and amusement."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "A3" %}</td>
+                                    <td>{% translate "Assuming Divinity" %}</td>
+                                     <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Tawhid (Quran 112:1-4)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Say, 'He is Allah, [who is] One (1) Allah, the Eternal Refuge (2) He neither begets nor is born (3) Nor is there to Him any equivalent.' (4)"{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "No Partners (Quran 17:111)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...وَلَمْ يَكُن لَّهُ شَرِيكٌ فِي الْمُلْكِ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...and [He] has had no partner in [His] dominion..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Nothing Like Him (Quran 42:11)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...لَيْسَ كَمِثْلِهِ شَيْءٌ وَهُوَ السَّمِيعُ الْبَصِيرُ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...There is nothing like unto Him, and He is the Hearing, the Seeing."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "No Similitudes (Quran 16:74)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...فَلا تَضْرِبُوا لِلَّهِ الْأَمْثَالَ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...So do not assert similarities to Allah..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <td>{% translate "A4" %}</td>
+                                    <td>{% translate "Tampering Ghaib" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Knowledge of Unseen (Quran 27:65)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿قُل لَّا يَعْلَمُ مَن فِي السَّمَاوَاتِ وَالْأَرْضِ الْغَيْبَ إِلَّا اللَّهُ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Say, 'None in the heavens and earth knows the unseen except Allah...'{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Fortune-telling (Muslim 2230)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>مَنْ أَتَى عَرَّافًا فَسَأَلَهُ عَنْ شَىْءٍ لَمْ تُقْبَلْ لَهُ صَلاَةٌ أَرْبَعِينَ لَيْلَةً</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Whoever goes to a fortune-teller and asks him about something, his prayer will not be accepted for forty nights." [Narrated by Muslim]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <td>{% translate "A5" %}</td>
+                                    <td>{% translate "Deviant Ideologies" %}</td>
+                                     <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Following Desires (Quran 45:23)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿أَفَرَأَيْتَ مَنِ اتَّخَذَ إِلَٰهَهُ هَوَاهُ وَأَضَلَّهُ اللَّهُ عَلَىٰ عِلْمٍ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Have you seen he who has taken as his god his [own] desire, and Allah has sent him astray due to knowledge..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Follow the Straight Path (Quran 6:153)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿وَأَنَّ هَٰذَا صِرَاطِي مُسْتَقِيمًا فَاتَّبِعُوهُ ۖ وَلَا تَتَّبِعُوا السُّبُلَ فَتَفَرَّقَ بِكُمْ عَن سَبِيلِهِ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"And, [moreover], this is My path, which is straight, so follow it; and do not follow [other] ways, for you will be separated from His way..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Path of Those Guided (Quran 1:6-7)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ۝ صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Guide us to the straight path (6) The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray. (7)"{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                {# --- Category B: Prohibition Exposure --- #}
+                                <tr class="table-group-divider">
+                                    <td colspan="3" class="fw-bold bg-light text-dark">{% translate "B. Prohibition Exposure" %}</td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "B1" %}</td>
+                                    <td>{% translate "Gambling" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Maysir (Quran 5:90-91)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿يَا أَيُّهَا الَّذِينَ آمَنُوا إِنَّمَا الْخَمْرُ وَالْمَيْسِرُ وَالْأَنصَابُ وَالْأَزْلَامُ رِجْسٌ مِّنْ عَمَلِ الشَّيْطَانِ فَاجْتَنِبُوهُ لَعَلَّكُمْ تُفْلِحُونَ ۝ إِنَّمَا يُرِيدُ الشَّيْطَانُ أَنْ يُوقِعَ بَيْنَكُمْ الْعَدَاوَةَ وَالْبَغْضَاءَ فِي الْخَمْرِ وَالْمَيْسِرِ وَيَصُدَّكُمْ عَنْ ذِكْرِ اللَّهِ وَعَنْ الصَّلاةِ فَهَلْ أَنْتُمْ مُنْتَهُونَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"O you who have believed, indeed, intoxicants, gambling, [sacrificing on] stone alters [to other than Allah], and divining arrows are but defilement from the work of Satan, so avoid it that you may be successful. (90) Satan only wants to cause between you animosity and hatred through intoxicants and gambling and to avert you from the remembrance of Allah and from prayer. So will you not desist? (91)"{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Nardashir (Dice Game - Muslim 2260)" %}:</strong>
+                                             <p lang="ar" dir="rtl" class="small mb-1">"<strong>مَنْ لَعِبَ بِالنَّرْدَشِيرِ، فَكَأَنَّمَا صَبَغَ يَدَهُ فِي لَحْمِ خِنْزِيرٍ وَدَمِهِ</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"He who played Nardashir (a game similar to backgammon, involving dice) is like one who dyed his hand with the flesh and blood of swine." [Narrated by Muslim]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "B2" %}</td>
+                                    <td>{% translate "Lying" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Lying for Jokes (Tirmidhi 1972)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>وَيْلٌ لِلَّذِي يُحَدِّثُ فَيَكْذِبُ لِيُضْحِكَ بِهِ الْقَوْمَ وَيْلٌ لَهُ وَيْلٌ لَهُ</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Woe to the one who talks about something to make the people laugh, lies, woe to him! Woe to him!" [Narrated by At-Tirmidhi]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Truthfulness leads to Paradise (Bukhari/Muslim)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>الصِّدْقَ يهْدِي إِلَى الْبِرِّ وَإنَّ البرِّ يهْدِي إِلَى الجنَّةِ... وإنَّ الْكَذِبَ يَهْدِي إِلَى الفُجُورِ وإنَّ الفُجُورَ يهْدِي إِلَى النارِ...</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Truthfulness leads to righteousness, and righteousness leads to Paradise... and lying leads to wickedness, and wickedness leads to Hellfire..." [Narrated by Al-Bukhari & Muslim]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Signs of a Hypocrite (Bukhari/Muslim)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>أَرْبعٌ منْ كُنَّ فِيهِ، كَانَ مُنافِقًا خالِصًا... إِذَا اؤتُمِنَ خَانَ، وَإذا حدَّثَ كَذَبَ، وَإِذَا عاهَدَ غَدَرَ، وَإِذَا خَاصمَ فجَرَ</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Four characteristics are such that if a person has all of them, he is a pure hypocrite... when entrusted, he betrays; when he speaks, he lies; when he makes a covenant, he is treacherous; and when he disputes, he behaves immorally." [Narrated by Al-Bukhari & Muslim]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "B3" %}</td>
+                                    <td>{% translate "Indecency" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Fahishah (Quran 17:32)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿وَلَا تَقْرَبُوا الزِّنَا ۖ إِنَّهُ كَانَ فَاحِشَةً وَسَاءَ سَبِيلًا﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"And do not approach unlawful sexual intercourse. Indeed, it is ever an immorality and is evil as a way."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Lowering Gaze (Quran 24:30-31)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿قُل لِّلْمُؤْمِنِينَ يَغُضُّوا مِنْ أَبْصَارِهِمْ وَيَحْفَظُوا فُرُوجَهُمْ... ۝ وَقُل لِّلْمُؤْمِنَاتِ يَغْضُضْنَ مِنْ أَبْصَارِهِنَّ وَيَحْفَظْنَ فُرُوجَهُنَّ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Tell the believing men to reduce [some] of their vision and guard their private parts... And tell the believing women to reduce [some] of their vision and guard their private parts..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Outer Garments (Quran 33:59)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿يَا أَيُّهَا النَّبِيُّ قُلْ لِأَزْوَاجِكَ وَبَنَاتِكَ وَنِسَاءِ الْمُؤْمِنِينَ يُدْنِينَ عَلَيْهِنَّ مِنْ جَلابِيبِهِنَّ ذَلِكَ أَدْنَى أَنْ يُعْرَفْنَ فَلا يُؤْذَيْنَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"O Prophet, tell your wives and your daughters and the women of the believers to bring down over themselves [part] of their outer garments. That is more suitable that they will be known and not be abused."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Displaying Adornment (Quran 24:31)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...وَلَا يُبْدِينَ زِينَتَهُنَّ إِلَّا لِبُعُولَتِهِنَّ أَوْ آبَائِهِنَّ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...and not expose their adornment except to their husbands, their fathers..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Avoiding Free Mixing (Bukhari 5232)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>لاَ يَخْلُوَنَّ رَجُلٌ بِامْرَأَةٍ إِلاَّ مَعَ ذِي مَحْرَمٍ</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"A man should not be alone with a woman except with a Dhu-Mahram..." [Narrated by Al-Bukhari]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "B4" %}</td>
+                                    <td>{% translate "Music" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Ma'azif (Bukhari 5590)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>...لَيَكُونَنَّ مِنْ أُمَّتِي أَقْوَامٌ يَسْتَحِلُّونَ ...الْمَعَازِفَ...</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"From among my followers there will be some people who will consider ... the use of musical instruments [Ma'azif], as lawful..." [Narrated by Al-Bukhari]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "B5" %}</td>
+                                    <td>{% translate "Time Waste" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Lagw (Quran 23:1-3)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿قَدْ أَفْلَحَ الْمُؤْمِنُونَ ۝ الَّذِينَ هُمْ فِي صَلَاتِهِمْ خَاشِعُونَ ۝ وَالَّذِينَ هُمْ عَنِ اللَّغْوِ مُعْرِضُونَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Certainly will the believers have succeeded (1) They who are during their prayer humbly submissive (2) And they who turn away from ill speech [Lagw]" (Characteristic of successful believers){% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Questioned About Time (Tirmidhi 2417)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>لا تزولُ قدَمَا عبدٍ يومَ القيامةِ حتَّى يُسألَ عن أربعٍ... عن عُمُرِه فيما أفناهُ...</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"The feet of a slave will not move on the Day of Resurrection until he is asked about four things... including 'about his life and how he spent it'..." [Narrated by At-Tirmidhi, graded Hasan Sahih]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                {# --- Category C: Normalization Risks --- #}
+                                 <tr class="table-group-divider">
+                                    <td colspan="3" class="fw-bold bg-light text-dark">{% translate "C. Normalization Risks" %}</td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "C1" %}</td>
+                                    <td>{% translate "Disdain/Arrogance" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Kibr (Quran 31:18)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿وَلَا تُصَعِّرْ خَدَّكَ لِلنَّاسِ وَلَا تَمْشِ فِي الْأَرْضِ مَرَحًا ۖ إِنَّ اللَّهَ لَا يُحِبُّ كُلَّ مُخْتَالٍ فَخُورٍ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"And do not turn your cheek [in contempt] toward people and do not walk through the earth exultantly. Indeed, Allah does not like everyone self-deluded and boastful."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Arrogance Bars Paradise (Muslim 91a)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>...لا يَدْخُل الجَنَّةَ مَنْ كَانَ في قَلْبِهِ مِثْقَالُ ذَرَّةٍ مَنْ كِبرٍ</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"He who has in his heart the weight of a mustard seed of pride shall not enter Paradise." [Narrated by Muslim]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Definition of Arrogance (Muslim 91a)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>...إِنَّ اللَّه جَمِيلٌ يُحِبُّ الجَمالَ، الكِبْرُ: بَطَرُ الحَقِّ، وغَمْطُ النَّاسِ</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Verily Allah is Beautiful and He loves beauty. Pride is disdaining the truth (out of self-conceit) and contempt for the people." [Narrated by Muslim]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "C2" %}</td>
+                                    <td>{% translate "Magic" %}</td>
+                                     <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Sihr (Quran 2:102)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...وَمَا يُعَلِّمَانِ مِنْ أَحَدٍ حَتَّىٰ يَقُولَا إِنَّمَا نَحْنُ فِتْنَةٌ فَلَا تَكْفُرْ...وَلَقَدْ عَلِمُوا لَمَنِ اشْتَرَاهُ مَا لَهُ فِي الْآخِرَةِ مِنْ خَلَاقٍ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...But the two angels do not teach anyone unless they say, 'We are a trial, so do not disbelieve...' And they certainly knew that whoever purchased it [magic] would not have in the Hereafter any share..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Seven Destructive Sins (Bukhari 2766, Muslim 89)" %}:</strong>
+                                             <p lang="ar" dir="rtl" class="small mb-1">"<strong>اجتنبوا السبع الموبقات، قالوا: يا رسول الله وما هن ؟ قال: الشرك بالله، والسحر...</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Avoid the seven destructive sins... Associating partners with Allah (Shirk), and Magic (Sihr)..." [Narrated by Al-Bukhari & Muslim]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Visiting Fortune-teller (Muslim 2230)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>من أتى عرافًا فسأله عن شيء، لم تقبل له صلاة أربعين يومًا</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Whoever goes to a fortune-teller and asks him about something, his prayer will not be accepted for forty days." [Narrated by Muslim]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "C3" %}</td>
+                                    <td>{% translate "Intoxicants" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Maysir (Quran 5:90-91)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿يَا أَيُّهَا الَّذِينَ آمَنُوا إِنَّمَا الْخَمْرُ وَالْمَيْسِرُ وَالْأَنصَابُ وَالْأَزْلَامُ رِجْسٌ مِّنْ عَمَلِ الشَّيْطَانِ فَاجْتَنِبُوهُ لَعَلَّكُمْ تُفْلِحُونَ ۝ إِنَّمَا يُرِيدُ الشَّيْطَانُ أَنْ يُوقِعَ بَيْنَكُمْ الْعَدَاوَةَ وَالْبَغْضَاءَ فِي الْخَمْرِ وَالْمَيْسِرِ وَيَصُدَّكُمْ عَنْ ذِكْرِ اللَّهِ وَعَنْ الصَّلاةِ فَهَلْ أَنْتُمْ مُنْتَهُونَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"O you who have believed, indeed, intoxicants, gambling, [sacrificing on] stone alters [to other than Allah], and divining arrows are but defilement from the work of Satan, so avoid it that you may be successful. (90) Satan only wants to cause between you animosity and hatred through intoxicants and gambling and to avert you from the remembrance of Allah and from prayer. So will you not desist? (91)"{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Curse on Alcohol (Tirmidhi 1295 - Sahih)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>لَعَن الله الخمرَ، ‌وشاربَها، وساقيها، وبائِعَها، ومبتاعَها، وعاصِرها، ومعتصِرها، وحامِلَها، والمحمولَةَ إليه</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"Allah has cursed Khamr (wine/intoxicants), its drinker, its server, its seller, its buyer, its presser, the one for whom it is pressed, its carrier, and the one to whom it is carried." [Narrated by At-Tirmidhi]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "C4" %}</td>
+                                    <td>{% translate "Crime/Violence" %}</td>
+                                    <td>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Transgression (Quran 2:190)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...وَلَا تَعْتَدُوا ۚ إِنَّ اللَّهَ لَا يُحِبُّ الْمُعْتَدِينَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...but do not transgress. Indeed. Allah does not like transgressors."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Unjust Killing (Quran 17:33)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿وَلَا تَقْتُلُوا النَّفْسَ الَّتِي حَرَّمَ اللَّهُ إِلَّا بِالْحَقِّ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"And do not kill the soul which Allah has forbidden, except by right..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "C5" %}</td>
+                                    <td>{% translate "Profanity" %}</td>
+                                    <td>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Fuhsh/Badhi' (Tirmidhi 2002)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>لَيْسَ الْمُؤْمِنُ بِالطَّعَّانِ وَلاَ اللَّعَّانِ وَلاَ الْفَاحِشِ وَلاَ الْبَذِيءِ</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"The believer does not taunt, nor curse, nor is he obscene [Fahish], nor vulgar/foul-mouthed [Badhi']." [Narrated by At-Tirmidhi]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Lowering Voice (Quran 31:19)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...وَاغْضُضْ مِن صَوْتِكَ ۚ إِنَّ أَنكَرَ الْأَصْوَاتِ لَصَوْتُ الْحَمِيرِ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...and lower your voice; indeed, the most disagreeable of sounds is the voice of donkeys."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                {# --- Category D: Player Risks --- #}
+                                 <tr class="table-group-divider">
+                                    <td colspan="3" class="fw-bold bg-light text-dark">{% translate "D. Player Risks" %}</td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "D1" %}</td>
+                                    <td>{% translate "Horror/Fear" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Frightening Muslims (Abu Dawud 5004)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>...لاَ يَحِلُّ لِمُسْلِمٍ أَنْ يُرَوِّعَ مُسْلِمًا</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"It is not lawful for a Muslim to frighten a Muslim." [Narrated by Abu Dawud]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{% translate "D2" %}</td>
+                                    <td>{% translate "Despair" %}</td>
+                                    <td>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "No Despair (Quran 39:53)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ ۚ إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...do not despair of the mercy of Allah. Indeed, Allah forgives all sins..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Disbelief & Despair (Quran 12:87)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...إِنَّهُ لَا يَيْأَسُ مِن رَّوْحِ اللَّهِ إِلَّا الْقَوْمُ الْكَافِرُونَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...Indeed, no one despairs of relief from Allah except the disbelieving people."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <td>{% translate "D3" %}</td>
+                                    <td>{% translate "Spending" %}</td>
+                                    <td>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Tabdhir (Quran 17:26-27)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...وَلَا تُبَذِّرْ تَبْذِيرًا ۝ إِنَّ الْمُبَذِّرِينَ كَانُوا إِخْوَانَ الشَّيَاطِينِ...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...and do not spend wastefully. (26) Indeed, the wasteful are brothers of the devils..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Israf (Quran 7:31)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...وَكُلُوا وَاشْرَبُوا وَلَا تُسْرِفُوا ۚ إِنَّهُ لَا يُحِبُّ الْمُسْرِفِينَ﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...And eat and drink, but be not excessive. Indeed, He likes not those who commit excess."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="reference">
+                                            <strong class="small d-block">{% translate "Questioned About Wealth (Tirmidhi 2417)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1">"<strong>...وعن ماله من أين اكتسبه؟ وفيم أنفقه؟...</strong>"</p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...and about his wealth, from where he earned it and in what he spent it..." [Narrated by At-Tirmidhi, graded Hasan Sahih]{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <td>{% translate "D4" %}</td>
+                                    <td>{% translate "Online Interactions" %}</td>
+                                    <td>
+                                         <div class="reference">
+                                            <strong class="small d-block">{% translate "Guarding Speech/Conduct (Quran 49:11-12)" %}:</strong>
+                                            <p lang="ar" dir="rtl" class="small mb-1"><strong>﴿...لَا يَسْخَرْ قَوْمٌ مِّن قَوْمٍ... وَلَا تَلْمِزُوا أَنفُسَكُمْ وَلَا تَنَابَزُوا بِالْأَلْقَابِ... وَلَا تَجَسَّسُوا وَلَا يَغْتَب بَّعْضُكُم بَعْضًا...﴾</strong></p>
+                                            {% if LANGUAGE_CODE != 'ar' %}
+                                                <p class="small text-muted fst-italic">{% blocktranslate %}"...let not a people ridicule [another] people... And do not insult one another and do not call each other by [offensive] nicknames... And do not spy or backbite each other..."{% endblocktranslate %}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <td>{% translate "D5" %}</td>
+                                    <td>{% translate "User Content" %}</td>
+                                    <td>
+                                        <p class="small text-muted fst-italic">{% translate "Concerns arise if the game platform enables or fails to adequately moderate user-generated content that violates the principles above (e.g., indecent creations, promoting Shirk)." %}</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> {# End table-responsive #}
                  </div>
             </section>
+            {# --- END Section 4 --- #}
 
-            {# 5. Severity Level Definitions Card #}
+            {# --- Section 5: Severity Level Definitions --- #}
             <section class="shadow-sm mb-5">
                 <div class="card-body p-4">
                      <h2 class="mb-4 pb-3 border-bottom">
@@ -160,8 +615,9 @@
                     </dl>
                 </div>
             </section>
+            {# --- END Section 5 --- #}
 
-            {# 6. Overall MGC Rating Tier Calculation Logic Card #}
+            {# --- Section 6: Tier Calculation Logic --- #}
             <section class="shadow-sm mb-5">
                  <div class="card-body p-4">
                     <h2 class="mb-4 pb-3 border-bottom">
@@ -188,8 +644,9 @@
                     </ol>
                  </div>
             </section>
+            {# --- END Section 6 --- #}
 
-            {# 7. Supporting Elements Card #}
+            {# --- Section 7: Supporting Elements --- #}
             <section class="shadow-sm mb-5">
                  <div class="card-body p-4">
                      <h2 class="mb-4 pb-3 border-bottom">
@@ -203,8 +660,9 @@
                     </dl>
                  </div>
             </section>
+            {# --- END Section 7 --- #}
 
-            {# 8. Disclaimer Card #}
+            {# --- Section 8: Disclaimer --- #}
             <section class="shadow-sm mb-5 bg-light">
                 <div class="card-body p-4">
                     <h2 class="mb-4 pb-3 border-bottom">
@@ -213,8 +671,9 @@
                     <p class="text-muted">{% blocktranslate %}MGC ratings are provided as guidance based on <em>ijtihad</em> following the stated methodology. They are not legally binding fatwas (religious edicts) and do not represent the sole correct Islamic viewpoint on every nuanced issue. Variation in scholarly opinion exists on some matters. Users are ultimately responsible for their choices and are encouraged to exercise personal Taqwa (God-consciousness) and consult with knowledgeable individuals if in doubt. MGC aims to assist, not replace, individual responsibility before Allah. Ratings may be updated based on game changes or new evidence.{% endblocktranslate %}</p>
                 </div>
             </section>
+            {# --- END Section 8 --- #}
 
-        {% endif %}
+        {% endif %} {# End of default content block #}
 
         <footer class="mt-5 pt-4 border-top text-center text-secondary small">
             {% url 'ratings:contact' as contact_url %}
@@ -233,4 +692,30 @@
     </div>
 
 </div> {# End Container #}
+{% endblock %}
+
+{% block extra_css %}
+{# Styles for the table and references #}
+<style>
+    .table.align-middle td { vertical-align: top !important; }
+    .table td .reference { padding-top: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--border-lighter); }
+    .table td .reference:first-child { padding-top: 0; }
+    .table td .reference:last-child { border-bottom: none; }
+    .table td .reference p.small { font-size: 0.8rem; line-height: 1.4; margin-bottom: 0.25rem !important; display: block; width: 100%; }
+    .table td .reference strong.small { font-size: 0.8rem; color: var(--text-primary); font-weight: 600; }
+    body.light-mode .table td .reference strong.small { color: var(--text-primary); }
+    .table-group-divider > td { border-top-width: 2px !important; border-top-color: var(--border-color) !important; font-size: 0.9rem; text-transform: uppercase; background-color: var(--bg-element-lighter) !important; color: var(--text-primary) !important; }
+    body.light-mode .table-group-divider > td { background-color: #e9ecef !important; color: #495057 !important; border-top-color: #dee2e6 !important; }
+    .severity-circle { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-left: 0.25rem; margin-right: 0.25rem; flex-shrink: 0; position: relative; top: 1px; }
+    .severity-circle.severity-n { background-color: var(--severity-n-color); }
+    .severity-circle.severity-l { background-color: var(--severity-l-color); }
+    .severity-circle.severity-m { background-color: var(--severity-m-color); }
+    .severity-circle.severity-s { background-color: var(--severity-s-color); }
+    p[lang="ar"] { font-family: 'Amiri', 'Noto Naskh Arabic', serif; font-size: 1.1rem !important; line-height: 1.8; }
+    p[lang="ar"] > strong { font-weight: normal; }
+    .reference p:not([lang="ar"]) > strong { font-weight: 600; color: var(--text-primary); }
+    body.light-mode .reference p:not([lang="ar"]) > strong { color: var(--text-primary); }
+    .reference sup a { font-size: 0.7em; vertical-align: super; margin-left: 2px; text-decoration: none; color: var(--link-color); }
+    .reference sup a:hover { color: var(--link-hover-color); }
+</style>
 {% endblock %}

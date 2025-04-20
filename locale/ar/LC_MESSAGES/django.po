@@ -804,7 +804,7 @@ msgstr "ادعاء الألوهية"
 
 #: .\all_my_code.txt:19780 .\templates\ratings\methodology.html:106
 msgid "Tampering Ghaib"
-msgstr "الخوض في الغيب"
+msgstr "العبث بالغيب"
 
 #: .\all_my_code.txt:19781 .\templates\ratings\methodology.html:107
 msgid "Deviant Ideologies"
@@ -1547,7 +1547,7 @@ msgstr "1. تحليل مفصل"
 msgid ""
 "Games are assessed against 20 specific Islamic concerns, evaluating content "
 "severity and avoidability."
-msgstr "يتم تقييم الألعاب مقابل 20 قلقًا إسلاميًا محددًا، مع تقييم خطورة المحتوى وإمكانية تجنبه."
+msgstr "يتم تقييم الألعاب مقابل 20 مخافة إسلامية محددة، مع تقييم خطورة المحتوى وإمكانية تجنبه."
 
 #: .\all_my_code.txt:20672 .\templates\homepage.html:80
 msgid "2. Tier Calculation"
@@ -2403,7 +2403,7 @@ msgstr "أ3. ادعاء الألوهية"
 
 #: .\ratings\models.py:135
 msgid "A4. Tampering Ghaib"
-msgstr "أ4. الخوض في الغيب"
+msgstr "أ4. العبث بالغيب"
 
 #: .\ratings\models.py:136
 msgid "A5. Deviant Ideologies"
@@ -4116,61 +4116,274 @@ msgid "Connect, get help, or contribute"
 msgstr "تواصل أو احصل على المساعدة أو ساهم"
 
 msgid "A1"
-msgstr "أ 1"
+msgstr "أ.1"
 
 msgid "A2"
-msgstr "أ 2"
+msgstr "أ.2"
 
 msgid "A3"
-msgstr "أ 3"
+msgstr "أ.3"
 
 msgid "A4"
-msgstr "أ 4"
+msgstr "أ.4"
 
 msgid "A5"
-msgstr "أ 5"
+msgstr "أ.5"
 
 msgid "B1"
-msgstr "ب 1"
+msgstr "ب.1"
 
 msgid "B2"
-msgstr "ب 2"
+msgstr "ب.2"
 
 msgid "B3"
-msgstr "ب 3"
+msgstr "ب.3"
 
 msgid "B4"
-msgstr "ب 4"
+msgstr "ب.4"
 
 msgid "B5"
-msgstr "ب 5"
+msgstr "ب.5"
 
 msgid "C1"
-msgstr "ج 1"
+msgstr "ج.1"
 
 msgid "C2"
-msgstr "ج 2"
+msgstr "ج.2"
 
 msgid "C3"
-msgstr "ج 3"
+msgstr "ج.3"
 
 msgid "C4"
-msgstr "ج 4"
+msgstr "ج.4"
 
 msgid "C5"
-msgstr "ج 5"
+msgstr "ج.5"
 
 msgid "D1"
-msgstr "د 1"
+msgstr "د.1"
 
 msgid "D2"
-msgstr "د 2"
+msgstr "د.2"
 
 msgid "D3"
-msgstr "د 3"
+msgstr "د.3"
 
 msgid "D4"
-msgstr "د 4"
+msgstr "د.4"
 
 msgid "D5"
-msgstr "د 5"
+msgstr "د.5"
+
+#: templates/ratings/methodology.html: [...]  <-- Line numbers will vary
+msgid "4. Specific Content Concerns & Their Islamic Basis"
+msgstr "٤. مخاوف المحتوى المحددة وأساسها الإسلامي"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Each game is analyzed across these 20 specific concerns, considering the following Islamic principles:"
+msgstr "يتم تحليل كل لعبة عبر هذه المخاوف العشرين المحددة، مع مراعاة المبادئ الإسلامية التالية:"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Code"
+msgstr "الرمز"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Concern"
+msgstr "المخاوف"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Islamic Basis (Examples)"
+msgstr "الأساس الإسلامي (أمثلة)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Altering Revelation (Quran 2:79)"
+msgstr "تحريف الوحي (القرآن 2:79)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Lying upon the Prophet (Bukhari 110)"
+msgstr "الكذب على النبي ﷺ (البخاري 110)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Mocking Religion (Quran 9:65-66)"
+msgstr "الاستهزاء بالدين (القرآن 9:65-66)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Mocking Prayer (Quran 5:58)"
+msgstr "الاستهزاء بالصلاة (القرآن 5:58)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Severity of Shirk (Quran 4:48)"
+msgstr "خطورة الشرك (القرآن 4:48)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Exclusivity of Islam (Quran 3:85)"
+msgstr "حصرية الإسلام (القرآن 3:85)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Tawhid (Quran 112:1-4)"
+msgstr "التوحيد (القرآن 112:1-4)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "No Partners (Quran 17:111)"
+msgstr "لا شريك له (القرآن 17:111)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Nothing Like Him (Quran 42:11)"
+msgstr "ليس كمثله شيء (القرآن 42:11)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "No Similitudes (Quran 16:74)"
+msgstr "عدم ضرب الأمثال لله (القرآن 16:74)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Knowledge of Unseen (Quran 27:65)"
+msgstr "علم الغيب (القرآن 27:65)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Fortune-telling (Muslim 2230)"
+msgstr "الكهانة/العرافة (مسلم 2230)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Following Desires (Quran 45:23)"
+msgstr "اتباع الهوى (القرآن 45:23)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Follow the Straight Path (Quran 6:153)"
+msgstr "اتباع الصراط المستقيم (القرآن 6:153)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Path of Those Guided (Quran 1:6-7)"
+msgstr "صراط الذين أنعمت عليهم (القرآن 1:6-7)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Maysir (Quran 5:90-91)"
+msgstr "الميسر (القرآن 5:90-91)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Nardashir (Dice Game - Muslim 2260)"
+msgstr "النردشير (لعبة النرد - مسلم 2260)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Lying for Jokes (Tirmidhi 1972)"
+msgstr "الكذب للمزاح (الترمذي 1972)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Truthfulness leads to Paradise (Bukhari/Muslim)"
+msgstr "الصدق يهدي إلى الجنة (البخاري ومسلم)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Signs of a Hypocrite (Bukhari/Muslim)"
+msgstr "علامات المنافق (البخاري ومسلم)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Fahishah (Quran 17:32)"
+msgstr "الفاحشة (القرآن 17:32)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Lowering Gaze (Quran 24:30-31)"
+msgstr "غض البصر (القرآن 24:30-31)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Outer Garments (Quran 33:59)"
+msgstr "الجلباب (القرآن 33:59)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Displaying Adornment (Quran 24:31)"
+msgstr "إبداء الزينة (القرآن 24:31)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Avoiding Free Mixing (Bukhari 5232)"
+msgstr "تجنب الاختلاط (البخاري 5232)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Ma'azif (Bukhari 5590)"
+msgstr "المعازف (البخاري 5590)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Lagw (Quran 23:1-3)"
+msgstr "اللغو (القرآن 23:1-3)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Questioned About Time (Tirmidhi 2417)"
+msgstr "السؤال عن الوقت (الترمذي 2417)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Kibr (Quran 31:18)"
+msgstr "الكبر (القرآن 31:18)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Arrogance Bars Paradise (Muslim 91a)"
+msgstr "الكبر يمنع دخول الجنة (مسلم 91أ)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Definition of Arrogance (Muslim 91a)"
+msgstr "تعريف الكبر (مسلم 91أ)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Sihr (Quran 2:102)"
+msgstr "السحر (القرآن 2:102)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Seven Destructive Sins (Bukhari 2766, Muslim 89)"
+msgstr "السبع الموبقات (البخاري 2766، مسلم 89)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Visiting Fortune-teller (Muslim 2230)"
+msgstr "إتيان العراف (مسلم 2230)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Khamr (Quran 5:90-91)"
+msgstr "الخمر (القرآن 5:90-91)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Curse on Alcohol (Tirmidhi 1295 - Sahih)"
+msgstr "لعن الخمر (الترمذي 1295 - صحيح)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Transgression (Quran 2:190)"
+msgstr "الاعتداء (القرآن 2:190)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Unjust Killing (Quran 17:33)"
+msgstr "القتل بغير حق (القرآن 17:33)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Fuhsh/Badhi' (Tirmidhi 2002)"
+msgstr "الفحش/البذاءة (الترمذي 2002)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Lowering Voice (Quran 31:19)"
+msgstr "غض الصوت (القرآن 31:19)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Frightening Muslims (Abu Dawud 5004)"
+msgstr "ترويع المسلم (أبو داود 5004)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "No Despair (Quran 39:53)"
+msgstr "عدم القنوط (القرآن 39:53)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Disbelief & Despair (Quran 12:87)"
+msgstr "الكفر والقنوط (القرآن 12:87)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Tabdhir (Quran 17:26-27)"
+msgstr "التبذير (القرآن 17:26-27)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Israf (Quran 7:31)"
+msgstr "الإسراف (القرآن 7:31)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Questioned About Wealth (Tirmidhi 2417)"
+msgstr "السؤال عن المال (الترمذي 2417)"
+
+#: templates/ratings/methodology.html: [...]
+msgid "Guarding Speech/Conduct (Quran 49:11-12)"
+msgstr "حفظ اللسان والسلوك (القرآن 49:11-12)"
+
+# --- Explanation for D5 ---
+#: templates/ratings/methodology.html: [...]
+msgid "Concerns arise if the game platform enables or fails to adequately moderate user-generated content that violates the principles above (e.g., indecent creations, promoting Shirk)."
+msgstr "تنشأ المخاوف إذا كانت منصة اللعبة تمكّن أو تفشل في الإشراف بشكل كافٍ على المحتوى الذي ينشئه المستخدمون والذي ينتهك المبادئ المذكورة أعلاه (مثل الترويج للشرك)."

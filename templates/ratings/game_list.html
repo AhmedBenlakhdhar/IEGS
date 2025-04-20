@@ -148,26 +148,65 @@
     {% if games_page.has_other_pages %}
         <nav aria-label="{% translate 'Game list navigation' %}" class="mt-5">
           <ul class="pagination justify-content-center">
+    
+            {# First Page Link #}
             {% if games_page.has_previous %}
-              <li class="page-item"><a class="page-link" href="?page=1{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'First page' %}"><span class="material-symbols-outlined">first_page</span></a></li>
-              <li class="page-item"><a class="page-link" href="?page={{ games_page.previous_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Previous page' %}"><span class="material-symbols-outlined">chevron_left</span></a></li>
+              <li class="page-item">
+                  {# Use & for HTML validity in URLs #}
+                  <a class="page-link" href="?page=1{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'First page' %}">
+                      <span class="material-symbols-outlined">first_page</span>
+                  </a>
+              </li>
             {% else %}
               <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">first_page</span></span></li>
+            {% endif %}
+    
+            {# Previous Page Link #}
+            {% if games_page.has_previous %}
+              <li class="page-item">
+                  <a class="page-link" href="?page={{ games_page.previous_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Previous page' %}">
+                      <span class="material-symbols-outlined">chevron_left</span>
+                  </a>
+              </li>
+            {% else %}
               <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">chevron_left</span></span></li>
             {% endif %}
-            <li class="page-item disabled"><span class="page-link">{% blocktranslate %}Page {{ games_page.number }} of {{ games_page.paginator.num_pages }}{% endblocktranslate %}</span></li>
+    
+            {# Current Page Indicator - CORRECTED #}
+            {# Use 'active' class, move variables outside translate tags #}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">
+                    {% translate "Page" %} {{ games_page.number }} {% translate "of" %} {{ games_page.paginator.num_pages }}
+                </span>
+            </li>
+    
+            {# Next Page Link #}
             {% if games_page.has_next %}
-              <li class="page-item"><a class="page-link" href="?page={{ games_page.next_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Next page' %}"><span class="material-symbols-outlined">chevron_right</span></a></li>
-              <li class="page-item"><a class="page-link" href="?page={{ games_page.paginator.num_pages }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Last page' %}"><span class="material-symbols-outlined">last_page</span></a></li>
+              <li class="page-item">
+                  <a class="page-link" href="?page={{ games_page.next_page_number }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Next page' %}">
+                      <span class="material-symbols-outlined">chevron_right</span>
+                  </a>
+              </li>
             {% else %}
               <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">chevron_right</span></span></li>
+            {% endif %}
+    
+            {# Last Page Link #}
+            {% if games_page.has_next %}
+              <li class="page-item">
+                  <a class="page-link" href="?page={{ games_page.paginator.num_pages }}{% for key, value_list in request.GET.lists %}{% for value in value_list %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}{% endfor %}" title="{% translate 'Last page' %}">
+                      <span class="material-symbols-outlined">last_page</span>
+                  </a>
+              </li>
+            {% else %}
               <li class="page-item disabled"><span class="page-link"><span class="material-symbols-outlined">last_page</span></span></li>
             {% endif %}
+    
           </ul>
         </nav>
     {% endif %}
     {# --- END: Pagination --- #}
-</div>
+    </div>
 {# --- End Main Content Area --- #}
 
 {% endblock %}
