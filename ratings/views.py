@@ -19,7 +19,7 @@ from urllib.parse import unquote
 from django.views.generic import TemplateView
 
 # --- Import django-countries ---
-from django_countries import countries
+from django_countries import countries # <<<--- ENSURE THIS IMPORT IS PRESENT
 
 # Import your models and forms
 from .models import Game, RatingTier, Flag, GameComment, MethodologyPage, WhyMGCPage, Suggestion
@@ -49,15 +49,10 @@ def calculate_risk_summary_for_game(game):
         max_severity_code = DEFAULT_SEVERITY_CODE
         for field_name in fields:
             current_severity = getattr(game, field_name, DEFAULT_SEVERITY_CODE)
-            # Treat None explicitly as default severity
             if current_severity is None:
                 current_severity = DEFAULT_SEVERITY_CODE
-
-            # Update max severity if current field's severity is higher
             if SEVERITY_ORDER.get(current_severity, 0) > SEVERITY_ORDER.get(max_severity_code, 0):
                 max_severity_code = current_severity
-
-        # Map the highest severity code found to its display text
         risk_summary_texts[cat_prefix] = RISK_SEVERITY_TEXT_MAP.get(
             max_severity_code, RISK_SEVERITY_TEXT_MAP[DEFAULT_SEVERITY_CODE]
         )
@@ -364,9 +359,10 @@ def user_profile_edit(request):
             else:
                  messages.error(request, _('Please correct the errors in the password change form.'), extra_tags='password_error')
         else:
+            # Handle cases where the form might be submitted without a specific button name (though unlikely with current setup)
             user_form = UserUpdateForm(instance=request.user)
             password_form = PasswordChangeForm(request.user)
-    else:
+    else: # GET request
         user_form = UserUpdateForm(instance=request.user)
         password_form = PasswordChangeForm(request.user)
 
@@ -419,8 +415,14 @@ def flag_comment(request, comment_id):
 # --- Methodology View ---
 def methodology_view(request):
     methodology_page = MethodologyPage.objects.first()
-    if not methodology_page:
-        messages.warning(request, _("Methodology page content is not available yet."))
+    # Add a message only if the page doesn't exist *and* DEBUG is True,
+    # or handle it differently in production (e.g., show a generic message or 404)
+    if not methodology_page and settings.DEBUG:
+        messages.warning(request, _("Methodology page content needs to be created in the admin."))
+    elif not methodology_page:
+         # In production, maybe redirect or show a simple placeholder
+         return render(request, 'placeholder_page.html', {'page_title': _('Methodology')}) # Example placeholder
+
     context = {
         'methodology_page': methodology_page,
         'page_title': methodology_page.title if methodology_page else _('MGC Rating Methodology')
@@ -431,8 +433,11 @@ def methodology_view(request):
 # --- Why MGC View ---
 def why_mgc_view(request):
     why_mgc_page = WhyMGCPage.objects.first()
-    if not why_mgc_page:
-        messages.warning(request, _("Content for 'Why MGC?' is not available yet."))
+    if not why_mgc_page and settings.DEBUG:
+        messages.warning(request, _("Content for 'Why MGC?' needs to be created in the admin."))
+    elif not why_mgc_page:
+        return render(request, 'placeholder_page.html', {'page_title': _('Why MGC?')}) # Example placeholder
+
     context = {
         'why_mgc_page': why_mgc_page,
         'page_title': why_mgc_page.title if why_mgc_page else _('Why MGC?')
@@ -451,8 +456,10 @@ def contact_view(request):
         message_template = _("I would like to request a review for the game: %(game_title)s\n\nPlease add any details or reasons for the request here:\n\n")
         game_title_display = _("[Please enter game title]")
         if requested_game_title_raw:
-            try: game_title_display = unquote(requested_game_title_raw)
-            except Exception: game_title_display = _("[Could not decode game title]")
+            try:
+                game_title_display = unquote(requested_game_title_raw)
+            except Exception:
+                game_title_display = _("[Could not decode game title]")
         initial_data['message'] = message_template % {'game_title': game_title_display}
 
     if request.method == 'POST':
@@ -467,6 +474,7 @@ def contact_view(request):
             # --- FIX: Get country code and look up its name ---
             country_code = form.cleaned_data.get('country') # This gets the code string, e.g., 'AF'
             # Use the countries utility to get the name from the code
+            # Ensure country_code is not None before passing to countries.name
             country_display = countries.name(country_code) if country_code else _('Not Provided')
             # --- END FIX ---
 
@@ -483,42 +491,34 @@ def contact_view(request):
             )
 
             try:
-                 # Use actual admin emails from settings
                  recipient_list = [admin_email for admin_name, admin_email in settings.ADMINS] if hasattr(settings, 'ADMINS') and settings.ADMINS else []
                  if not recipient_list and not settings.DEBUG:
-                      # Log a critical error in production if ADMINS is not set
                       print("CRITICAL ERROR: ADMINS setting is empty or not configured in production. Contact form email cannot be sent.")
                       messages.error(request, _('Sorry, the site administration has not been configured to receive messages. Please try again later or contact support directly.'), extra_tags='contact_form form_error')
                       return render(request, 'ratings/contact.html', {'form': form})
 
-                 # Send email or print if in DEBUG and no admins
                  if recipient_list:
                      send_mail(
                          email_subject,
                          email_message,
-                         settings.DEFAULT_FROM_EMAIL, # Use configured sender
+                         settings.DEFAULT_FROM_EMAIL,
                          recipient_list,
                          fail_silently=False
                      )
                      messages.success(request, _('Thank you for your message! We will get back to you soon.'), extra_tags='contact_form')
                      return redirect('ratings:contact_success')
                  elif settings.DEBUG:
-                      # Print to console only during development if ADMINS isn't set
                       print(f"--- Contact Form Email (DEBUG: No ADMINS set) ---\nSubject: {email_subject}\nFrom: {from_email}\n{email_message}\n---------------------------------------------------------")
                       messages.success(request, _('[DEBUG] Thank you for your message! (Email would be sent to ADMINS if configured)'), extra_tags='contact_form')
                       return redirect('ratings:contact_success')
 
             except Exception as e:
-                # Log the actual error for debugging
                 print(f"ERROR sending contact form email: {e}")
-                # Provide a user-friendly error message
                 messages.error(request, _('Sorry, there was an error sending your message due to a server issue. Please try again later.'), extra_tags='contact_form form_error')
 
         else: # Form is NOT valid
-             # Use the corrected generic error message
              messages.error(request, _('Please correct the errors noted below.'), extra_tags='contact_form form_error')
-             # Log specific errors for easier debugging
-             print(f"Contact form validation errors: {form.errors.as_json()}")
+             print(f"Contact form validation errors: {form.errors.as_json()}") # Log specific errors
 
     else: # GET request
         form = ContactForm(initial=initial_data)
@@ -538,23 +538,17 @@ def contact_success_view(request):
 def delete_suggestion(request, suggestion_id):
     suggestion = get_object_or_404(Suggestion.objects.select_related('game', 'user'), pk=suggestion_id)
 
-    # Determine redirect URL based on user type and referrer
     if request.user.is_staff:
         referer = request.META.get('HTTP_REFERER')
         admin_url = reverse('admin:ratings_suggestion_changelist')
-        # Redirect back to admin list if that's where they came from
         if referer and admin_url in referer:
              redirect_url = admin_url
-        # Otherwise, redirect to game detail (if applicable) or admin list as fallback
         else:
              redirect_url = suggestion.game.get_absolute_url() + '#user-suggestions' if suggestion.game else admin_url
     else:
-        # Regular user can only delete their own suggestions
         if suggestion.user != request.user:
              messages.error(request, _("You do not have permission to delete this suggestion."))
-             # Redirect to game detail if possible, otherwise home
              return redirect(suggestion.game.get_absolute_url() + '#user-suggestions' if suggestion.game else reverse('home'))
-        # Redirect back to the game page where they likely deleted it from
         redirect_url = suggestion.game.get_absolute_url() + '#user-suggestions' if suggestion.game else reverse('home')
 
     suggestion.delete()
@@ -569,8 +563,6 @@ class SupportUsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _("Support MGC")
-        # Example: Add Patreon link if available in settings or context
-        # context['patreon_link'] = getattr(settings, 'PATREON_LINK', None)
         return context
 
 support_us_view = SupportUsView.as_view()
