@@ -1,10 +1,4 @@
 # ratings/views.py
-# (Full file with corrections applied to contact_view)
-# (Full file with corrections applied to contact_view)
-# (Full file with corrections applied to contact_view)
-# (Full file with corrections applied to contact_view)
-# (Full file with corrections applied to contact_view)
-# (Full file with corrections applied to contact_view)
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -496,26 +490,27 @@ def contact_view(request):
             )
 
             try:
-                 recipient_list = [admin_email for admin_name, admin_email in settings.ADMINS] if hasattr(settings, 'ADMINS') and settings.ADMINS else []
+                 recipient_list = settings.CONTACT_FORM_RECIPIENT_LIST if hasattr(settings, 'CONTACT_FORM_RECIPIENT_LIST') and settings.CONTACT_FORM_RECIPIENT_LIST else []
                  if not recipient_list and not settings.DEBUG:
-                      print("CRITICAL ERROR: ADMINS setting is empty or not configured in production. Contact form email cannot be sent.")
-                      messages.error(request, _('Sorry, the site administration has not been configured to receive messages. Please try again later or contact support directly.'), extra_tags='contact_form form_error')
-                      return render(request, 'ratings/contact.html', {'form': form})
+                     # Use a more specific error message if the contact list is the problem
+                     print("CRITICAL ERROR: CONTACT_FORM_RECIPIENT_LIST setting is empty or not configured in production. Contact form email cannot be sent.")
+                     messages.error(request, _('Sorry, the site administration has not been configured to receive contact messages. Please try again later.'), extra_tags='contact_form form_error')
+                     return render(request, 'ratings/contact.html', {'form': form})
 
                  if recipient_list:
-                     send_mail(
-                         email_subject,
-                         email_message,
-                         settings.DEFAULT_FROM_EMAIL,
-                         recipient_list,
-                         fail_silently=False
-                     )
-                     messages.success(request, _('Thank you for your message! We will get back to you soon.'), extra_tags='contact_form')
-                     return redirect('ratings:contact_success')
+                    send_mail(
+                        email_subject,
+                        email_message,
+                        settings.DEFAULT_FROM_EMAIL, # Sender address
+                        recipient_list, # Use the list from the new setting
+                        fail_silently=False
+                    )
+                    messages.success(request, _('Thank you for your message! We will get back to you soon.'), extra_tags='contact_form')
+                    return redirect('ratings:contact_success')
                  elif settings.DEBUG:
-                      print(f"--- Contact Form Email (DEBUG: No ADMINS set) ---\nSubject: {email_subject}\nFrom: {from_email}\n{email_message}\n---------------------------------------------------------")
-                      messages.success(request, _('[DEBUG] Thank you for your message! (Email would be sent to ADMINS if configured)'), extra_tags='contact_form')
-                      return redirect('ratings:contact_success')
+                    print(f"--- Contact Form Email (DEBUG: No ADMINS set) ---\nSubject: {email_subject}\nFrom: {from_email}\n{email_message}\n---------------------------------------------------------")
+                 messages.success(request, _('[DEBUG] Thank you for your message! (Email would be sent to CONTACT_FORM_RECIPIENT_LIST if configured)'), extra_tags='contact_form')
+                 return redirect('ratings:contact_success')
 
             except Exception as e:
                 print(f"ERROR sending contact form email: {e}")
